@@ -1,0 +1,75 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "Action",
+"language": "GDScript",
+"path": "res://Actions/Action.gd"
+}, {
+"base": "Action",
+"class": "AlertAction",
+"language": "GDScript",
+"path": "res://Actions/print.gd"
+}, {
+"base": "Action",
+"class": "CompositeAction",
+"language": "GDScript",
+"path": "res://Actions/composite.gd"
+}, {
+"base": "Action",
+"class": "MoveStep",
+"language": "GDScript",
+"path": "res://Actions/move.gd"
+}, {
+"base": "CompositeAction",
+"class": "Parallell",
+"language": "GDScript",
+"path": "res://Actions/parallell.gd"
+}, {
+"base": "Action",
+"class": "Rotate",
+"language": "GDScript",
+"path": "res://Actions/rotate.gd"
+}, {
+"base": "Action",
+"class": "Sequence",
+"language": "GDScript",
+"path": "res://Actions/sequence.gd"
+}, {
+"base": "Action",
+"class": "Wait",
+"language": "GDScript",
+"path": "res://Actions/wait.gd"
+} ]
+_global_script_class_icons={
+"Action": "",
+"AlertAction": "",
+"CompositeAction": "",
+"MoveStep": "",
+"Parallell": "",
+"Rotate": "",
+"Sequence": "",
+"Wait": ""
+}
+
+[application]
+
+config/name="ElectroRobot"
+run/main_scene="res://main.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+Global="*res://global.gd"
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"

@@ -1,0 +1,82 @@
+extends KinematicBody2D
+
+func _ready():
+	add_to_group("players")
+
+func _physics_process(delta):
+	pass
+
+func getCards():
+	return createCards()
+	
+func createCards():
+	var cards = []
+	for x in range(5):
+		var card = Cards.generateCard()
+		card.character = self
+		cards.append(card)
+	return cards
+
+class Cards:
+	enum {MOVE, ROTATE, SIZE}
+	
+	static func generateCard():
+		var action
+		randomize()
+		match randi() % SIZE:
+			MOVE:
+				action = Move.new(Move.randDirection(), Move.randSteps())
+			ROTATE:
+				action = Rotate.new(Rotate.randRotation())
+		return Sequence.new([AlertAction.new(action.getText()), action])
+		
+
+class Move:
+	extends Action
+
+	const FORWARD = Vector2.UP
+	const BACK = Vector2.DOWN
+	const SIDEWAYS_LEFT = Vector2.LEFT
+	const SIDEWAYS_RIGHT = Vector2.RIGHT
+	const WAIT_TIME = 0.25
+	const MAX_STEPS = 4
+	
+	const DIRECTIONS = [FORWARD, BACK, SIDEWAYS_LEFT, SIDEWAYS_RIGHT]
+	
+	var action
+	var direction
+	var steps
+	
+	static func randDirection():
+		return DIRECTIONS[randi() % 2]
+	
+	static func randSteps():
+		return randi() % MAX_STEPS + 1
+	
+	func _init(direction, steps):
+		self.direction = direction
+		self.steps = steps
+		var actions = []
+		for x in steps:
+			actions.append(MoveStep.new(direction, true))
+			if (x < steps - 1):
+				actions.append(Wait.new(WAIT_TIME))
+		action = Sequence.new(actions)
+		
+	func getText():
+		match direction:
+			FORWARD:
+				return str("Move forward ", steps)
+			SIDEWAYS_LEFT:
+				return str("Move sideways left ", steps)
+			SIDEWAYS_RIGHT:
+				return str("Move sideways right ", steps)
+			BACK:
+				return str("Move back ", steps)
+		
+	func setCharacter(character):
+		.setCharacter(character)
+		action.setCharacter(character)
+	
+	func act(delta):
+		return action.act(delta)
