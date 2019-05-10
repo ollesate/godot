@@ -1,4 +1,4 @@
-extends Action
+extends Card
 
 class_name Rotate
 
@@ -23,6 +23,7 @@ func _init(rotate_by):
 	self.rotate_by = rotate_by
 	if (rotate_by == UTURN):
 		duration *= 2
+	self.description = getText()
 
 func getText():
 	match rotate_by:

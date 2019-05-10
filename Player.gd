@@ -8,19 +8,21 @@ func _physics_process(delta):
 
 func getCards():
 	return createCards()
-	
+
+func onHit(damage):
+	pass
+
 func createCards():
 	var cards = []
 	for x in range(5):
-		var card = Cards.generateCard()
-		card.character = self
+		var card = Cards.generateCard(self)
 		cards.append(card)
 	return cards
 
 class Cards:
 	enum {MOVE, ROTATE, SIZE}
 	
-	static func generateCard():
+	static func generateCard(character):
 		var action
 		randomize()
 		match randi() % SIZE:
@@ -28,11 +30,12 @@ class Cards:
 				action = Move.new(Move.randDirection(), Move.randSteps())
 			ROTATE:
 				action = Rotate.new(Rotate.randRotation())
-		return Sequence.new([AlertAction.new(action.getText()), action])
+		action.character = character
+		return action
 		
 
 class Move:
-	extends Action
+	extends Card
 
 	const FORWARD = Vector2.UP
 	const BACK = Vector2.DOWN
@@ -62,6 +65,7 @@ class Move:
 			if (x < steps - 1):
 				actions.append(Wait.new(WAIT_TIME))
 		action = Sequence.new(actions)
+		self.description = getText()
 		
 	func getText():
 		match direction:
@@ -79,4 +83,5 @@ class Move:
 		action.setCharacter(character)
 	
 	func act(delta):
+		.act(delta)
 		return action.act(delta)

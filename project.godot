@@ -20,6 +20,16 @@ _global_script_classes=[ {
 "path": "res://Actions/print.gd"
 }, {
 "base": "Action",
+"class": "Card",
+"language": "GDScript",
+"path": "res://Actions/card.gd"
+}, {
+"base": "CanvasItem",
+"class": "CardLabel",
+"language": "GDScript",
+"path": "res://ui_card.gd"
+}, {
+"base": "Action",
 "class": "CompositeAction",
 "language": "GDScript",
 "path": "res://Actions/composite.gd"
@@ -35,6 +45,11 @@ _global_script_classes=[ {
 "path": "res://Actions/parallell.gd"
 }, {
 "base": "Action",
+"class": "PlayerCard",
+"language": "GDScript",
+"path": "res://playerCard.gd"
+}, {
+"base": "Card",
 "class": "Rotate",
 "language": "GDScript",
 "path": "res://Actions/rotate.gd"
@@ -44,6 +59,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Actions/sequence.gd"
 }, {
+"base": "Card",
+"class": "Shoot",
+"language": "GDScript",
+"path": "res://Actions/shoot.gd"
+}, {
 "base": "Action",
 "class": "Wait",
 "language": "GDScript",
@@ -52,11 +72,15 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "Action": "",
 "AlertAction": "",
+"Card": "",
+"CardLabel": "",
 "CompositeAction": "",
 "MoveStep": "",
 "Parallell": "",
+"PlayerCard": "",
 "Rotate": "",
 "Sequence": "",
+"Shoot": "",
 "Wait": ""
 }
 
