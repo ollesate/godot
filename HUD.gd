@@ -12,7 +12,6 @@ func _ready():
 	for playerHand in playerHands:
 		playerHand.visible = false
 	var players = get_tree().get_nodes_in_group("players")
-	print(players.size())
 	for i in range(players.size()):
 		playerHandsMap[players[i]] = playerHands[i]
 		playerHands[i].visible = true

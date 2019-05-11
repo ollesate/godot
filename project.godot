@@ -17,7 +17,7 @@ _global_script_classes=[ {
 "base": "Action",
 "class": "AlertAction",
 "language": "GDScript",
-"path": "res://Actions/print.gd"
+"path": "res://Actions/alert.gd"
 }, {
 "base": "Action",
 "class": "Card",

@@ -2,7 +2,7 @@ extends KinematicBody2D
 
 signal onHit
 
-const SPEED = 500
+const SPEED = Global.BULLET_SPEED
 const ROTATION_SPEED = 20.0
 const MAX_TIME = 4.0
 
@@ -12,7 +12,6 @@ var playerOwner
 
 func _ready():
 	direction = Vector2(0, -1).rotated(rotation)
-	print (direction)
 	
 func _physics_process(delta):
 	rotate(deg2rad(ROTATION_SPEED))

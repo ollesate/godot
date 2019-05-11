@@ -1,7 +1,10 @@
 extends KinematicBody2D
 
+onready var hp = $"UI/HP"
+
 func _ready():
 	add_to_group("players")
+	hp.hide()
 
 func _physics_process(delta):
 	pass
@@ -10,7 +13,8 @@ func getCards():
 	return createCards()
 
 func onHit(damage):
-	pass
+	hp.value -= damage
+	hp.show()
 
 func createCards():
 	var cards = []
@@ -41,7 +45,7 @@ class Move:
 	const BACK = Vector2.DOWN
 	const SIDEWAYS_LEFT = Vector2.LEFT
 	const SIDEWAYS_RIGHT = Vector2.RIGHT
-	const WAIT_TIME = 0.25
+	const WAIT_TIME = Global.PLAYER_STEP_WAIT
 	const MAX_STEPS = 4
 	
 	const DIRECTIONS = [FORWARD, BACK, SIDEWAYS_LEFT, SIDEWAYS_RIGHT]

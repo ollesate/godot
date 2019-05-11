@@ -2,8 +2,8 @@ extends Action
 
 class_name MoveStep
 	
-const LENGTH = 128.0
-const STEP_DURATION = 1.0	
+const LENGTH = Global.STEP_SIZE
+const STEP_DURATION = Global.PLAYER_STEP_DURATION	
 const SPEED = LENGTH / STEP_DURATION
 var timeLeft = STEP_DURATION
 var direction

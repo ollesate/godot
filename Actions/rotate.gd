@@ -2,7 +2,7 @@ extends Card
 
 class_name Rotate
 
-const DURATION = 1.0
+const DURATION = Global.PLAYER_ROTATION_DURATION
 
 const LEFT = -90
 const RIGHT = 90
