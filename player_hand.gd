@@ -1,5 +1,7 @@
 extends Control
 
+signal onSwap(idx1, idx2)
+
 var positions = {}
 
 func _ready():
@@ -29,7 +31,14 @@ func onChildDropped(child):
 	child.rect_global_position = positions[child]
 	
 func swap(child1, child2):
+	emit_signal("onSwap", index(child1), index(child2))
 	var pos = positions[child1]
 	positions[child1] = positions[child2]
 	positions[child2] = pos
 	child2.move(pos)
+	
+func index(child):
+	for i in range(get_children().size()):
+		if get_child(i) == child:
+			return i
+	return -1

@@ -22,12 +22,27 @@ texture = ExtResource( 2 )
 shape = SubResource( 1 )
 
 [node name="UI" type="Control" parent="."]
+editor/display_folded = true
 margin_left = -1.09278e-06
 margin_top = 25.0
 margin_right = -1.09278e-06
 margin_bottom = 25.0
 script = ExtResource( 3 )
 position = Vector2( 0, 25 )
+
+[node name="HP" type="TextureProgress" parent="UI"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -198.0
+margin_top = -120.0
+margin_right = 198.0
+margin_bottom = -67.0
+rect_scale = Vector2( 0.3, 0.4 )
+rect_pivot_offset = Vector2( 198, 0 )
+max_value = 9.0
+value = 9.0
+texture_under = ExtResource( 4 )
+texture_progress = ExtResource( 5 )
 
 [node name="Cards" type="VBoxContainer" parent="UI"]
 anchor_left = 0.5
@@ -45,17 +60,3 @@ margin_right = 98.0
 margin_bottom = 14.0
 text = "Move forward 2"
 align = 1
-
-[node name="HP" type="TextureProgress" parent="UI"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -198.0
-margin_top = -120.0
-margin_right = 198.0
-margin_bottom = -67.0
-rect_scale = Vector2( 0.3, 0.4 )
-rect_pivot_offset = Vector2( 198, 0 )
-max_value = 9.0
-value = 9.0
-texture_under = ExtResource( 4 )
-texture_progress = ExtResource( 5 )

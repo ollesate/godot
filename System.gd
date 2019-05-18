@@ -2,7 +2,28 @@ extends Node2D
 
 var actions = []
 
+var isStarted = false
+
+enum State { DEAL_CARDS, SIMULATION }
+var state = -1
+
+func _ready():
+	$Network.connect("onGameStart", self, "Network_onGameStart")
+	$Network.connect("onPlayerJoined", self, "Network_onPlayerJoined")
+	$LobbyUI/Button.connect("pressed", self, "Lobby_onStartPressed")
+
+func Network_onGameStart():
+	isStarted = true
+
+func Network_onPlayerJoined(playerInfo):
+	$Players.addPlayer(playerInfo)
+	
+func Lobby_onStartPressed():
+	$Network.startGame()
+
 func _physics_process(delta):
+	if !isStarted:
+		return
 	if (actions.size() == 0):
 		onNextPhase()
 		return
@@ -10,9 +31,24 @@ func _physics_process(delta):
 		actions.remove(0)
 
 func onNextPhase():
-	onStart()
+	state += 1
+	state = state % State.size()
+	match state:
+		State.DEAL_CARDS:
+			onDealCards()
+		State.SIMULATION:
+			onSimulateGame()
 
-func onStart():
+func onDealCards():
+	for netPlayer in $Network.get_children():
+		netPlayer.dealCards([])
+	actions.append(AlertAction.new("Player card phase"))
+	actions.append(Wait.new(5))
+
+func onSimulateGame():
+	for netPlayer in $Network.get_children():
+		netPlayer.getCards()
+	
 	var players = get_tree().get_nodes_in_group("players")
 	var cards = []
 	var player_cards = {}

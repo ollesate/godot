@@ -1,0 +1,59 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Network.tscn" type="PackedScene" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _ready():
+	$VBoxContainer/Button.connect(\"pressed\", self, \"_on_Button_pressed\")
+
+func _on_Button_pressed():
+	var playerName = $VBoxContainer/LineEdit.text
+	print(\"button pressed\")
+	if playerName.length() > 0:
+		var playerColor = $VBoxContainer/ColorPickerButton.color
+		$Network.joinLobby(get_tree().get_network_unique_id(), playerName, playerColor)
+"
+
+[node name="Root" type="Control"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -512.0
+margin_right = 512.0
+margin_bottom = 600.0
+script = SubResource( 1 )
+
+[node name="Network" parent="." instance=ExtResource( 1 )]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -29.0
+margin_top = -21.0
+margin_right = 29.0
+margin_bottom = 21.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_right = 105.0
+margin_bottom = 14.0
+text = "Enter your name"
+align = 1
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 105.0
+margin_bottom = 42.0
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+margin_top = 46.0
+margin_right = 105.0
+margin_bottom = 66.0
+text = "Ready"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="VBoxContainer"]
+margin_top = 70.0
+margin_right = 105.0
+margin_bottom = 90.0

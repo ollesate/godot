@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+var cards = []
+var info
+
+remotesync func dealCards(cards):
+	self.cards = cards
+
+remotesync func swap(cardIdx1, cardIdx2):
+	var temp = cards[cardIdx1]
+	cards[cardIdx1] = cards[cardIdx2]
+	cards[cardIdx2] = temp
+	
+func getCards():
+	return cards"
+
+[node name="PlayerScene" type="Node"]
+script = SubResource( 1 )

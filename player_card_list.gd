@@ -4,6 +4,8 @@ extends Control
 
 export var position = Vector2(0, -120)
 
+onready var cards = $"Cards"
+
 var labels = {}
 var maxCards
 
@@ -15,13 +17,13 @@ func _ready():
 func Global_onPlayerCards(player, playerCards):
 	if $".." == player:
 		labels.clear()
-		for child in $Cards.get_children():
+		for child in cards.get_children():
 			child.free()
 		for playerCard in playerCards:
 			var label = Label.new()
 			label.text = playerCard.description
-			$Cards.add_child(label)
-			$Cards.move_child(label, 0)
+			cards.add_child(label)
+			cards.move_child(label, 0)
 			labels[playerCard.card] = label
 	maxCards = playerCards.size()
 	updateOpacity()
@@ -37,9 +39,9 @@ func Global_onCardEnd(player, card):
 	updateOpacity()
 
 func updateOpacity():
-	var count = $Cards.get_child_count()
+	var count = cards.get_child_count()
 	for i in range(count):
-		var card = $Cards.get_child(i)
+		var card = cards.get_child(i)
 		card.modulate.a = float(i + 1 + maxCards - count) / maxCards
 
 func _process(delta):
