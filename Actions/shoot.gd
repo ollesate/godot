@@ -2,7 +2,7 @@ extends Card
 
 class_name Shoot
 	
-var bulletScene = preload("res://Bullet.tscn")
+var bulletScene = preload("res://Game/Bullet.tscn")
 
 var isHit = false
 

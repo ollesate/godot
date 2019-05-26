@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/lifebar_bg.png-b0805a68b1631320bc6be8eca0a09f57.stex"
+path="res://.import/lifebar_bg.png-0429d451f065132ef0e74dcb05559400.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://lifebar_bg.png"
-dest_files=[ "res://.import/lifebar_bg.png-b0805a68b1631320bc6be8eca0a09f57.stex" ]
+source_file="res://Assets/lifebar_bg.png"
+dest_files=[ "res://.import/lifebar_bg.png-0429d451f065132ef0e74dcb05559400.stex" ]
 
 [params]
 

@@ -10,7 +10,6 @@ var player_info = {}
 signal onGameStart()
 
 signal onConnected()
-signal onDisconnected()
 signal onConnectionFailed()
 signal onServerDisconnect()
 
@@ -78,3 +77,9 @@ remotesync func addPlayer(playerInfo):
 	player.set_name(str(playerInfo.id))
 	player.info = playerInfo
 	$Players.add_child(player)
+
+func getMyPlayer():
+	var id = get_tree().get_network_unique_id()
+	for player in $Players.get_children():
+		if player.info.id == id:
+			return player

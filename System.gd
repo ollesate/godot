@@ -14,6 +14,7 @@ func _ready():
 
 func Network_onGameStart():
 	isStarted = true
+	$LobbyUI.hide()
 
 func Network_onPlayerJoined(playerInfo):
 	$Players.addPlayer(playerInfo)

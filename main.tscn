@@ -1,24 +1,46 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://System.gd" type="Script" id=1]
 [ext_resource path="res://Network.tscn" type="PackedScene" id=2]
-[ext_resource path="res://icon.png" type="Texture" id=3]
-[ext_resource path="res://PlayersSpawner.gd" type="Script" id=4]
-[ext_resource path="res://ConveyorBelt.gd" type="Script" id=5]
-[ext_resource path="res://HUD.gd" type="Script" id=6]
-[ext_resource path="res://Readiness-Regular.ttf" type="DynamicFontData" id=7]
-[ext_resource path="res://Events.gd" type="Script" id=8]
-[ext_resource path="res://ui_cards.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Assets/icon.png" type="Texture" id=3]
+[ext_resource path="res://Game/ConveyorBelt.gd" type="Script" id=4]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=5]
+[ext_resource path="res://Events.gd" type="Script" id=6]
+[ext_resource path="res://ui_cards.tscn" type="PackedScene" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 64, 64 )
 
-[sub_resource type="RectangleShape2D" id=2]
+[sub_resource type="GDScript" id=2]
+script/source = "extends Node2D
+
+var playerScene = preload(\"res://Player.tscn\")
+var spawns = [Vector2(320, 320), Vector2(320, 448), Vector2(704, 448)]
+var playerSpawns = {}
+
+func _ready():
+	pass
+
+func addPlayer(playerInfo):
+	var count = playerSpawns.size()
+	playerSpawns[playerInfo] = spawns[count]
+	var player = playerScene.instance()
+	player.name = str(playerInfo.id)
+	player.position = spawns[count]
+	add_child(player)
+
+func removePlayer(playerInfo):
+	playerSpawns.erase(playerSpawns)
+	for child in get_children():
+		if child.name == playerSpawns.id:
+			remove_child(child)"
+
+[sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 32, 32 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=4]
 size = 34
-font_data = ExtResource( 7 )
+font_data = ExtResource( 5 )
 
 [node name="Root" type="Node2D"]
 script = ExtResource( 1 )
@@ -478,7 +500,7 @@ texture = ExtResource( 3 )
 shape = SubResource( 1 )
 
 [node name="Players" type="Node2D" parent="."]
-script = ExtResource( 4 )
+script = SubResource( 2 )
 
 [node name="Floors" type="Node2D" parent="."]
 editor/display_folded = true
@@ -697,13 +719,13 @@ z_index = -1
 editor/display_folded = true
 position = Vector2( 128, 0 )
 rotation = -1.57079
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -712,13 +734,13 @@ texture = ExtResource( 3 )
 [node name="Belt4" type="Area2D" parent="ConveyorBelts"]
 editor/display_folded = true
 rotation = -1.57079
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt4"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt4"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -727,13 +749,13 @@ texture = ExtResource( 3 )
 [node name="Belt3" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 0 )
 rotation = -3.14159
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt3"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt3"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -742,13 +764,13 @@ texture = ExtResource( 3 )
 [node name="Belt5" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 128 )
 rotation = -3.14159
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt5"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt5"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -757,13 +779,13 @@ texture = ExtResource( 3 )
 [node name="Belt6" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 256 )
 rotation = -4.71238
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt6"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt6"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -772,13 +794,13 @@ texture = ExtResource( 3 )
 [node name="Belt7" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 0, 256 )
 rotation = -4.71238
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt7"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt7"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -787,13 +809,13 @@ texture = ExtResource( 3 )
 [node name="Belt8" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 128, 256 )
 rotation = -4.71238
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt8"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt8"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -802,13 +824,13 @@ texture = ExtResource( 3 )
 [node name="Belt9" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 256 )
 rotation = -6.28318
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt9"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt9"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -817,13 +839,13 @@ texture = ExtResource( 3 )
 [node name="Belt10" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 128 )
 rotation = -6.28318
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt10"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt10"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -832,13 +854,13 @@ texture = ExtResource( 3 )
 [node name="Belt2" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 0 )
 rotation = -1.57079
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt2"]
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt2"]
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
@@ -847,7 +869,6 @@ texture = ExtResource( 3 )
 [node name="HUD" type="Control" parent="."]
 margin_right = 1024.0
 margin_bottom = 576.0
-script = ExtResource( 6 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -858,9 +879,9 @@ anchor_right = 0.5
 margin_left = -40.0
 margin_right = 40.0
 margin_bottom = 45.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 4 )
 text = "Hello"
-script = ExtResource( 8 )
+script = ExtResource( 6 )
 
 [node name="PlayerCards" type="Control" parent="HUD"]
 editor/display_folded = true
@@ -868,21 +889,21 @@ visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="Cards" parent="HUD/PlayerCards" instance=ExtResource( 9 )]
+[node name="Cards" parent="HUD/PlayerCards" instance=ExtResource( 7 )]
 
-[node name="Cards2" parent="HUD/PlayerCards" instance=ExtResource( 9 )]
+[node name="Cards2" parent="HUD/PlayerCards" instance=ExtResource( 7 )]
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = 734.0
 margin_right = 984.0
 
-[node name="Cards3" parent="HUD/PlayerCards" instance=ExtResource( 9 )]
+[node name="Cards3" parent="HUD/PlayerCards" instance=ExtResource( 7 )]
 anchor_top = 1.0
 anchor_bottom = 1.0
 margin_top = 378.0
 margin_bottom = 536.0
 
-[node name="Cards4" parent="HUD/PlayerCards" instance=ExtResource( 9 )]
+[node name="Cards4" parent="HUD/PlayerCards" instance=ExtResource( 7 )]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
