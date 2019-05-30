@@ -2,7 +2,7 @@ extends Node2D
 
 var actions = []
 
-var isStarted = false
+var isStarted = true
 
 enum State { DEAL_CARDS, SIMULATION }
 var state = -1
@@ -10,6 +10,7 @@ var state = -1
 func _ready():
 	$Network.connect("onGameStart", self, "Network_onGameStart")
 	$Network.connect("onPlayerJoined", self, "Network_onPlayerJoined")
+	$Network.connect("onPlayerDisconnected", self, "Network_onPlayerDisconnected")
 	$LobbyUI/Button.connect("pressed", self, "Lobby_onStartPressed")
 
 func Network_onGameStart():
@@ -18,6 +19,9 @@ func Network_onGameStart():
 
 func Network_onPlayerJoined(playerInfo):
 	$Players.addPlayer(playerInfo)
+	
+func Network_onPlayerDisconnected(playerInfo):
+	$Players.removePlayer(playerInfo)
 	
 func Lobby_onStartPressed():
 	$Network.startGame()
@@ -41,30 +45,31 @@ func onNextPhase():
 			onSimulateGame()
 
 func onDealCards():
-	for netPlayer in $Network.get_children():
-		netPlayer.dealCards([])
+	$HUD/StateProgress.start("Dealing cards...", 4)
+	for playerId in $Network.joinedPlayers:
+		$Network.dealCardsToPlayer(playerId, CardUtils.generateCards())
 	actions.append(AlertAction.new("Player card phase"))
-	actions.append(Wait.new(5))
+	actions.append(Wait.new(4))
 
 func onSimulateGame():
-	for netPlayer in $Network.get_children():
-		netPlayer.getCards()
-	
+	$HUD/StateProgress.showText("Simulating game")
 	var players = get_tree().get_nodes_in_group("players")
 	var cards = []
-	var player_cards = {}
-	for player in players:
-		player_cards[player] = []
-		for card in player.getCards():
-			player_cards[player].append(PlayerCard.new(card))
+	
+	var playerCards = $Network.getPlayerCards()
+	for id in playerCards.keys():
+		var player = $Players.players[id]
+		for card in playerCards[id]:
+			card.character = player
+			# TODO: connect to callbacks
 			
 	var turns = Sequence.new([])
 	for turn in range(5):
 		var turnSequence = Sequence.new([])
 		turnSequence.actions.append(AlertAction.new("Players move"))
-		for player in player_cards.keys():
-			if (turn < player_cards[player].size()):
-				turnSequence.actions.append(player_cards[player][turn])
+		for id in playerCards.keys():
+			if (turn < playerCards[id].size()):
+				turnSequence.actions.append(playerCards[id][turn])
 		
 		turnSequence.actions.append(AlertAction.new("Players shoot"))
 		turnSequence.actions.append(getShootAction())
@@ -72,10 +77,8 @@ func onSimulateGame():
 		turnSequence.actions.append(getBeltsAction())
 		turns.actions.append(turnSequence)
 	
+	turns.actions.append(Wait.new(3))
 	actions.append(turns)
-
-	for player in player_cards.keys():
-		Global.onPlayerCards(player, player_cards[player])
 	
 func getBeltsAction():
 	var parallell = Parallell.new([])

@@ -1,4 +1,4 @@
-extends Container
+extends Control
 
 var cardLabelScene = preload("res://ui_card.tscn")
 var cardLabels = {}

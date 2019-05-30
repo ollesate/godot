@@ -22,7 +22,6 @@ texture = ExtResource( 2 )
 shape = SubResource( 1 )
 
 [node name="UI" type="Control" parent="."]
-editor/display_folded = true
 margin_left = -1.09278e-06
 margin_top = 25.0
 margin_right = -1.09278e-06
@@ -60,3 +59,13 @@ margin_right = 98.0
 margin_bottom = 14.0
 text = "Move forward 2"
 align = 1
+
+[node name="NameLabel" type="Label" parent="UI"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -27.0
+margin_top = -89.0
+margin_right = 27.0
+margin_bottom = -75.0
+grow_horizontal = 2
+text = "<Name>"

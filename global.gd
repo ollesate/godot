@@ -8,15 +8,16 @@ const PLAYER_STEP_WAIT = GENERAL_SPEED / 2
 const PLAYER_ROTATION_DURATION = GENERAL_SPEED
 const BULLET_SPEED = 400 * SPEED_MODIFIER
 
-onready var events = get_node("/root/Root/HUD/Events")
+# onready var events = get_node("/root/Root/HUD/Events")
 
 signal onCardStart(player, card)
 signal onCardEnd(player, card)
 signal onPlayerCards(player, cards)
 
 func alert(text):
-	events.onEvent(text)
-	
+	# events.onEvent(text)
+	pass
+
 func onPlayerCards(player, cards):
 	emit_signal("onPlayerCards", player, cards)
 	

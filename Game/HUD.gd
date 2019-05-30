@@ -1,7 +1,6 @@
 extends Control
 
 var playerHandsMap = {}
-var playerCardScene = preload("ui_cards.tscn")
 
 func _ready():
 	Global.connect("onPlayerCards", self, "Global_onPlayerCards")

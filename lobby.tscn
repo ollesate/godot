@@ -5,16 +5,20 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
-func _ready():
-	$VBoxContainer/Button.connect(\"pressed\", self, \"_on_Button_pressed\")
+onready var button = $VBoxContainer/Button
+onready var edit = $VBoxContainer/LineEdit
+onready var colorPicker = $VBoxContainer/ColorPickerButton
 
-func _on_Button_pressed():
-	var playerName = $VBoxContainer/LineEdit.text
-	print(\"button pressed\")
-	if playerName.length() > 0:
-		var playerColor = $VBoxContainer/ColorPickerButton.color
-		$Network.joinLobby(get_tree().get_network_unique_id(), playerName, playerColor)
-"
+func _ready():
+	button.connect(\"pressed\", self, \"button_pressed\")
+	$Network.connect(\"onGameStart\", self, \"Network_onGameStart\")
+	
+func button_pressed():
+	var id = get_tree().get_network_unique_id()
+	$Network.joinLobby(id, edit.text, colorPicker.color)
+
+func Network_onGameStart():
+	get_tree().change_scene(\"res://player_hand.tscn\")"
 
 [node name="Root" type="Control"]
 anchor_left = 0.5

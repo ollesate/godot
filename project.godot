@@ -29,6 +29,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://ui_card.gd"
 }, {
+"base": "Reference",
+"class": "CardUtils",
+"language": "GDScript",
+"path": "res://Game/cardUtils.gd"
+}, {
 "base": "Action",
 "class": "CompositeAction",
 "language": "GDScript",
@@ -48,6 +53,11 @@ _global_script_classes=[ {
 "class": "PlayerCard",
 "language": "GDScript",
 "path": "res://playerCard.gd"
+}, {
+"base": "Card",
+"class": "PlayerMove",
+"language": "GDScript",
+"path": "res://Actions/playerMove.gd"
 }, {
 "base": "Card",
 "class": "Rotate",
@@ -74,10 +84,12 @@ _global_script_class_icons={
 "AlertAction": "",
 "Card": "",
 "CardLabel": "",
+"CardUtils": "",
 "CompositeAction": "",
 "MoveStep": "",
 "Parallell": "",
 "PlayerCard": "",
+"PlayerMove": "",
 "Rotate": "",
 "Sequence": "",
 "Shoot": "",

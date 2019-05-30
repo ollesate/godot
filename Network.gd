@@ -6,6 +6,7 @@ const MAX_PLAYERS = 4
 export var isServer = false
 
 var player_info = {}
+var playerCards = {}
 
 signal onGameStart()
 
@@ -14,8 +15,12 @@ signal onConnectionFailed()
 signal onServerDisconnect()
 
 signal onPlayerJoined()
+signal onPlayerDisconnected()
+signal onPlayerCards()
 
 func _ready():
+	if get_tree().network_peer != null:
+		return
 	var peer = NetworkedMultiplayerENet.new()
 	if (isServer):
 		print("server start")
@@ -33,11 +38,17 @@ func _ready():
 		get_tree().connect("connection_failed", self, "_connected_fail")
 		get_tree().connect("server_disconnected", self, "_server_disconnected")
 
+var joinedPlayers setget ,joinedPlayers
+
+func joinedPlayers():
+	return get_tree().get_network_connected_peers()
+
 func _player_connected(id):
 	print(str("network peer connected ", id))
 
 func _player_disconnected(id):
-	print(str("network peer disconnected ", id))
+	print(str("network peer disconnected ", player_info[id]))
+	emit_signal("onPlayerDisconnected", player_info[id])
 	player_info.erase(id)
 
 func _connected_ok():
@@ -54,7 +65,7 @@ func _connected_fail():
 	emit_signal("onConnectionFailed")
 
 func joinLobby(id, name, color):
-	print("try join lobby")
+	print("join lobby")
 	rpc_id(0, "_player_join_lobby", id, name, color)
 
 master func startGame():
@@ -83,3 +94,29 @@ func getMyPlayer():
 	for player in $Players.get_children():
 		if player.info.id == id:
 			return player
+
+master func dealCardsToPlayer(id, cards):
+	print(str("deal cards to player", id))
+	playerCards[id] = cards
+	var cardInfos = []
+	for card in cards:
+		cardInfos.append({
+			description = card.description	
+		})
+	rpc_id(id, "dealCards", cardInfos)
+
+slave func dealCards(cardInfos):
+	print("onPlayerCards")
+	emit_signal("onPlayerCards", cardInfos)
+	
+func swapCards(idx1, idx2):
+	rpc_id(0, "playerSwapCards", idx1, idx2)
+
+func playerSwapCards(idx1, idx2):
+	var cards = playerCards[get_tree().get_rpc_sender_id()]
+	var temp = cards[idx1]
+	cards[idx1] = cards[idx2]
+	cards[idx2] = temp
+
+func getPlayerCards():
+	return playerCards

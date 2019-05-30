@@ -1,13 +1,18 @@
-extends TextureRect
+extends Control
 
 const TWEEN_DURATION = 0.1
 
 var dragPosition
+var title setget setTitle
 
 signal onPositionChanged(child, postion)
 signal onDropped(child)
 
-func _on_Card_gui_input(event):
+func setTitle(title):
+	title = title
+	$Label.text = title
+
+func _gui_input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
 			dragPosition = get_global_mouse_position() - rect_global_position
