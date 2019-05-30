@@ -119,7 +119,8 @@ slave func dealCards(cardInfos):
 func swapCards(idx1, idx2):
 	rpc_id(0, "playerSwapCards", idx1, idx2)
 
-func playerSwapCards(idx1, idx2):
+remote func playerSwapCards(idx1, idx2):
+	print(str("Player swap cards", idx1, idx2))
 	var cards = playerCards[get_tree().get_rpc_sender_id()]
 	var temp = cards[idx1]
 	cards[idx1] = cards[idx2]
