@@ -48,20 +48,34 @@ func onDealCards():
 	$HUD/StateProgress.start("Dealing cards...", 4)
 	for playerId in $Network.joinedPlayers:
 		$Network.dealCardsToPlayer(playerId, CardUtils.generateCards())
+
+	# Spawn killed players
+	for playerId in $Network.joinedPlayers:
+		if !$Players.players.has(playerId):
+			$Players.addPlayer($Network.player_info[playerId])
+
 	actions.append(AlertAction.new("Player card phase"))
 	actions.append(Wait.new(4))
 
 func onSimulateGame():
+	$Network.startSimulation()
+	
 	$HUD/StateProgress.showText("Simulating game")
-	var players = get_tree().get_nodes_in_group("players")
+	var players = $Players.players
 	var cards = []
 	
 	var playerCards = $Network.getPlayerCards()
+	# Remove cars which has no token. Only useful when testing
 	for id in playerCards.keys():
-		var player = $Players.players[id]
+		if !players.has(id):
+			playerCards.erase(id) 
+	
+	for id in playerCards.keys():
+		var player = players[id]
 		for card in playerCards[id]:
 			card.character = player
-			# TODO: connect to callbacks
+			card.connect("onCardStarted", self, "onCardStarted")
+			card.connect("onCardFinished", self, "onCardFinished")
 			
 	var turns = Sequence.new([])
 	for turn in range(5):
@@ -79,7 +93,13 @@ func onSimulateGame():
 	
 	turns.actions.append(Wait.new(3))
 	actions.append(turns)
-	
+
+func onCardStarted(card):
+	$Network.onCardStarted(card)
+
+func onCardFinished(card):
+	$Network.onCardFinished(card)
+
 func getBeltsAction():
 	var parallell = Parallell.new([])
 	var belts = get_tree().get_nodes_in_group("belts")

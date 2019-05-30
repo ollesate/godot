@@ -10,17 +10,18 @@ script/source = "extends Control
 func _ready():
 	$CardHand.connect(\"onSwap\", self, \"CardHand_onSwap\")
 	$Network.connect(\"onPlayerCards\", self, \"Network_onPlayerCards\")
+	$Network.connect(\"onSimulationStart\", self, \"Network_onSimulationStart\")
 
 func CardHand_onSwap(idx1, idx2):
 	$Network.swapCards(idx1, idx2)
 	
 func Network_onPlayerCards(cardInfos):
 	print(str(\"on player cards\", cardInfos))
-	var index = 0
-	for cardInfo in cardInfos:
-		print(str(\"card\", cardInfo.description))
-		$CardHand.setCard(index, cardInfo.description)
-		index += 1"
+	$CardHand.setCards(cardInfos)
+	$CardHand.setLocked(false)
+	
+func Network_onSimulationStart():
+	$CardHand.setLocked(true)"
 
 [node name="Root" type="Control"]
 anchor_right = 1.0

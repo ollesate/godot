@@ -17,6 +17,10 @@ signal onServerDisconnect()
 signal onPlayerJoined()
 signal onPlayerDisconnected()
 signal onPlayerCards()
+signal onSelectCard()
+signal onCardStarted()
+signal onCardFinished()
+signal onSimulationStart()
 
 func _ready():
 	if get_tree().network_peer != null:
@@ -45,6 +49,11 @@ func joinedPlayers():
 
 func _player_connected(id):
 	print(str("network peer connected ", id))
+	player_info[id] = {
+		id = id,
+		name = str("Player", get_tree().get_network_connected_peers().size()),
+		color = Color.white
+	}
 
 func _player_disconnected(id):
 	print(str("network peer disconnected ", player_info[id]))
@@ -76,10 +85,8 @@ remotesync func _startGame():
 	emit_signal("onGameStart")
 
 remote func _player_join_lobby(id, name, color):
-	if player_info.has(id):
-		return
-	print(str("register player ", id))
 	player_info[id] = { id = id, name = name, color = color }
+	print(str("Player join lobby ", player_info[id]))
 	emit_signal("onPlayerJoined", player_info[id])
 	rpc("addPlayer", player_info[id])
 
@@ -120,3 +127,28 @@ func playerSwapCards(idx1, idx2):
 
 func getPlayerCards():
 	return playerCards
+	
+master func onCardStarted(card):
+	var playerId = card.character.id
+	var cardIndex = playerCards[playerId].find(card)
+	rpc_id(playerId, "Player_onCardStarted", cardIndex)
+
+master func onCardFinished(card):
+	var playerId = card.character.id
+	var cardIndex = playerCards[playerId].find(card)
+	rpc_id(playerId, "Player_onCardFinished", cardIndex)
+
+slave func Player_onCardStarted(cardIndex):
+	print(str("on select card ", cardIndex))
+	emit_signal("onCardStarted", cardIndex)
+
+slave func Player_onCardFinished(index):
+	emit_signal("onCardFinished", index)
+
+master func startSimulation():
+	for id in get_tree().get_network_connected_peers():
+		rpc_id(id, "Player_onSimulationStart")
+		
+slave func Player_onSimulationStart():
+	emit_signal("onSimulationStart")
+	

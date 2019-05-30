@@ -1,21 +1,40 @@
+tool
 extends Control
 
 signal onSwap(idx1, idx2)
 
 var positions = {}
+export var locked = false setget setLocked 
 
 func _ready():
+	$"../Network".connect("onCardStarted", self, "selectCard")
+	$"../Network".connect("onCardFinished", self, "unselectCard")
 	for card in get_children():
 		card.connect("onPositionChanged", self, "onChildChangedPosition")
 		card.connect("onDropped", self, "onChildDropped")
 		positions[card] = card.rect_position
-	setCard(0, "Hi")
-	setCard(1, "Hi2")
-	setCard(2, "Hi3")
+	get_child(0).title = "Hi"
+	get_child(1).title = "Hi2"
+	get_child(2).title = "Hi3"
 
-func setCard(index, title):
-	get_child(index).title = title
-				
+func setCards(cardInfos):
+	for child in get_children():
+		child.state = UiCard.NONE
+	for index in range(cardInfos.size()):
+		get_child(index).title = cardInfos[index].description
+
+func setLocked(newLocked):
+	locked = newLocked
+	modulate.a = 0.5 if locked else 1.0
+	for child in get_children():
+		child.setLocked(locked)
+
+func selectCard(index):
+	get_child(index).state = UiCard.SELECTED
+
+func unselectCard(index):
+	get_child(index).state = UiCard.CONSUMED
+
 func onChildChangedPosition(child, position):
 	for i in range(get_child_count()):
 		var currentChild = get_child(i)

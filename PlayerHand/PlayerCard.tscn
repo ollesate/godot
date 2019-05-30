@@ -4,7 +4,7 @@
 [ext_resource path="res://PlayerHand/Card.gd" type="Script" id=2]
 
 [node name="PlayerCard" type="TextureRect"]
-self_modulate = Color( 0.196078, 0.196078, 0.196078, 1 )
+self_modulate = Color( 0, 0, 0, 1 )
 margin_right = 320.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 200, 50 )

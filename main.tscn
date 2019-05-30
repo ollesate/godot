@@ -942,6 +942,7 @@ margin_right = 984.0
 margin_bottom = 536.0
 
 [node name="StateProgress" type="VBoxContainer" parent="HUD"]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -294.0
@@ -969,6 +970,7 @@ stretch_margin_left = 100
 stretch_margin_right = 100
 
 [node name="LobbyUI" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 
