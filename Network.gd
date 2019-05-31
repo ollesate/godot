@@ -21,6 +21,7 @@ signal onSelectCard()
 signal onCardStarted()
 signal onCardFinished()
 signal onSimulationStart()
+signal onTokenHit()
 
 func _ready():
 	if get_tree().network_peer != null:
@@ -152,4 +153,9 @@ master func startSimulation():
 		
 slave func Player_onSimulationStart():
 	emit_signal("onSimulationStart")
-	
+
+master func playerTokenHit(playerId, hpLeft):
+	rpc_id(playerId, "Player_onTokenHit", hpLeft)
+
+slave func Player_onTokenHit(hpLeft):
+	emit_signal("onTokenHit", hpLeft)

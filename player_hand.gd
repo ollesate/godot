@@ -4,7 +4,8 @@ extends Control
 signal onSwap(idx1, idx2)
 
 var positions = {}
-export var locked = false setget setLocked 
+export var locked = false setget setLocked
+export var hpLeft = 5 setget setHpLeft
 
 func _ready():
 	$"../Network".connect("onCardStarted", self, "selectCard")
@@ -16,6 +17,7 @@ func _ready():
 	get_child(0).title = "Hi"
 	get_child(1).title = "Hi2"
 	get_child(2).title = "Hi3"
+	setHpLeft(3)
 
 func setCards(cardInfos):
 	for child in get_children():
@@ -28,6 +30,12 @@ func setLocked(newLocked):
 	modulate.a = 0.5 if locked else 1.0
 	for child in get_children():
 		child.setLocked(locked)
+
+func setHpLeft(newHpLeft):
+	hpLeft = newHpLeft
+	for idx in range(get_child_count()):
+		print(str(idx, " set locked ", idx >= hpLeft))
+		get_child(idx).setDisabled(idx >= hpLeft)
 
 func selectCard(index):
 	get_child(index).state = UiCard.SELECTED
@@ -48,7 +56,7 @@ func onChildChangedPosition(child, position):
 			var mid1 = currentChild.rect_position.y + currentChild.rect_size.y / 2
 			swap(currentChild, prevChild)
 			move_child(currentChild, i - 1)
-		elif nextChild and currentChild.rect_position.y > nextChild.rect_position.y:
+		elif nextChild and !nextChild.disabled and currentChild.rect_position.y > nextChild.rect_position.y:
 			swap(currentChild, nextChild)
 			move_child(currentChild, i + 1)
 

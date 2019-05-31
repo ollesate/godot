@@ -16,9 +16,13 @@ export var state = NONE setget setState
 var dragPosition
 var title setget setTitle
 var locked
+var disabled
 
 signal onPositionChanged(child, postion)
 signal onDropped(child)
+
+func _ready():
+	self_modulate = Color.black
 
 func setState(newState):
 	if newState >= COLOR_STATES.size() or newState < 0:
@@ -33,8 +37,13 @@ func setTitle(title):
 func setLocked(locked):
 	self.locked = locked
 
+func setDisabled(disabled):
+	self.disabled = disabled
+	if disabled:
+		self_modulate = Color.darkgray
+
 func _gui_input(event):
-	if (locked):
+	if (locked or disabled):
 		return
 	if event is InputEventMouseButton:
 		if event.pressed:

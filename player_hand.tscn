@@ -11,6 +11,7 @@ func _ready():
 	$CardHand.connect(\"onSwap\", self, \"CardHand_onSwap\")
 	$Network.connect(\"onPlayerCards\", self, \"Network_onPlayerCards\")
 	$Network.connect(\"onSimulationStart\", self, \"Network_onSimulationStart\")
+	$Network.connect(\"onTokenHit\", self, \"Network_onTokenHit\")
 
 func CardHand_onSwap(idx1, idx2):
 	print(str(\"swap\", idx1, idx2))
@@ -22,7 +23,10 @@ func Network_onPlayerCards(cardInfos):
 	$CardHand.setLocked(false)
 	
 func Network_onSimulationStart():
-	$CardHand.setLocked(true)"
+	$CardHand.setLocked(true)
+
+func Network_onTokenHit(hpLeft):
+	$CardHand.hpLeft = hpLeft"
 
 [node name="Root" type="Control"]
 anchor_right = 1.0
@@ -35,6 +39,7 @@ script = SubResource( 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 2 )
+hpLeft = 3
 
 [node name="PlayerCard" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
@@ -58,6 +63,7 @@ margin_right = -16.0
 margin_bottom = 194.0
 
 [node name="PlayerCard4" parent="CardHand" instance=ExtResource( 3 )]
+self_modulate = Color( 0.66, 0.66, 0.66, 1 )
 anchor_right = 1.0
 margin_left = 16.0
 margin_top = 208.0
@@ -65,6 +71,7 @@ margin_right = -16.0
 margin_bottom = 258.0
 
 [node name="PlayerCard5" parent="CardHand" instance=ExtResource( 3 )]
+self_modulate = Color( 0.66, 0.66, 0.66, 1 )
 anchor_right = 1.0
 margin_left = 16.0
 margin_top = 272.0

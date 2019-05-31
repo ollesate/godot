@@ -18,7 +18,7 @@ func Network_onGameStart():
 	$LobbyUI.hide()
 
 func Network_onPlayerJoined(playerInfo):
-	$Players.addPlayer(playerInfo)
+	$Players.spawnPlayer(playerInfo)
 	
 func Network_onPlayerDisconnected(playerInfo):
 	$Players.removePlayer(playerInfo)
@@ -45,17 +45,29 @@ func onNextPhase():
 			onSimulateGame()
 
 func onDealCards():
-	$HUD/StateProgress.start("Dealing cards...", 4)
+	var cardPhaseDuration = Global.CARD_PHASE_DURATION
+	$HUD/StateProgress.start("Dealing cards...", cardPhaseDuration)
 	for playerId in $Network.joinedPlayers:
 		$Network.dealCardsToPlayer(playerId, CardUtils.generateCards())
 
 	# Spawn killed players
 	for playerId in $Network.joinedPlayers:
 		if !$Players.players.has(playerId):
-			$Players.addPlayer($Network.player_info[playerId])
+			$Players.spawnPlayer($Network.player_info[playerId])
+			# Connect player
+			var player = $Players.players[playerId]
+			player.connect("onHit", self, "onPlayerTokenHit")
+			player.connect("onDestroyed", self, "onPlayerTokenDestroyed")
+			$Network.playerTokenHit(playerId, player.currentHp)
 
 	actions.append(AlertAction.new("Player card phase"))
-	actions.append(Wait.new(4))
+	actions.append(Wait.new(cardPhaseDuration))
+
+func onPlayerTokenHit(player):
+	$Network.playerTokenHit(player.id, player.currentHp)
+
+func onPlayerTokenDestroyed(player):
+	pass
 
 func onSimulateGame():
 	$Network.startSimulation()
@@ -65,7 +77,7 @@ func onSimulateGame():
 	var cards = []
 	
 	var playerCards = $Network.getPlayerCards()
-	# Remove cars which has no token. Only useful when testing
+	# Remove cards which has no token. Only useful when testing
 	for id in playerCards.keys():
 		if !players.has(id):
 			playerCards.erase(id) 
@@ -87,11 +99,12 @@ func onSimulateGame():
 		
 		turnSequence.actions.append(AlertAction.new("Players shoot"))
 		turnSequence.actions.append(getShootAction())
+		turnSequence.actions.append(getLaserAction())
 		turnSequence.actions.append(AlertAction.new("Belts"))
 		turnSequence.actions.append(getBeltsAction())
 		turns.actions.append(turnSequence)
 	
-	turns.actions.append(Wait.new(3))
+	turns.actions.append(Wait.new(Global.END_TURN_DURATION))
 	actions.append(turns)
 
 func onCardStarted(card):
@@ -110,11 +123,17 @@ func getBeltsAction():
 	return parallell
 
 func getShootAction():
-	var players = get_tree().get_nodes_in_group("players")
+	var players = $Players.players.values()
 	var shootActions = []
 	for player in players:
-		var shoot = Shoot.new()
+		var shoot = CardUtils.getShootAction()
 		shoot.character = player
 		shootActions.append(shoot)
 	return Parallell.new(shootActions)
-		
+
+func getLaserAction():
+	var lasers = get_tree().get_nodes_in_group("lasers")
+	var laserActions = []
+	for laser in lasers:
+		laserActions.append(laser.getAction())
+	return Parallell.new(laserActions)

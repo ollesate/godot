@@ -18,6 +18,9 @@ static func generateCard():
 			action = Rotate.new(Rotate.randRotation())
 	return CardWrapper.new(action)
 
+static func getShootAction():
+	return CardWrapper.new(Shoot.new())
+
 class CardWrapper:
 	
 	signal onCardStarted()
@@ -26,6 +29,7 @@ class CardWrapper:
 	extends Card
 	
 	var card
+	var characterDied
 	
 	func _init(card):
 		self.card = card
@@ -34,9 +38,16 @@ class CardWrapper:
 	func setCharacter(newCharacter):
 		character = newCharacter
 		card.character = newCharacter
+		character.connect("onDestroyed", self, "onDestroyed")
+	
+	func onDestroyed(character):
+		characterDied = true
 		
 	func act(delta):
 		.act(delta)
+		
+		if characterDied:
+			return true
 		
 		if self.isFirstTime:
 			emit_signal("onCardStarted", self)
