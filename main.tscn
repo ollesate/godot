@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://System.gd" type="Script" id=1]
 [ext_resource path="res://Network.tscn" type="PackedScene" id=2]
@@ -10,7 +10,6 @@
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=8]
 [ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=9]
 [ext_resource path="res://Laser.tscn" type="PackedScene" id=10]
-[ext_resource path="res://Player.tscn" type="PackedScene" id=11]
 
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 64, 64 )
@@ -32,13 +31,9 @@ func spawnPlayer(playerInfo):
 		var next = playerSpawns.size()
 		playerSpawns[playerInfo.id] = spawns[next]
 	var player = playerScene.instance()
-	player.name = str(playerInfo.id)
-	player.id = playerInfo.id
-	player.playerName = playerInfo.name
-	player.color = playerInfo.color
 	player.position = playerSpawns[playerInfo.id]
 	add_child(player)
-	players[playerInfo.id] = player
+	return player
 
 func getPlayers():
 	var players = {}
@@ -999,13 +994,4 @@ text = "Start game"
 [node name="CardHands" type="Node2D" parent="."]
 
 [node name="Laser" parent="." instance=ExtResource( 10 )]
-position = Vector2( 64, 192 )
-
-[node name="Player" parent="." instance=ExtResource( 11 )]
-position = Vector2( 448, 320 )
-
-[node name="Laser3" parent="." instance=ExtResource( 10 )]
-position = Vector2( 64, 64 )
-
-[node name="Laser2" parent="." instance=ExtResource( 10 )]
-position = Vector2( 64, 320 )
+position = Vector2( 64, 448 )

@@ -14,10 +14,6 @@ func _ready():
 		card.connect("onPositionChanged", self, "onChildChangedPosition")
 		card.connect("onDropped", self, "onChildDropped")
 		positions[card] = card.rect_position
-	get_child(0).title = "Hi"
-	get_child(1).title = "Hi2"
-	get_child(2).title = "Hi3"
-	setHpLeft(3)
 
 func setCards(cardInfos):
 	for child in get_children():
@@ -32,6 +28,7 @@ func setLocked(newLocked):
 		child.setLocked(locked)
 
 func setHpLeft(newHpLeft):
+	print(str("set hp left", newHpLeft))
 	hpLeft = newHpLeft
 	for idx in range(get_child_count()):
 		print(str(idx, " set locked ", idx >= hpLeft))

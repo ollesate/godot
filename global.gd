@@ -17,6 +17,8 @@ signal onCardStart(player, card)
 signal onCardEnd(player, card)
 signal onPlayerCards(player, cards)
 
+var actions = []
+
 func alert(text):
 	# events.onEvent(text)
 	pass
@@ -29,3 +31,11 @@ func onCardStart(player, card):
 
 func onCardEnd(player, card):
 	emit_signal("onCardEnd", player, card)
+
+func perform(action):
+	actions.append(action)
+
+func _physics_process(delta):
+	for action in actions:
+		if action.act(delta):
+			actions.remove(actions.find(action))

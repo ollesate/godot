@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Network.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Laser.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+func _ready():
+	yield($Network, \"onPlayerConnected\")
+	var id = $Network.players[0]
+	$Network.connectTokenToPlayer($Player, id)
+	$Player.hp.value = 5
+	$Network.dealCardsToPlayer(
+		id, 
+		[Card.wait(), Card.wait(), Card.wait(), Card.wait()]
+	)
+	yield(Card.perform($Laser.getAction()), \"finished\")	 "
+
+[node name="Root" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Network" parent="." instance=ExtResource( 1 )]
+isServer = true
+
+[node name="Laser" parent="." instance=ExtResource( 2 )]
+position = Vector2( 64, 192 )
+
+[node name="Player" parent="." instance=ExtResource( 3 )]
+position = Vector2( 448, 192 )

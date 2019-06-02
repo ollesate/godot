@@ -6,6 +6,7 @@ const MAX_PLAYERS = 4
 export var isServer = false
 
 var player_info = {}
+var players = [] setget , getPlayers
 var playerCards = {}
 
 signal onGameStart()
@@ -14,6 +15,7 @@ signal onConnected()
 signal onConnectionFailed()
 signal onServerDisconnect()
 
+signal onPlayerConnected()
 signal onPlayerJoined()
 signal onPlayerDisconnected()
 signal onPlayerCards()
@@ -48,6 +50,9 @@ var joinedPlayers setget ,joinedPlayers
 func joinedPlayers():
 	return get_tree().get_network_connected_peers()
 
+func getPlayers():
+	return get_tree().get_network_connected_peers()
+
 func _player_connected(id):
 	print(str("network peer connected ", id))
 	player_info[id] = {
@@ -55,6 +60,7 @@ func _player_connected(id):
 		name = str("Player", get_tree().get_network_connected_peers().size()),
 		color = Color.white
 	}
+	emit_signal("onPlayerConnected", id)
 
 func _player_disconnected(id):
 	print(str("network peer disconnected ", player_info[id]))
@@ -154,8 +160,12 @@ master func startSimulation():
 slave func Player_onSimulationStart():
 	emit_signal("onSimulationStart")
 
-master func playerTokenHit(playerId, hpLeft):
-	rpc_id(playerId, "Player_onTokenHit", hpLeft)
+master func playerTokenHit(token):
+	rpc_id(token.id, "Player_onTokenHit", token.hp.value)
 
 slave func Player_onTokenHit(hpLeft):
 	emit_signal("onTokenHit", hpLeft)
+
+master func connectTokenToPlayer(playerToken, id):
+	playerToken.setInfo(player_info[id])
+	playerToken.connect("onHit", self, "playerTokenHit")

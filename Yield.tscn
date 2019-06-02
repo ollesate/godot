@@ -1,0 +1,85 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/icon.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var stage
+
+var action
+var yielder
+
+func test():
+	print(\"hello\")
+	print(yield())
+	print(\"world\")
+	print(yield())
+	print(\"cheers\")
+
+func _ready():
+	var moveAction = MinorAction.new(\"forward\")
+	Processor.process(moveAction)
+	yield(moveAction, \"finished\")
+
+	perform(MinorAction.new(\"forward\"))
+	perform(MinorAction.new(\"forward\"))
+	# 1. do sequence in order when phase changes
+	# Kan vi bli av med actions helt och hållet?
+	# Om vi skiter i act och endast har en finish metod
+	# 
+	
+func perform(action):
+	pass
+
+func _process(delta):
+	if action:
+		action.act(delta)
+
+class Processor:
+	
+	static func process(action):
+		pass # Do some global stuff here
+
+class MinorAction:
+	
+	signal finished()
+	
+	var text
+	var dur = 3
+	
+	func _init(text):
+		self.text = text
+	
+	func act(delta):
+		print(text)
+		dur -= delta
+		if dur < 0:
+			emit_signal(\"finished\")"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Node2D
+
+
+var dur = 3
+var dir = 1
+
+func _process(delta):
+	dur -= delta
+	if dur < 0:
+		dir = -dir
+		dur = 3
+	position.x += dir"
+
+[node name="Yield" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Ball" type="Node2D" parent="."]
+position = Vector2( 256, 128 )
+script = SubResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Ball"]
+texture = ExtResource( 1 )

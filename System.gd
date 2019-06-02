@@ -53,18 +53,18 @@ func onDealCards():
 	# Spawn killed players
 	for playerId in $Network.joinedPlayers:
 		if !$Players.players.has(playerId):
-			$Players.spawnPlayer($Network.player_info[playerId])
+			var player = $Players.spawnPlayer(
+				$Network.player_info[playerId]
+			)
 			# Connect player
-			var player = $Players.players[playerId]
-			player.connect("onHit", self, "onPlayerTokenHit")
-			player.connect("onDestroyed", self, "onPlayerTokenDestroyed")
-			$Network.playerTokenHit(playerId, player.currentHp)
+			$Network.connectTokenToPlayer(player, playerId)
+			$Network.playerTokenHit(player)
 
 	actions.append(AlertAction.new("Player card phase"))
 	actions.append(Wait.new(cardPhaseDuration))
 
 func onPlayerTokenHit(player):
-	$Network.playerTokenHit(player.id, player.currentHp)
+	$Network.playerTokenHit(player)
 
 func onPlayerTokenDestroyed(player):
 	pass

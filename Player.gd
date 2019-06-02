@@ -24,13 +24,26 @@ func _ready():
 	for child in $UI/Cards.get_children():
 		$UI/Cards.remove_child(child)
 
+func setInfo(info):
+	id = info.id
+	if info.name:
+		playerName = info.name
+	else:
+		playerName = str("Player", id)
+	if info.color:
+		color = info.color
+	else:
+		color = Color.white
+	nameLabel.modulate = color
+	nameLabel.text = playerName
+
 func getHp():
 	return hp.value
 
 func onHit(damage):
-	emit_signal("onHit", self)
 	hp.value -= damage
 	hp.show()
+	emit_signal("onHit", self)	
 	if hp.value <= 0:
 		emit_signal("onDestroyed", self)
 		queue_free()

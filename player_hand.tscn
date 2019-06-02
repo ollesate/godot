@@ -26,6 +26,7 @@ func Network_onSimulationStart():
 	$CardHand.setLocked(true)
 
 func Network_onTokenHit(hpLeft):
+	print(\"on token hit\")
 	$CardHand.hpLeft = hpLeft"
 
 [node name="Root" type="Control"]
@@ -39,7 +40,7 @@ script = SubResource( 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 2 )
-hpLeft = 3
+hpLeft = 10
 
 [node name="PlayerCard" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
@@ -63,7 +64,6 @@ margin_right = -16.0
 margin_bottom = 194.0
 
 [node name="PlayerCard4" parent="CardHand" instance=ExtResource( 3 )]
-self_modulate = Color( 0.66, 0.66, 0.66, 1 )
 anchor_right = 1.0
 margin_left = 16.0
 margin_top = 208.0
@@ -71,7 +71,6 @@ margin_right = -16.0
 margin_bottom = 258.0
 
 [node name="PlayerCard5" parent="CardHand" instance=ExtResource( 3 )]
-self_modulate = Color( 0.66, 0.66, 0.66, 1 )
 anchor_right = 1.0
 margin_left = 16.0
 margin_top = 272.0
