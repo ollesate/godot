@@ -1,22 +1,30 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Laser.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
 func _ready():
 	yield($Network, \"onPlayerConnected\")
-	var id = $Network.players[0]
-	$Network.connectTokenToPlayer($Player, id)
-	$Player.hp.value = 5
+	print(\"onConnected\")
+	print($Network.players)
+	var playerId = $Network.players[0]
 	$Network.dealCardsToPlayer(
-		id, 
-		[Card.wait(), Card.wait(), Card.wait(), Card.wait()]
+		playerId,
+		[Card.wait(), Card.wait(), Card.wait(), Card.wait(), Card.wait()]
 	)
-	yield(Card.perform($Laser.getAction()), \"finished\")	 "
+	$Network.connectTokenToPlayer($Player, playerId)
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")
+	yield(Card.perform($Laser.getAction()), \"finished\")"
 
 [node name="Root" type="Node2D"]
 script = SubResource( 1 )
@@ -29,3 +37,9 @@ position = Vector2( 64, 192 )
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
 position = Vector2( 448, 192 )
+
+[node name="Root" parent="." instance=ExtResource( 4 )]
+margin_left = 576.0
+margin_top = 16.0
+margin_right = 576.0
+margin_bottom = 16.0

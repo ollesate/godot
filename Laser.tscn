@@ -55,7 +55,7 @@ func animFinished():
 	var laserIntersect = getLaserIntersect()
 	if laserIntersect:
 		if laserIntersect.collider.is_in_group(\"players\"):
-			laserIntersect.collider.onHit(3)
+			laserIntersect.collider.onHit(1)
 	emit_signal(\"onShootFinished\")
 
 func setDirection(dir):

@@ -23,7 +23,7 @@ func setCards(cardInfos):
 
 func setLocked(newLocked):
 	locked = newLocked
-	modulate.a = 0.5 if locked else 1.0
+	modulate.a = 0.7 if locked else 1.0
 	for child in get_children():
 		child.setLocked(locked)
 

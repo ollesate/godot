@@ -26,38 +26,42 @@ signal onSimulationStart()
 signal onTokenHit()
 
 func _ready():
-	if get_tree().network_peer != null:
-		return
+	custom_multiplayer = MultiplayerAPI.new()
+	custom_multiplayer.set_root_node(self)
 	var peer = NetworkedMultiplayerENet.new()
 	if (isServer):
 		print("server start")
 		peer.create_server(PORT, MAX_PLAYERS)
 	else:
 		print("client start")
-		peer.create_client("127.0.0.1", PORT)
-	get_tree().set_network_peer(peer)
+		peer.create_client("localhost", PORT)
+	custom_multiplayer.set_network_peer(peer)
 	
 	if isServer:
-		get_tree().connect("network_peer_connected", self, "_player_connected")
-		get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
+		custom_multiplayer.connect("network_peer_connected", self, "_player_connected")
+		custom_multiplayer.connect("network_peer_disconnected", self, "_player_disconnected")
 	else:
-		get_tree().connect("connected_to_server", self, "_connected_ok")
-		get_tree().connect("connection_failed", self, "_connected_fail")
-		get_tree().connect("server_disconnected", self, "_server_disconnected")
+		custom_multiplayer.connect("connected_to_server", self, "_connected_ok")
+		custom_multiplayer.connect("connection_failed", self, "_connected_fail")
+		custom_multiplayer.connect("server_disconnected", self, "_server_disconnected")
 
 var joinedPlayers setget ,joinedPlayers
 
+func _process(delta):
+	if custom_multiplayer.has_network_peer():
+		custom_multiplayer.poll()
+
 func joinedPlayers():
-	return get_tree().get_network_connected_peers()
+	return custom_multiplayer.get_network_connected_peers()
 
 func getPlayers():
-	return get_tree().get_network_connected_peers()
+	return custom_multiplayer.get_network_connected_peers()
 
 func _player_connected(id):
 	print(str("network peer connected ", id))
 	player_info[id] = {
 		id = id,
-		name = str("Player", get_tree().get_network_connected_peers().size()),
+		name = str("Player", custom_multiplayer.get_network_connected_peers().size()),
 		color = Color.white
 	}
 	emit_signal("onPlayerConnected", id)
@@ -103,12 +107,6 @@ remotesync func addPlayer(playerInfo):
 	player.info = playerInfo
 	$Players.add_child(player)
 
-func getMyPlayer():
-	var id = get_tree().get_network_unique_id()
-	for player in $Players.get_children():
-		if player.info.id == id:
-			return player
-
 master func dealCardsToPlayer(id, cards):
 	print(str("deal cards to player", id))
 	playerCards[id] = cards
@@ -128,7 +126,8 @@ func swapCards(idx1, idx2):
 
 remote func playerSwapCards(idx1, idx2):
 	print(str("Player swap cards", idx1, idx2))
-	var cards = playerCards[get_tree().get_rpc_sender_id()]
+	var id = custom_multiplayer.get_rpc_sender_id()
+	var cards = playerCards[id]
 	var temp = cards[idx1]
 	cards[idx1] = cards[idx2]
 	cards[idx2] = temp
@@ -154,7 +153,7 @@ slave func Player_onCardFinished(index):
 	emit_signal("onCardFinished", index)
 
 master func startSimulation():
-	for id in get_tree().get_network_connected_peers():
+	for id in custom_multiplayer.get_network_connected_peers():
 		rpc_id(id, "Player_onSimulationStart")
 		
 slave func Player_onSimulationStart():

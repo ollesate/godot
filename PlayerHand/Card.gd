@@ -36,6 +36,9 @@ func setTitle(title):
 	
 func setLocked(locked):
 	self.locked = locked
+	if dragPosition:
+		dragPosition = null
+		emit_signal("onDropped", self)
 
 func setDisabled(disabled):
 	self.disabled = disabled
@@ -47,15 +50,15 @@ func _gui_input(event):
 		return
 	if event is InputEventMouseButton:
 		if event.pressed:
-			dragPosition = get_global_mouse_position() - rect_global_position
+			dragPosition = get_global_mouse_position() - rect_position
 		else:
 			dragPosition = null
 			emit_signal("onDropped", self)
 	if event is InputEventMouseMotion and dragPosition:
-		rect_global_position.y = (get_global_mouse_position() - dragPosition).y
-		emit_signal("onPositionChanged", self, rect_global_position)
+		rect_position.y = (get_global_mouse_position() - dragPosition).y
+		emit_signal("onPositionChanged", self, rect_position)
 
 func move(finalPos):
-	var currentPos = rect_global_position
-	$Tween.interpolate_property(self, "rect_global_position", currentPos, finalPos, TWEEN_DURATION, Tween.TRANS_LINEAR, Tween.EASE_IN)
+	var currentPos = rect_position
+	$Tween.interpolate_property(self, "rect_position", currentPos, finalPos, TWEEN_DURATION, Tween.TRANS_LINEAR, Tween.EASE_IN)
 	$Tween.start()
