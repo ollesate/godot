@@ -99,13 +99,6 @@ remote func _player_join_lobby(id, name, color):
 	player_info[id] = { id = id, name = name, color = color }
 	print(str("Player join lobby ", player_info[id]))
 	emit_signal("onPlayerJoined", player_info[id])
-	rpc("addPlayer", player_info[id])
-
-remotesync func addPlayer(playerInfo):
-	var player = preload("res://PlayerNetwork.tscn").instance()
-	player.set_name(str(playerInfo.id))
-	player.info = playerInfo
-	$Players.add_child(player)
 
 master func dealCardsToPlayer(id, cards):
 	print(str("deal cards to player", id))
