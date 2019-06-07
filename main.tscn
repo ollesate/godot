@@ -993,4 +993,4 @@ text = "Start game"
 
 [node name="CardHands" type="Node2D" parent="."]
 
-[node name="Root" parent="." instance=ExtResource( 10 )]
+[node name="PlayerHand" parent="." instance=ExtResource( 10 )]
