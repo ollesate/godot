@@ -15,6 +15,9 @@ func _init(direction, character_adjusted = false):
 
 func act(delta):
 	.act(delta)
+	if self.isFirstTime:
+		print(character.position)
+	
 	if (self.isFirstTime && character_adjusted):
 		direction = direction.rotated(self.character.rotation)
 	self.character.move_and_slide(direction * SPEED)
@@ -23,4 +26,8 @@ func act(delta):
 		if (collision.collider.is_in_group("players")):
 			collision.collider.move_and_slide(direction * SPEED)
 	timeLeft -= delta;
-	return timeLeft <= 0
+	if timeLeft <= 0:
+		character.position.x = floor(character.position.x)
+		character.position.y = floor(character.position.y)
+		return true
+	return false

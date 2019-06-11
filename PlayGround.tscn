@@ -15,16 +15,16 @@ func _ready():
 	var playerId = $Network.players[0]
 	$Network.dealCardsToPlayer(
 		playerId,
-		[Card.wait(), Card.wait(), Card.wait(), Card.wait(), Card.wait()]
+		[PlayerMove.new(PlayerMove.FORWARD, 2), Card.wait(), Card.wait(), Card.wait(), Card.wait()]
 	)
 	$Network.connectTokenToPlayer($Player, playerId)
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")
-	yield(Card.perform($Laser.getAction()), \"finished\")"
+	# yield(Card.perform($Laser.getAction()), \"finished\")
+	# Create cards and perform them on the player
+	yield(Card.perform(PlayerMove.new(PlayerMove.FORWARD, 2), $Player), \"finished\")
+	yield(Card.perform(Rotate.new(Rotate.UTURN), $Player), \"finished\")
+	yield(Card.perform(PlayerMove.new(PlayerMove.FORWARD, 1), $Player), \"finished\")
+	yield(Card.perform(Rotate.new(Rotate.RIGHT), $Player), \"finished\")
+	yield(Card.perform(PlayerMove.new(PlayerMove.FORWARD, 1), $Player), \"finished\")"
 
 [node name="Root" type="Node2D"]
 script = SubResource( 1 )
@@ -34,9 +34,13 @@ isServer = true
 
 [node name="Laser" parent="." instance=ExtResource( 2 )]
 position = Vector2( 64, 192 )
+direction = 0
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
-position = Vector2( 448, 192 )
+position = Vector2( 448, 384 )
+
+[node name="Player2" parent="." instance=ExtResource( 3 )]
+position = Vector2( 320, 256 )
 
 [node name="Root" parent="." instance=ExtResource( 4 )]
 margin_left = 576.0
