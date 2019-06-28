@@ -1,13 +1,27 @@
 extends Area2D
 
-var direction: Vector2
+var steps = 1
+var rotate = 0
+
+enum TYPE {
+	STRAIGHT,
+	TURN
+}
+
+var move = Vector2(0, 1)
 
 func _init():
 	add_to_group("belts")
-	direction = Vector2(0, -1).rotated(rotation)
+	
+func config(flipX, flipY, transpose):
+	$Sprite.flip_h = flipX if not transpose else flipY
+	$Sprite.flip_v = flipY if not transpose else flipX
+	if transpose:
+		$Sprite.scale.y = -1
+		$Sprite.rotate(deg2rad(90))
 
 func getAction():
-	return MovePlayer.new(self, direction)
+	return MovePlayer.new(self, Vector2(0, 0))
 
 func getPlayer():
 	for body in get_overlapping_bodies():

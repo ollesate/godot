@@ -1,12 +1,13 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://System.gd" type="Script" id=1]
 [ext_resource path="res://Network.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Assets/icon.png" type="Texture" id=3]
-[ext_resource path="res://Game/ConveyorBelt.gd" type="Script" id=4]
-[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=5]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=6]
-[ext_resource path="res://player_hand.tscn" type="PackedScene" id=7]
+[ext_resource path="res://conveyor.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Game/ConveyorBelt.gd" type="Script" id=5]
+[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=6]
+[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=7]
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=8]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 64, 64 )
@@ -739,30 +740,15 @@ position = Vector2( 960, 64 )
 texture = ExtResource( 3 )
 
 [node name="ConveyorBelts" type="Node2D" parent="."]
-editor/display_folded = true
 position = Vector2( 448, 192 )
 z_index = -1
 
-[node name="Belt" type="Area2D" parent="ConveyorBelts"]
-editor/display_folded = true
-position = Vector2( 128, 0 )
-rotation = -1.57079
-script = ExtResource( 4 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ConveyorBelts/Belt"]
-shape = SubResource( 3 )
-
-[node name="Sprite" type="Sprite" parent="ConveyorBelts/Belt"]
-modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
-texture = ExtResource( 3 )
+[node name="Belt" parent="ConveyorBelts" instance=ExtResource( 4 )]
 
 [node name="Belt4" type="Area2D" parent="ConveyorBelts"]
 editor/display_folded = true
 rotation = -1.57079
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -777,7 +763,7 @@ texture = ExtResource( 3 )
 [node name="Belt3" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 0 )
 rotation = -3.14159
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -792,7 +778,7 @@ texture = ExtResource( 3 )
 [node name="Belt5" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 128 )
 rotation = -3.14159
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -807,7 +793,7 @@ texture = ExtResource( 3 )
 [node name="Belt6" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( -128, 256 )
 rotation = -4.71238
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -822,7 +808,7 @@ texture = ExtResource( 3 )
 [node name="Belt7" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 0, 256 )
 rotation = -4.71238
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -837,7 +823,7 @@ texture = ExtResource( 3 )
 [node name="Belt8" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 128, 256 )
 rotation = -4.71238
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -852,7 +838,7 @@ texture = ExtResource( 3 )
 [node name="Belt9" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 256 )
 rotation = -6.28318
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -867,7 +853,7 @@ texture = ExtResource( 3 )
 [node name="Belt10" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 128 )
 rotation = -6.28318
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -882,7 +868,7 @@ texture = ExtResource( 3 )
 [node name="Belt2" type="Area2D" parent="ConveyorBelts"]
 position = Vector2( 256, 0 )
 rotation = -1.57079
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -923,8 +909,8 @@ margin_right = 588.0
 margin_bottom = 53.0
 rect_min_size = Vector2( 200, 35 )
 step = 0.0
-texture_under = ExtResource( 5 )
-texture_progress = ExtResource( 6 )
+texture_under = ExtResource( 6 )
+texture_progress = ExtResource( 7 )
 nine_patch_stretch = true
 stretch_margin_left = 100
 stretch_margin_right = 100
@@ -944,4 +930,4 @@ text = "Start game"
 
 [node name="CardHands" type="Node2D" parent="."]
 
-[node name="PlayerHand" parent="." instance=ExtResource( 7 )]
+[node name="PlayerHand" parent="." instance=ExtResource( 8 )]

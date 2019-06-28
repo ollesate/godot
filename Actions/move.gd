@@ -8,6 +8,7 @@ const SPEED = LENGTH / STEP_DURATION
 var timeLeft = STEP_DURATION
 var direction
 var character_adjusted
+var finished
 
 func _init(direction, character_adjusted = false):
 	self.direction = direction
@@ -15,19 +16,19 @@ func _init(direction, character_adjusted = false):
 
 func act(delta):
 	.act(delta)
-	if self.isFirstTime:
-		print(character.position)
+
+	self.character.move_and_slide(direction * delta)
+	if self.character.get_slide_count() > 0:
+		pass
+	# cool stuff
+	# for step in range(steps):
+	#	var action = Card.process(Move.forward(), self.character)
+	# 	yield(action, "finished")
+	#	if action.hitTarget:
+	#		if !Map.collider(direction, 2, self.character)
+	# 			var pushAction = ...
 	
-	if (self.isFirstTime && character_adjusted):
-		direction = direction.rotated(self.character.rotation)
-	self.character.move_and_slide(direction * SPEED)
-	if (self.character.get_slide_count() > 0):
-		var collision = self.character.get_slide_collision(0)
-		if (collision.collider.is_in_group("players")):
-			collision.collider.move_and_slide(direction * SPEED)
-	timeLeft -= delta;
-	if timeLeft <= 0:
-		character.position.x = floor(character.position.x)
-		character.position.y = floor(character.position.y)
-		return true
+	# for step in range(steps):
+	# 	yield(self.character.move(length, 'finished')	
+
 	return false

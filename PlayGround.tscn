@@ -9,6 +9,12 @@
 script/source = "extends Node2D
 
 func _ready():
+	yield($Player, \"moveFinished\")
+
+func _process(delta):
+	$Player.move(Vector2.LEFT)
+
+func oops():
 	yield($Network, \"onPlayerConnected\")
 	print(\"onConnected\")
 	print($Network.players)
@@ -37,7 +43,7 @@ position = Vector2( 64, 192 )
 direction = 0
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
-position = Vector2( 448, 384 )
+position = Vector2( 448, 256 )
 
 [node name="Player2" parent="." instance=ExtResource( 3 )]
 position = Vector2( 320, 256 )

@@ -2,6 +2,7 @@ extends KinematicBody2D
 
 signal onHit()
 signal onDestroyed()
+signal moveFinished()
 
 const HP_MAX = 9
 
@@ -37,6 +38,25 @@ func setInfo(info):
 	nameLabel.modulate = color
 	nameLabel.text = playerName
 
+var movePoint
+
+func move(dir):
+	if movePoint == null:
+		movePoint = nextPoint(dir)
+	print("pos")
+	print(transform.origin)
+	print(movePoint)
+	print("distance")
+	# print(transform.origin.distance_to(movePoint))
+	print(transform.origin.dot(dir))
+	print(movePoint.dot(dir))
+	if transform.origin.dot(dir) < movePoint.dot(dir):
+		move_and_slide(dir * 45.0)
+
+func nextPoint(dir):
+	var centerPos = transform.origin
+	return centerPos + Global.STEP_SIZE * dir
+
 func getHp():
 	return hp.value
 
@@ -47,3 +67,31 @@ func onHit(damage):
 	if hp.value <= 0:
 		emit_signal("onDestroyed", self)
 		queue_free()
+		
+class MoveForward:
+	extends Action
+	
+	var movePoint
+	var dir
+	
+	func _init(dir):
+		self.dir = dir
+	
+	func act(delta):
+		.act(delta)
+		
+		if !movePoint:
+			movePoint = nextPoint(dir)
+		print("pos")
+		print(self.character.transform.origin)
+		print(self.character.movePoint)
+		print("distance")
+		# print(transform.origin.distance_to(movePoint))
+		print(self.character.transform.origin.dot(dir))
+		print(self.character.movePoint.dot(dir))
+		if self.character.transform.origin.dot(dir) < movePoint.dot(dir):
+			self.character.move_and_slide(dir * 45.0)
+			
+	func nextPoint(dir):
+		var centerPos = self.character.transform.origin
+		return centerPos + Global.STEP_SIZE * dir
