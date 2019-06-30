@@ -2,6 +2,8 @@ extends Area2D
 
 var steps = 1
 var rotate = 0
+var direction
+var straight
 
 enum TYPE {
 	STRAIGHT,
@@ -9,6 +11,14 @@ enum TYPE {
 }
 
 var move = Vector2(0, 1)
+
+func start():
+	$Sprite.isDrawing = true
+	$Sprite.update()
+
+func stop():
+	$Sprite.isDrawing = false
+	$Sprite.update()
 
 func _init():
 	add_to_group("belts")

@@ -15,9 +15,14 @@ _global_script_classes=[ {
 "path": "res://Actions/Action.gd"
 }, {
 "base": "Action",
-"class": "AlertAction",
+"class": "ActionMove",
 "language": "GDScript",
-"path": "res://Actions/alert.gd"
+"path": "res://Actions/actionMove.gd"
+}, {
+"base": "Reference",
+"class": "Actions",
+"language": "GDScript",
+"path": "res://Actions/Actions.gd"
 }, {
 "base": "Action",
 "class": "Card",
@@ -81,7 +86,8 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Action": "",
-"AlertAction": "",
+"ActionMove": "",
+"Actions": "",
 "Card": "",
 "CardUtils": "",
 "CompositeAction": "",

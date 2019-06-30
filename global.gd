@@ -18,10 +18,7 @@ signal onCardEnd(player, card)
 signal onPlayerCards(player, cards)
 
 var actions = []
-
-func alert(text):
-	# events.onEvent(text)
-	pass
+var drawActions = []
 
 func onPlayerCards(player, cards):
 	emit_signal("onPlayerCards", player, cards)
@@ -36,6 +33,11 @@ func perform(action):
 	actions.append(action)
 
 func _physics_process(delta):
-	for action in actions:
+	for i in range(actions.size()):
+		var action = actions[i]
+		if !action.isRunning:
+			action.emit_signal("started")
+		action.isRunning = true
 		if action.act(delta):
-			actions.remove(actions.find(action))
+			actions.remove(i)
+			action.emit_signal("finished")

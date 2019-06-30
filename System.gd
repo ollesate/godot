@@ -60,7 +60,6 @@ func onDealCards():
 			$Network.connectTokenToPlayer(player, playerId)
 			$Network.playerTokenHit(player)
 
-	actions.append(AlertAction.new("Player card phase"))
 	actions.append(Wait.new(cardPhaseDuration))
 
 func onPlayerTokenHit(player):
@@ -92,15 +91,11 @@ func onSimulateGame():
 	var turns = Sequence.new([])
 	for turn in range(5):
 		var turnSequence = Sequence.new([])
-		turnSequence.actions.append(AlertAction.new("Players move"))
 		for id in playerCards.keys():
 			if (turn < playerCards[id].size()):
 				turnSequence.actions.append(playerCards[id][turn])
-		
-		turnSequence.actions.append(AlertAction.new("Players shoot"))
 		turnSequence.actions.append(getShootAction())
 		turnSequence.actions.append(getLaserAction())
-		turnSequence.actions.append(AlertAction.new("Belts"))
 		turnSequence.actions.append(getBeltsAction())
 		turns.actions.append(turnSequence)
 	

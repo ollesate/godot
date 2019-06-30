@@ -4,9 +4,10 @@ class_name CompositeAction
 
 var actions = []
 
-func _init(actions):
+func _init(actions = []):
 	self.actions = actions
 
-func setCharacter(character):
+func setCharacter(val):
+	character = val
 	for action in actions:
-		action.character = character
+		action.character = val
