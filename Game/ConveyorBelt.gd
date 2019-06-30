@@ -3,14 +3,6 @@ extends Area2D
 var steps = 1
 var rotate = 0
 var direction
-var straight
-
-enum TYPE {
-	STRAIGHT,
-	TURN
-}
-
-var move = Vector2(0, 1)
 
 func start():
 	$Sprite.isDrawing = true
