@@ -8,6 +8,13 @@
 [sub_resource type="GDScript" id=4]
 script/source = "extends Node2D
 
+func _init():
+	var up = Vector2(0, -1)
+	var left = Vector2(-1, 0)
+	var rot = up.angle_to(left)
+	
+	print(\"rot \", rad2deg(rot))
+
 func _ready():
 	syncPositions()
 
@@ -93,18 +100,18 @@ tile_data = PoolIntArray( 0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 4, 1, 0, 5, 1, 0, 
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 75, 75 )
 format = 1
-tile_data = PoolIntArray( -131067, 1, 0, 65541, 12, 0, 131074, 536870939, 0, 131075, -2147483644, 0, 131076, 2, 0, 131077, -2147483647, 0, 131078, -1073741824, 0, 131079, 536870913, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, 1610612738, 0, 196611, -1610612732, 0, 196612, -1610612734, 0, 196613, 1073741825, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, 536870914, 0, 262147, 4, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -536870912, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327680, 26, 0, 327681, 26, 0, 327682, -2147483646, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, 1610612737, 0, 327688, 4, 0, 327689, 0, 0, 393216, 26, 0, 393217, 26, 0 )
+tile_data = PoolIntArray( -131067, 1, 0, 65541, 12, 0, 131074, -1073741822, 0, 131075, -2147483644, 0, 131076, 2, 0, 131077, -2147483647, 0, 131078, -1073741824, 0, 131079, -1073741824, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, 1073741825, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327680, 26, 0, 327681, 26, 0, 327682, -2147483646, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0, 393216, 26, 0, 393217, 26, 0 )
 script = ExtResource( 3 )
 
-[node name="Player2" type="KinematicBody2D" parent="."]
-position = Vector2( 335.43, 260.596 )
+[node name="Player5" type="KinematicBody2D" parent="."]
+position = Vector2( 187.152, 268.265 )
 scale = Vector2( 2, 2 )
 script = SubResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="Sprite" type="Sprite" parent="Player2"]
+[node name="Sprite" type="Sprite" parent="Player5"]
 texture = ExtResource( 4 )
 hframes = 10
 frame = 6
@@ -112,18 +119,18 @@ region_enabled = true
 region_rect = Rect2( 0, 288, 320, 32 )
 script = SubResource( 2 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player5"]
 shape = SubResource( 3 )
 
-[node name="Player3" type="KinematicBody2D" parent="."]
-position = Vector2( 261.93, 261.235 )
+[node name="Player11" type="KinematicBody2D" parent="."]
+position = Vector2( 486.265, 183.9 )
 scale = Vector2( 2, 2 )
 script = SubResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="Sprite" type="Sprite" parent="Player3"]
+[node name="Sprite" type="Sprite" parent="Player11"]
 texture = ExtResource( 4 )
 hframes = 10
 frame = 6
@@ -131,19 +138,18 @@ region_enabled = true
 region_rect = Rect2( 0, 288, 320, 32 )
 script = SubResource( 2 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player11"]
 shape = SubResource( 3 )
 
-[node name="Player" type="KinematicBody2D" parent="."]
-position = Vector2( 190.944, 260.97 )
+[node name="Player10" type="KinematicBody2D" parent="."]
+position = Vector2( 260.652, 268.265 )
 scale = Vector2( 2, 2 )
 script = SubResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
-isRunning = true
 
-[node name="Sprite" type="Sprite" parent="Player"]
+[node name="Sprite" type="Sprite" parent="Player10"]
 texture = ExtResource( 4 )
 hframes = 10
 frame = 6
@@ -151,5 +157,100 @@ region_enabled = true
 region_rect = Rect2( 0, 288, 320, 32 )
 script = SubResource( 2 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player10"]
+shape = SubResource( 3 )
+
+[node name="Player6" type="KinematicBody2D" parent="."]
+position = Vector2( 186.513, 337.291 )
+scale = Vector2( 2, 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player6"]
+texture = ExtResource( 4 )
+hframes = 10
+frame = 6
+region_enabled = true
+region_rect = Rect2( 0, 288, 320, 32 )
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player6"]
+shape = SubResource( 3 )
+
+[node name="Player9" type="KinematicBody2D" parent="."]
+position = Vector2( 260.652, 338.57 )
+scale = Vector2( 2, 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player9"]
+texture = ExtResource( 4 )
+hframes = 10
+frame = 6
+region_enabled = true
+region_rect = Rect2( 0, 288, 320, 32 )
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player9"]
+shape = SubResource( 3 )
+
+[node name="Player7" type="KinematicBody2D" parent="."]
+position = Vector2( 561.682, 415.265 )
+scale = Vector2( 2, 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player7"]
+texture = ExtResource( 4 )
+hframes = 10
+frame = 6
+region_enabled = true
+region_rect = Rect2( 0, 288, 320, 32 )
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player7"]
+shape = SubResource( 3 )
+
+[node name="Player12" type="KinematicBody2D" parent="."]
+position = Vector2( 488.822, 413.348 )
+scale = Vector2( 2, 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player12"]
+texture = ExtResource( 4 )
+hframes = 10
+frame = 6
+region_enabled = true
+region_rect = Rect2( 0, 288, 320, 32 )
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player12"]
+shape = SubResource( 3 )
+
+[node name="Player8" type="KinematicBody2D" parent="."]
+position = Vector2( 563.6, 187.096 )
+scale = Vector2( 2, 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player8"]
+texture = ExtResource( 4 )
+hframes = 10
+frame = 6
+region_enabled = true
+region_rect = Rect2( 0, 288, 320, 32 )
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player8"]
 shape = SubResource( 3 )

@@ -112,6 +112,11 @@ config/icon="res://Assets/icon.png"
 
 Global="*res://global.gd"
 
+[layer_names]
+
+2d_physics/layer_1="normal"
+2d_physics/layer_2="ghost"
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
