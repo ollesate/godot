@@ -33,11 +33,10 @@ func perform(action):
 	actions.append(action)
 
 func _physics_process(delta):
-	for i in range(actions.size()):
-		var action = actions[i]
+	for action in actions:
 		if !action.isRunning:
 			action.emit_signal("started")
 		action.isRunning = true
 		if action.act(delta):
-			actions.remove(i)
+			actions.remove(actions.find(action))
 			action.emit_signal("finished")

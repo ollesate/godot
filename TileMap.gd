@@ -12,13 +12,13 @@ func _ready():
 		var flipY = is_cell_y_flipped(cellPos.x, cellPos.y)
 		var transposed = is_cell_transposed(cellPos.x, cellPos.y)
 		var node = create(name, cellPos, flipX, flipY, transposed)
-		print(name)
+		# print(name)
 		if node:
 			add_child(node)
 			set_cellv(cellPos, -1)
 			node.position = map_to_world(cellPos) + Vector2(1, 1) * textureSize / 2
 	
-	yield(Actions.wait(0.5).perform(), "finished")
+	yield(Actions.wait(5.5).perform(), "finished")
 	perform()
 				
 func create(name, cellPos, flipX, flipY, transposed):
@@ -61,6 +61,27 @@ func create(name, cellPos, flipX, flipY, transposed):
 			belt.rotate = rad2deg(otherVector.angle_to(belt.direction))
 			belts[key] = belt
 			return belt
+		"Laser1":
+			var laser = preload("res://Laser.tscn").instance()
+			var newLaserDir = modulate(laser.direction, flipX, flipY, transposed)
+			var rotation = laser.direction.angle_to(newLaserDir)
+			laser.direction = newLaserDir
+			laser.rotation = rotation
+			return laser
+		"Laser2":
+			var laser = preload("res://Laser2.tscn").instance()
+			var newLaserDir = modulate(laser.direction, flipX, flipY, transposed)
+			var rotation = laser.direction.angle_to(newLaserDir)
+			laser.direction = newLaserDir
+			laser.rotation = rotation
+			return laser
+		"Laser3":
+			var laser = preload("res://Laser3.tscn").instance()
+			var newLaserDir = modulate(laser.direction, flipX, flipY, transposed)
+			var rotation = laser.direction.angle_to(newLaserDir)
+			laser.direction = newLaserDir
+			laser.rotation = rotation
+			return laser
 
 func modulate(vector, flipX, flipY, transposed):
 	if transposed:
@@ -71,6 +92,9 @@ func getRect(x, y):
 	return Rect2(x * textureSize, y * textureSize, textureSize, textureSize)
 
 func perform():
+	for laser in get_tree().get_nodes_in_group("lasers"):
+		laser.shoot()
+	
 	for i in range(5):
 		yield(getBeltAction(1).perform(), "finished")
 		yield(Actions.wait(.5).perform(), "finished")

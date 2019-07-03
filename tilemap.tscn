@@ -1,19 +1,12 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://tilemap2.tres" type="TileSet" id=1]
 [ext_resource path="res://tilemap.tres" type="TileSet" id=2]
 [ext_resource path="res://TileMap.gd" type="Script" id=3]
-[ext_resource path="res://Assets/spritesheet.png" type="Texture" id=4]
+[ext_resource path="res://Assets/tank.png" type="Texture" id=4]
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
-
-func _init():
-	var up = Vector2(0, -1)
-	var left = Vector2(-1, 0)
-	var rot = up.angle_to(left)
-	
-	print(\"rot \", rad2deg(rot))
 
 func _ready():
 	syncPositions()
@@ -27,7 +20,56 @@ func syncPos(player):
 	var pos = $Background.world_to_map(player.position)
 	player.position = $Background.map_to_world(pos) + $Background.cell_size / 2"
 
-[sub_resource type="GDScript" id=1]
+[sub_resource type="GDScript" id=2]
+script/source = "extends TileMap
+
+func _ready():
+	yield(Actions.wait(1).perform(), \"finished\")
+	yield(getAction().perform(), \"finished\")
+
+func getAction():
+	var actions = []
+	for player in get_tree().get_nodes_in_group(\"players\"):
+		var cellPos = world_to_map(player.position)
+		var id = get_cellv(cellPos)
+		var name = tile_set.tile_get_name(id)
+		if name == \"Hole\":
+			actions.append(Sequence.new([
+				ScaleAction.new(Vector2.ZERO, 1.0).with(player),
+				DeleteAction.new().with(player)
+			]))
+	return Parallell.new(actions)
+
+class DeleteAction:
+	extends Action
+	
+	func act(delta):
+		character.free()
+		return true
+
+class ScaleAction:
+	extends Action
+	
+	var startDuration
+	
+	var scaleTo
+	var scaleFrom
+	var duration
+	
+	func _init(scaleTo, duration):
+		self.startDuration = duration
+		self.scaleTo = scaleTo
+		self.duration = duration
+
+	func start():
+		scaleFrom = character.scale
+
+	func act(delta):
+		character.scale = lerp(scaleFrom, scaleTo, (startDuration - duration) / startDuration)
+		duration -= delta
+		return duration <= 0"
+
+[sub_resource type="GDScript" id=3]
 script/source = "extends KinematicBody2D
 
 export var isRunning = false
@@ -67,7 +109,7 @@ class MovePlayer:
 				var player: KinematicBody2D = collider
 				player.move_and_slide(moveAction.velocity)"
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Sprite
 
 const FRAME_DURATION = 0.1
@@ -83,174 +125,52 @@ func _process(delta):
 		currentDur = FRAME_DURATION
 		frame = (frame + 1) % hframes"
 
-[sub_resource type="RectangleShape2D" id=3]
+[sub_resource type="RectangleShape2D" id=5]
 extents = Vector2( 13.9454, 11.9861 )
 
 [node name="Root" type="Node2D"]
 position = Vector2( 1, 0 )
-script = SubResource( 4 )
+script = SubResource( 1 )
 
 [node name="Background" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 75, 75 )
 format = 1
-tile_data = PoolIntArray( 0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 4, 1, 0, 5, 1, 0, 6, 1, 0, 7, 1, 0, 8, 1, 0, 9, 1, 0, 10, 1, 0, 11, 1, 0, 12, 1, 0, 13, 1, 0, 14, 1, 0, 65536, 0, 327680, 65537, 0, 327684, 65538, 0, 196612, 65539, 0, 393219, 65540, 1, 0, 65541, 0, 327680, 65542, 0, 327684, 65543, 0, 327684, 65544, 0, 327681, 65545, 0, 327684, 65546, 0, 327684, 65547, 0, 327681, 65548, 0, 196612, 65549, 0, 327684, 65550, 0, 196613, 131072, 1, 0, 131073, 1, 0, 131074, 1, 0, 131075, 1, 0, 131076, 1, 0, 131077, 1, 0, 131078, 1, 0, 131079, 1, 0, 131080, 0, 262147, 131081, 1, 0, 131082, 1, 0, 131083, 0, 262147, 131084, 1, 0, 131085, 1, 0, 131086, 0, 262149, 196609, 1, 0, 196610, 1, 0, 196611, 1, 0, 196612, 1, 0, 196613, 1, 0, 196614, 1, 0, 196615, 1, 0, 196616, 0, 262147, 196617, 1, 0, 196618, 0, 196611, 196619, 0, 393218, 196620, 0, 196613, 196621, 1, 0, 196622, 0, 262147, 262144, 1, 0, 262145, 1, 0, 262146, 1, 0, 262147, 1, 0, 262148, 1, 0, 262149, 1, 0, 262150, 1, 0, 262151, 1, 0, 262152, 0, 393217, 262153, 0, 327684, 262154, 0, 327682, 262155, 1, 0, 262156, 0, 393217, 262157, 0, 327684, 262158, 0, 327682, 327680, 1, 0, 327681, 1, 0, 327682, 1, 0, 327683, 1, 0, 327684, 1, 0, 327685, 1, 0, 327686, 1, 0, 327687, 1, 0, 327688, 0, 262149, 327689, 1, 0, 327690, 0, 327683, 327691, 0, 327681, 327692, 0, 327685, 327693, 1, 0, 327694, 0, 262149, 393216, 0, 0, 393217, 0, 131076, 393218, 0, 1, 393219, 0, 2, 393220, 1, 0, 393221, 0, 0, 393222, 0, 131076, 393223, 0, 1, 393224, 0, 458757, 393225, 1, 0, 393226, 1, 0, 393227, 0, 262149, 393228, 1, 0, 393229, 1, 0, 393230, 0, 262147, 458752, 0, 131072, 458753, 0, 4, 458754, 0, 4, 458755, 0, 131074, 458756, 1, 0, 458757, 0, 131072, 458758, 0, 4, 458759, 0, 4, 458760, 0, 458756, 458761, 0, 327684, 458762, 0, 196612, 458763, 0, 393218, 458764, 0, 327684, 458765, 0, 196612, 458766, 0, 327685 )
+tile_data = PoolIntArray( 0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 4, 1, 0, 5, 1, 0, 6, 1, 0, 7, 1, 0, 8, 1, 0, 9, 1, 0, 10, 1, 0, 11, 1, 0, 12, 1, 0, 13, 1, 0, 14, 1, 0, 65536, 0, 327680, 65537, 0, 327684, 65538, 0, 196612, 65539, 0, 393219, 65540, 1, 0, 65541, 1, 0, 65542, 1, 0, 65543, 1, 0, 65544, 0, 196611, 65545, 0, 327684, 65546, 0, 327684, 65547, 0, 327681, 65548, 0, 196612, 65549, 0, 327684, 65550, 0, 196613, 131072, 1, 0, 131073, 1, 0, 131074, 1, 0, 131075, 1, 0, 131076, 1, 0, 131077, 1, 0, 131078, 1, 0, 131079, 1, 0, 131080, 0, 262147, 131081, 1, 0, 131082, 1, 0, 131083, 0, 262147, 131084, 1, 0, 131085, 1, 0, 131086, 0, 262149, 196609, 1, 0, 196610, 1, 0, 196611, 1, 0, 196612, 1, 0, 196613, 1, 0, 196614, 1, 0, 196615, 1, 0, 196616, 0, 262147, 196617, 1, 0, 196618, 0, 196611, 196619, 0, 393218, 196620, 0, 196613, 196621, 1, 0, 196622, 0, 262147, 262144, 1, 0, 262145, 1, 0, 262146, 1, 0, 262147, 1, 0, 262148, 1, 0, 262149, 1, 0, 262150, 1, 0, 262151, 1, 0, 262152, 0, 393217, 262153, 0, 327684, 262154, 0, 327682, 262155, 1, 0, 262156, 0, 393217, 262157, 0, 327684, 262158, 0, 327682, 327680, 1, 0, 327681, 1, 0, 327682, 1, 0, 327683, 1, 0, 327684, 1, 0, 327685, 1, 0, 327686, 1, 0, 327687, 1, 0, 327688, 0, 262149, 327689, 1, 0, 327690, 0, 327683, 327691, 0, 327681, 327692, 0, 327685, 327693, 1, 0, 327694, 0, 262149, 393216, 0, 0, 393217, 0, 131076, 393218, 0, 1, 393219, 0, 2, 393220, 1, 0, 393221, 0, 0, 393222, 0, 131076, 393223, 0, 1, 393224, 0, 458757, 393225, 1, 0, 393226, 1, 0, 393227, 0, 262149, 393228, 1, 0, 393229, 1, 0, 393230, 0, 262147, 458752, 0, 131072, 458753, 0, 4, 458754, 0, 4, 458755, 0, 131074, 458756, 1, 0, 458757, 0, 131072, 458758, 0, 4, 458759, 0, 4, 458760, 0, 458756, 458761, 0, 327684, 458762, 0, 196612, 458763, 0, 393218, 458764, 0, 327684, 458765, 0, 196612, 458766, 0, 327685 )
+script = SubResource( 2 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 75, 75 )
 format = 1
-tile_data = PoolIntArray( -131067, 1, 0, 65541, 12, 0, 131074, -1073741822, 0, 131075, -2147483644, 0, 131076, 2, 0, 131077, -2147483647, 0, 131078, -1073741824, 0, 131079, -1073741824, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, 1073741825, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327680, 26, 0, 327681, 26, 0, 327682, -2147483646, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0, 393216, 26, 0, 393217, 26, 0 )
+tile_data = PoolIntArray( 2, 27, 0, 6, 1610612760, 0, 65541, 12, 0, 131074, -1073741822, 0, 131075, -2147483644, 0, 131076, 1610612763, 0, 131078, -1073741824, 0, 131079, -1073741824, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, -1073741797, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0 )
+script = ExtResource( 3 )
+
+[node name="Lasers" type="TileMap" parent="."]
+tile_set = ExtResource( 2 )
+cell_size = Vector2( 75, 75 )
+format = 1
+tile_data = PoolIntArray( 2, 27, 0, 6, -1610612712, 0, 131073, 24, 0, 196614, -1610612709, 0, 393221, -1073741800, 0 )
 script = ExtResource( 3 )
 
 [node name="Player5" type="KinematicBody2D" parent="."]
-position = Vector2( 187.152, 268.265 )
+editor/display_folded = true
+position = Vector2( 553.107, 193.04 )
 scale = Vector2( 2, 2 )
-script = SubResource( 1 )
+script = SubResource( 3 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Sprite" type="Sprite" parent="Player5"]
+modulate = Color( 0.960784, 0.87451, 0.301961, 1 )
 texture = ExtResource( 4 )
 hframes = 10
 frame = 6
 region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
+region_rect = Rect2( 0, 0, 320, 32 )
+region_filter_clip = true
+script = SubResource( 4 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player5"]
-shape = SubResource( 3 )
-
-[node name="Player11" type="KinematicBody2D" parent="."]
-position = Vector2( 486.265, 183.9 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player11"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player11"]
-shape = SubResource( 3 )
-
-[node name="Player10" type="KinematicBody2D" parent="."]
-position = Vector2( 260.652, 268.265 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player10"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player10"]
-shape = SubResource( 3 )
-
-[node name="Player6" type="KinematicBody2D" parent="."]
-position = Vector2( 186.513, 337.291 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player6"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player6"]
-shape = SubResource( 3 )
-
-[node name="Player9" type="KinematicBody2D" parent="."]
-position = Vector2( 260.652, 338.57 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player9"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player9"]
-shape = SubResource( 3 )
-
-[node name="Player7" type="KinematicBody2D" parent="."]
-position = Vector2( 561.682, 415.265 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player7"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player7"]
-shape = SubResource( 3 )
-
-[node name="Player12" type="KinematicBody2D" parent="."]
-position = Vector2( 488.822, 413.348 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player12"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player12"]
-shape = SubResource( 3 )
-
-[node name="Player8" type="KinematicBody2D" parent="."]
-position = Vector2( 563.6, 187.096 )
-scale = Vector2( 2, 2 )
-script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player8"]
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 288, 320, 32 )
-script = SubResource( 2 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player8"]
-shape = SubResource( 3 )
+shape = SubResource( 5 )

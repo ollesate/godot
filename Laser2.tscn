@@ -1,17 +1,17 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Assets/2005TilesetA.png" type="Texture" id=1]
-[ext_resource path="res://Laser.gd" type="Script" id=2]
+[ext_resource path="res://Laser2.gd" type="Script" id=2]
 [ext_resource path="res://LaserEmitter.tscn" type="PackedScene" id=3]
 
-[node name="Laser" type="Sprite"]
+[node name="Laser2" type="Sprite"]
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 300, 0, 75, 75 )
+region_rect = Rect2( 375, 0, 75, 75 )
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_group_": true
-}
 
 [node name="LaserEmitter" parent="." instance=ExtResource( 3 )]
-position = Vector2( -10.3679, 0 )
+position = Vector2( -10.9042, -16.088 )
+
+[node name="LaserEmitter2" parent="." instance=ExtResource( 3 )]
+position = Vector2( -11.2617, 14.8368 )

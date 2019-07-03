@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://LaserEmitter.gd" type="Script" id=1]
+[ext_resource path="res://Assets/box.png" type="Texture" id=2]
+
+[node name="LaserEmitter" type="Node2D"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Laser" type="Line2D" parent="."]
+modulate = Color( 1, 1, 1, 0.7 )
+scale = Vector2( 1.01179, 1 )
+points = PoolVector2Array( 0, 0, 1644.61, 0 )
+width = 5.0
+default_color = Color( 1, 0, 0.631373, 0.917193 )
+texture = ExtResource( 2 )
+texture_mode = 1757487568
+
+[node name="Tween" type="Tween" parent="."]

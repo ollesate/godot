@@ -1,0 +1,151 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/single_tank.png" type="Texture" id=1]
+[ext_resource path="res://Assets/box.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends VBoxContainer
+
+var swatchs = []
+
+func _ready():
+	for child in $VBoxContainer/HBoxContainer.get_children():
+		var color = child.modulate
+		child.connect(\"gui_input\", self, \"on_swatch_input\", [color])
+	for child in $VBoxContainer/HBoxContainer2.get_children():
+		var color = child.modulate
+		child.connect(\"gui_input\", self, \"on_swatch_input\", [color])
+
+func on_swatch_input(ev, color):
+	if ev is InputEventMouseButton:
+		if ev.pressed:
+			$Tank.modulate = color
+		"
+
+[node name="Control" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1024.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+text = "Name"
+align = 1
+valign = 1
+
+[node name="LineEdit" type="LineEdit" parent="."]
+margin_left = 412.0
+margin_top = 54.0
+margin_right = 612.0
+margin_bottom = 78.0
+rect_min_size = Vector2( 200, 0 )
+size_flags_horizontal = 4
+align = 1
+
+[node name="Tank" type="TextureRect" parent="."]
+margin_top = 82.0
+margin_right = 1024.0
+margin_bottom = 182.0
+rect_min_size = Vector2( 0, 100 )
+texture = ExtResource( 1 )
+stretch_mode = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 387.0
+margin_top = 186.0
+margin_right = 637.0
+margin_bottom = 286.0
+rect_min_size = Vector2( 250, 100 )
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 250.0
+margin_bottom = 48.0
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+modulate = Color( 0.160784, 0.384314, 1, 1 )
+margin_right = 59.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+modulate = Color( 0.384314, 0, 0.917647, 1 )
+margin_left = 63.0
+margin_right = 122.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect3" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+modulate = Color( 0.666667, 0, 1, 1 )
+margin_left = 126.0
+margin_right = 185.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect4" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+modulate = Color( 0.835294, 0, 0, 1 )
+margin_left = 189.0
+margin_right = 250.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 52.0
+margin_right = 250.0
+margin_bottom = 100.0
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+modulate = Color( 0.105882, 0.368627, 0.12549, 1 )
+margin_right = 59.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+modulate = Color( 1, 0.839216, 0, 1 )
+margin_left = 63.0
+margin_right = 122.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect3" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+modulate = Color( 1, 0.427451, 0, 1 )
+margin_left = 126.0
+margin_right = 185.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect4" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+modulate = Color( 0.188235, 0.309804, 0.996078, 1 )
+margin_left = 189.0
+margin_right = 250.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
