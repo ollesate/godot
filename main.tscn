@@ -79,6 +79,7 @@ script = ExtResource( 1 )
 isServer = true
 
 [node name="Walls" type="Node2D" parent="."]
+editor/display_folded = true
 
 [node name="Wall" type="StaticBody2D" parent="Walls"]
 editor/display_folded = true
@@ -740,6 +741,7 @@ position = Vector2( 960, 64 )
 texture = ExtResource( 3 )
 
 [node name="ConveyorBelts" type="Node2D" parent="."]
+editor/display_folded = true
 position = Vector2( 448, 192 )
 z_index = -1
 
@@ -881,6 +883,7 @@ modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
 texture = ExtResource( 3 )
 
 [node name="HUD" type="Control" parent="."]
+editor/display_folded = true
 margin_right = 1024.0
 margin_bottom = 576.0
 __meta__ = {
