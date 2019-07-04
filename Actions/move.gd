@@ -20,15 +20,4 @@ func act(delta):
 	self.character.move_and_slide(direction * delta)
 	if self.character.get_slide_count() > 0:
 		pass
-	# cool stuff
-	# for step in range(steps):
-	#	var action = Card.process(Move.forward(), self.character)
-	# 	yield(action, "finished")
-	#	if action.hitTarget:
-	#		if !Map.collider(direction, 2, self.character)
-	# 			var pushAction = ...
-	
-	# for step in range(steps):
-	# 	yield(self.character.move(length, 'finished')	
-
 	return false

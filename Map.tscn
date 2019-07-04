@@ -154,7 +154,6 @@ tile_data = PoolIntArray( 2, 27, 0, 6, -1610612712, 0, 131073, 24, 0, 196614, -1
 script = ExtResource( 3 )
 
 [node name="Player5" type="KinematicBody2D" parent="."]
-editor/display_folded = true
 position = Vector2( 553.107, 193.04 )
 scale = Vector2( 2, 2 )
 script = SubResource( 3 )

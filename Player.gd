@@ -1,10 +1,30 @@
+class_name Player
+
 extends KinematicBody2D
 
 signal onHit()
 signal onDestroyed()
-signal moveFinished()
+
+const FORWARD = Vector2(1, 0)
+const BACKWARDS = Vector2(-1, 0)
+
+const LEFT = -90
+const RIGHT = 90
+const UTURN = 180
 
 const HP_MAX = 9
+
+static func moveAction(movement, steps):
+	var actions = []
+	for i in range(steps):
+		actions.append(MoveStep.new(movement))
+		actions.append(Actions.wait(1))
+	return Parallell.new(actions)
+	
+static func rotateAction(rotation):
+	if rotation == UTURN:
+		return RotateAction.new(rotation, 2)
+	return RotateAction.new(rotation, 1)
 
 onready var hp = $UI/HP
 onready var nameLabel = $UI/NameLabel
@@ -38,25 +58,6 @@ func setInfo(info):
 	nameLabel.modulate = color
 	nameLabel.text = playerName
 
-var movePoint
-
-func move(dir):
-	if movePoint == null:
-		movePoint = nextPoint(dir)
-	print("pos")
-	print(transform.origin)
-	print(movePoint)
-	print("distance")
-	# print(transform.origin.distance_to(movePoint))
-	print(transform.origin.dot(dir))
-	print(movePoint.dot(dir))
-	if transform.origin.dot(dir) < movePoint.dot(dir):
-		move_and_slide(dir * 45.0)
-
-func nextPoint(dir):
-	var centerPos = transform.origin
-	return centerPos + Global.STEP_SIZE * dir
-
 func getHp():
 	return hp.value
 
@@ -68,30 +69,27 @@ func onHit(damage):
 		emit_signal("onDestroyed", self)
 		queue_free()
 		
-class MoveForward:
-	extends Action
+class MovePlayer:
+	extends CompositeAction
+
+	var moveAction
+	var direction
 	
-	var movePoint
-	var dir
+	func _init(direction):
+		self.direction = direction
 	
-	func _init(dir):
-		self.dir = dir
+	func start():
+		moveAction = ActionMove.new(direction, 1, 100)
+		character.get_node("Sprite").isAnimating = true
+		
+	func finish():
+		character.get_node("Sprite").isAnimating = false
 	
 	func act(delta):
-		.act(delta)
-		
-		if !movePoint:
-			movePoint = nextPoint(dir)
-		print("pos")
-		print(self.character.transform.origin)
-		print(self.character.movePoint)
-		print("distance")
-		# print(transform.origin.distance_to(movePoint))
-		print(self.character.transform.origin.dot(dir))
-		print(self.character.movePoint.dot(dir))
-		if self.character.transform.origin.dot(dir) < movePoint.dot(dir):
-			self.character.move_and_slide(dir * 45.0)
-			
-	func nextPoint(dir):
-		var centerPos = self.character.transform.origin
-		return centerPos + Global.STEP_SIZE * dir
+		if moveAction.act(delta):
+			return true
+		if character.get_slide_count() > 0:
+			var collider = character.get_slide_collision(0).collider
+			if collider.is_in_group("players"):
+				var player: KinematicBody2D = collider
+				player.move_and_slide(moveAction.velocity)

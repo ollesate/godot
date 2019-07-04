@@ -115,21 +115,6 @@ func getBeltAction(step):
 				actions.append(BeltMove.new(belt).with(player))
 	return Parallell.new(actions)
 
-class RotateAction:
-	extends Action
-	
-	var rotation
-	var duration
-	
-	func _init(rotation, duration):
-		self.rotation = deg2rad(rotation)
-		self.duration = duration
-	
-	func act(delta):
-		duration -= delta
-		character.rotate(rotation * delta)
-		return duration <= 0
-
 class BeltMove:
 	extends ActionMove
 	

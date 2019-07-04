@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Laser.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Game/objects/laser/Laser.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://player_hand.tscn" type="PackedScene" id=4]
 
@@ -40,7 +40,6 @@ isServer = true
 
 [node name="Laser" parent="." instance=ExtResource( 2 )]
 position = Vector2( 64, 192 )
-direction = 0
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
 position = Vector2( 448, 256 )

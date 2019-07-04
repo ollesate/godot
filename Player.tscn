@@ -1,22 +1,39 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
-[ext_resource path="res://Assets/icon_small.png" type="Texture" id=2]
+[ext_resource path="res://Assets/tank.png" type="Texture" id=2]
 [ext_resource path="res://player_card_list.gd" type="Script" id=3]
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=4]
 [ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=5]
 
+[sub_resource type="GDScript" id=2]
+script/source = "extends Sprite
+
+const FRAME_DURATION = 0.1
+
+var isAnimating = false
+var currentDur = FRAME_DURATION
+	
+func _process(delta):
+	if !isAnimating:
+		return
+	currentDur -= delta
+	if currentDur <= 0:
+		currentDur = FRAME_DURATION
+		frame = (frame + 1) % hframes"
+
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 50, 50 )
+extents = Vector2( 31.9265, 27.225 )
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
 
 [node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 2, 2 )
 texture = ExtResource( 2 )
+hframes = 10
+region_rect = Rect2( 0, 0, 32, 32 )
+script = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
@@ -32,11 +49,11 @@ position = Vector2( 0, 25 )
 [node name="HP" type="TextureProgress" parent="UI"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -198.0
-margin_top = -120.0
-margin_right = 198.0
-margin_bottom = -67.0
-rect_scale = Vector2( 0.3, 0.4 )
+margin_left = -197.638
+margin_top = -66.0423
+margin_right = 199.362
+margin_bottom = -13.0423
+rect_scale = Vector2( 0.2, 0.2 )
 rect_pivot_offset = Vector2( 198, 0 )
 max_value = 9.0
 value = 9.0
@@ -44,6 +61,7 @@ texture_under = ExtResource( 4 )
 texture_progress = ExtResource( 5 )
 
 [node name="Cards" type="VBoxContainer" parent="UI"]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
