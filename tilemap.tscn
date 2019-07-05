@@ -1,9 +1,19 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Map.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=2]
 
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+
+func _ready():
+	print(\"start\")
+	Player.moveAction(Player.FORWARD, 3).with($Player).perform()
+"
+
 [node name="Node2D" type="Node2D"]
+script = SubResource( 1 )
 
 [node name="Root" parent="." instance=ExtResource( 1 )]
 
@@ -12,8 +22,9 @@ tile_data = PoolIntArray( 2, 27, 0, 3, 4, 0, 4, 4, 0, 5, 4, 0, 6, 1610612760, 0,
 
 [node name="Player5" parent="Root" index="3"]
 editor/display_folded = true
+position = Vector2( 490.348, 188.273 )
 
-[node name="Player" parent="Root" instance=ExtResource( 2 )]
-position = Vector2( 337.212, 188.079 )
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 264.331, 267.52 )
 
 [editable path="Root"]
