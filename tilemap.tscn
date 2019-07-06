@@ -9,9 +9,13 @@ script/source = "extends Node2D
 
 func _ready():
 	print(\"start\")
-	yield(Actions.wait(1).perform(), \"finished\")	
-	print(\"start\")
-	Player.shootAction().with($Player).perform()
+	yield(Actions.wait(0.5).perform(), \"finished\")	
+	print(\"shoot\")
+	yield(Player.shootAction().with($Player).perform(), \"finished\")
+	print(\"shoot\")
+	yield(Player.shootAction().with($Player).perform(), \"finished\")
+	print(\"shoot\")
+	yield(Player.shootAction().with($Player).perform(), \"finished\")
 "
 
 [node name="Node2D" type="Node2D"]
@@ -24,10 +28,10 @@ tile_data = PoolIntArray( 2, 27, 0, 3, 4, 0, 4, 4, 0, 5, 4, 0, 6, 1610612760, 0,
 
 [node name="Player5" parent="Root" index="3"]
 editor/display_folded = true
-position = Vector2( 490.348, 188.273 )
+position = Vector2( 568.201, 411.503 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 261.153, 270.698 )
+position = Vector2( 263.536, 191.257 )
 
 [node name="Player2" parent="." instance=ExtResource( 2 )]
 position = Vector2( 569.386, 188.873 )
