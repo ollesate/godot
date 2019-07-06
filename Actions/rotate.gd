@@ -1,14 +1,14 @@
 class_name RotateAction
 extends Action
 
-var rotation
+var rotationSpeed
 var duration
 
 func _init(rotation, duration):
-	self.rotation = deg2rad(rotation)
+	self.rotationSpeed = deg2rad(rotation) / duration
 	self.duration = duration
 
 func act(delta):
 	duration -= delta
-	character.rotate(rotation * delta)
+	character.rotate(rotationSpeed * delta)
 	return duration <= 0

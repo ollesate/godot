@@ -47,7 +47,6 @@ class MovePlayer:
 		if (self.isFirstTime):
 			var player = belt.getPlayer()
 			if (player != null):
-				Global.alert("Belts")
 				action = MoveStep.new(direction)
 				action.character = player
 			else:

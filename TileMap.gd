@@ -4,7 +4,7 @@ const textureSize = 75
 
 var belts = {}
 
-func _ready():
+func _ready():	
 	for cellPos in get_used_cells():
 		var cellId = get_cellv(cellPos)
 		var name = tile_set.tile_get_name(cellId)
@@ -15,11 +15,9 @@ func _ready():
 		# print(name)
 		if node:
 			add_child(node)
-			set_cellv(cellPos, -1)
+			if name != "Spawns":
+				set_cellv(cellPos, -1)
 			node.position = map_to_world(cellPos) + Vector2(1, 1) * textureSize / 2
-	
-	yield(Actions.wait(5.5).perform(), "finished")
-	perform()
 				
 func create(name, cellPos, flipX, flipY, transposed):
 	var key = cellPos
@@ -82,6 +80,12 @@ func create(name, cellPos, flipX, flipY, transposed):
 			laser.direction = newLaserDir
 			laser.rotation = rotation
 			return laser
+		"Spawns":
+			var spawnPoint = preload("res://SpawnPoint.tscn").instance()
+			var spawnVector = get_cell_autotile_coord(cellPos.x, cellPos.y)
+			spawnPoint.index = spawnVector.x + 4 * spawnVector.y
+			return spawnPoint
+			
 
 func modulate(vector, flipX, flipY, transposed):
 	if transposed:

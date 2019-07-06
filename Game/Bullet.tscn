@@ -9,7 +9,7 @@ signal onHit()
 
 const SPEED = Global.BULLET_SPEED
 const ROTATION_SPEED = 20.0
-const MAX_TIME = 4.0
+const MAX_TIME = 2.0
 
 var direction
 var duration = MAX_TIME

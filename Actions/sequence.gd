@@ -2,13 +2,16 @@ extends Action
 
 class_name Sequence
 
+signal stepFinished()
+
 var actions = []
 var isNew
 
 func _init(actions):
 	self.actions = actions
 
-func setCharacter(character):
+func setCharacter(val):
+	character = val
 	for action in actions:
 		action.character = character
 
@@ -21,4 +24,5 @@ func act(delta):
 	if (actions[0].act(delta)):
 		actions[0].emit_signal("finished")
 		actions.remove(0)
+		emit_signal("stepFinished", actions.size())
 		isNew = false

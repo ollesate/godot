@@ -40,8 +40,8 @@ func animFinished():
 	$Laser.default_color.a = 0.3
 	var laserIntersect = getLaserIntersect()
 	if laserIntersect:
-		if laserIntersect.collider.is_in_group("players"):
-			# laserIntersect.collider.onHit(1)
+		if laserIntersect.collider.has_method("onHit"):
+			laserIntersect.collider.onHit(1)
 			pass
 	emit_signal("finished")
 	

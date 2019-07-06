@@ -28,7 +28,7 @@ func _init(direction, steps):
 	for x in steps:
 		actions.append(MoveStep.new(direction, true))
 		if (x < steps - 1):
-			actions.append(Wait.new(WAIT_TIME))
+			actions.append(Wait.new(0.5))
 	action = Sequence.new(actions)
 	self.description = getText()
 	

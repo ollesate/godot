@@ -1,9 +1,8 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://tilemap2.tres" type="TileSet" id=1]
 [ext_resource path="res://tilemap.tres" type="TileSet" id=2]
 [ext_resource path="res://TileMap.gd" type="Script" id=3]
-[ext_resource path="res://Assets/tank.png" type="Texture" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -17,116 +16,27 @@ func syncPositions():
 		syncPos(player)
 
 func syncPos(player):
-	var pos = $Background.world_to_map(player.position)
-	player.position = $Background.map_to_world(pos) + $Background.cell_size / 2"
+	var pos = getMapPos(player)
+	player.position = $Background.map_to_world(pos) + $Background.cell_size / 2
+	
+func getPlayersInHole():
+	var players = []
+	for player in get_tree().get_nodes_in_group(\"players\"):
+		var cellPos = getMapPos(player)
+		if $Background.isHole(cellPos):
+			players.append(player)
+	return players
+
+func getMapPos(player):
+	return $Background.world_to_map(player.position)"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends TileMap
 
-func _ready():
-	yield(Actions.wait(1).perform(), \"finished\")
-	yield(getAction().perform(), \"finished\")
-
-func getAction():
-	var actions = []
-	for player in get_tree().get_nodes_in_group(\"players\"):
-		var cellPos = world_to_map(player.position)
-		var id = get_cellv(cellPos)
-		var name = tile_set.tile_get_name(id)
-		if name == \"Hole\":
-			actions.append(Sequence.new([
-				ScaleAction.new(Vector2.ZERO, 1.0).with(player),
-				DeleteAction.new().with(player)
-			]))
-	return Parallell.new(actions)
-
-class DeleteAction:
-	extends Action
-	
-	func act(delta):
-		character.free()
-		return true
-
-class ScaleAction:
-	extends Action
-	
-	var startDuration
-	
-	var scaleTo
-	var scaleFrom
-	var duration
-	
-	func _init(scaleTo, duration):
-		self.startDuration = duration
-		self.scaleTo = scaleTo
-		self.duration = duration
-
-	func start():
-		scaleFrom = character.scale
-
-	func act(delta):
-		character.scale = lerp(scaleFrom, scaleTo, (startDuration - duration) / startDuration)
-		duration -= delta
-		return duration <= 0"
-
-[sub_resource type="GDScript" id=3]
-script/source = "extends KinematicBody2D
-
-export var isRunning = false
-
-func _ready():
-	add_to_group(\"players\")
-	if !isRunning:
-		return
-	return
-
-	yield(MovePlayer.new(Vector2.RIGHT).with(self).perform(), \"finished\")
-	yield(Actions.wait(1).perform(), \"finished\")
-	yield(MovePlayer.new(Vector2.RIGHT).with(self).perform(), \"finished\")
-	
-
-class MovePlayer:
-	extends CompositeAction
-
-	var moveAction
-	
-	func _init(dir):
-		moveAction = ActionMove.new(dir, 1, 100)
-		actions = [moveAction]
-	
-	func start():
-		character.get_node(\"Sprite\").isAnimating = true
-		
-	func finish():
-		character.get_node(\"Sprite\").isAnimating = false
-	
-	func act(delta):
-		if moveAction.act(delta):
-			return true
-		if character.get_slide_count() > 0:
-			var collider = character.get_slide_collision(0).collider
-			if collider.is_in_group(\"players\"):
-				var player: KinematicBody2D = collider
-				player.move_and_slide(moveAction.velocity)"
-
-[sub_resource type="GDScript" id=4]
-script/source = "extends Sprite
-
-const FRAME_DURATION = 0.1
-
-var isAnimating = false
-var currentDur = FRAME_DURATION
-	
-func _process(delta):
-	if !isAnimating:
-		return
-	currentDur -= delta
-	if currentDur <= 0:
-		currentDur = FRAME_DURATION
-		frame = (frame + 1) % hframes"
-
-[sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 13.9454, 11.9861 )
+func isHole(cellPos):
+	var id = get_cellv(cellPos)
+	var name = tile_set.tile_get_name(id)
+	return name == \"Hole\""
 
 [node name="Root" type="Node2D"]
 position = Vector2( 1, 0 )
@@ -152,24 +62,3 @@ cell_size = Vector2( 75, 75 )
 format = 1
 tile_data = PoolIntArray( 2, 27, 0, 6, -1610612712, 0, 131073, 24, 0, 196614, -1610612709, 0, 393221, -1073741800, 0 )
 script = ExtResource( 3 )
-
-[node name="Player5" type="KinematicBody2D" parent="."]
-position = Vector2( 553.107, 193.04 )
-scale = Vector2( 2, 2 )
-script = SubResource( 3 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Player5"]
-modulate = Color( 0.960784, 0.87451, 0.301961, 1 )
-texture = ExtResource( 4 )
-hframes = 10
-frame = 6
-region_enabled = true
-region_rect = Rect2( 0, 0, 320, 32 )
-region_filter_clip = true
-script = SubResource( 4 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player5"]
-shape = SubResource( 5 )

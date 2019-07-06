@@ -21,10 +21,19 @@ static func moveAction(movement, steps):
 		actions.append(Actions.wait(1))
 	return Sequence.new(actions)
 	
+static func moveStep(movement):
+	var actions = []
+	actions.append(Actions.wait(1))
+	actions.append(MovePlayer.new(movement))
+	return Sequence.new(actions)
+	
 static func rotateAction(rotation):
 	if rotation == UTURN:
-		return RotateAction.new(rotation, 2)
-	return RotateAction.new(rotation, 1)
+		return RotateAction.new(rotation, 1)
+	return RotateAction.new(rotation, 0.5)
+
+static func fallAction():
+	return PlayerFall.new(1)
 
 static func shootAction():
 	return Shoot.new()
@@ -37,6 +46,7 @@ var playerName = ""
 var color = Color.white
 var hpMax = HP_MAX
 var currentHp setget , getHp
+var pendingRemoval
 
 func _ready():
 	add_to_group("players")
@@ -96,6 +106,15 @@ class MovePlayer:
 			if collider.is_in_group("players"):
 				var player: KinematicBody2D = collider
 				player.move_and_slide(moveAction.velocity)
+
+class PlayerFall:
+	extends Sequence
+
+	func _init(fallDuration).([ScaleAction.new(0, fallDuration), RemoveAction.new()]):
+		pass
+	
+	func start():
+		character.pendingRemoval = true
 
 class Shoot:
 	extends Action
