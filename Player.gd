@@ -42,33 +42,27 @@ onready var hp = $UI/HP
 onready var nameLabel = $UI/NameLabel
 
 var id
-var playerName = ""
-var color = Color.white
+var playerName = "" setget setPlayerName
+var color = Color.white setget setColor
 var hpMax = HP_MAX
 var currentHp setget , getHp
-var pendingRemoval
 
 func _ready():
 	add_to_group("players")
 	hp.max_value = hpMax
 	hp.hide()
 	nameLabel.text = playerName
-	if color:
-		nameLabel.modulate = color
+	nameLabel.modulate = color
 	for child in $UI/Cards.get_children():
 		$UI/Cards.remove_child(child)
 
-func setInfo(info):
-	id = info.id
-	if info.name:
-		playerName = info.name
-	else:
-		playerName = str("Player", id)
-	if info.color:
-		color = info.color
-	else:
-		color = Color.white
+func setColor(val):
+	color = val if val != null else Color.white
 	nameLabel.modulate = color
+	modulate = color
+
+func setPlayerName(val):
+	playerName = val if val else ""
 	nameLabel.text = playerName
 
 func getHp():

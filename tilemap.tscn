@@ -6,17 +6,17 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
-var turns = []
-var currentTurn = 0
+var playerInfos = []
+var spawnPoints = {}
+var players = {}
 
 func _ready():
+	yield(Actions.wait(0.5).perform(), \"finished\")
 	beltPushPlayerIntoHole()
 
 func playersAct(cards):
 	var nTurns = 5
-	currentTurn = 0
-	turns = []
-	
+	var turns = []
 	var players = get_tree().get_nodes_in_group(\"players\")
 
 	for i in range(nTurns):
@@ -29,9 +29,7 @@ func playersAct(cards):
 				var card = cards[player][i]
 				turns[i].append(card.with(player))
 				
-	for turnIndex in range(turns.size()):
-		currentTurn = turnIndex
-		var turn = turns[turnIndex]
+	for turn in turns:
 		for card in turn:
 			card.perform()
 			if card.type == Cards.MOVE:
@@ -67,15 +65,34 @@ func getPlayersFallAction():
 		fallingActions.append(Player.fallAction().with(fallingPlayer))
 	return Parallell.new(fallingActions)
 
-func playerDieNextTurnNotIncluded():
-	pass
-
 func beltPushPlayerIntoHole():
+	var info = {\"name\": \"Olof\", \"color\": Color.blue}
+	addPlayerInfo(info)
+	
+	yield(Actions.wait(1).perform(), \"finished\")
+	removePlayerInfo(info)
+	
+	return
 	var cards = {$Player: [Cards.moveAction(Player.FORWARD, 2), Cards.moveAction(Player.FORWARD, 2)]}
 	playersAct(cards)
 
-func simGame(cards):
-	pass"
+func addPlayerInfo(info):
+	var spawnPoint = $Root.spawns[playerInfos.size()]
+	playerInfos.append(info)
+	spawnPoints[info] = spawnPoint
+	var player = preload(\"res://Player.tscn\").instance()
+	add_child(player)
+	player.position = spawnPoint.position
+	players[info] = player
+	player.playerName = info.name if info.has(\"name\") else null
+	player.color = info.color if info.has(\"color\") else null
+
+func removePlayerInfo(info):
+	playerInfos.erase(info)
+	spawnPoints.erase(info)
+	var player = players[info]
+	players.erase(info)
+	remove_child(player)"
 
 [node name="Node2D" type="Node2D"]
 script = SubResource( 1 )
@@ -83,7 +100,7 @@ script = SubResource( 1 )
 [node name="Root" parent="." instance=ExtResource( 1 )]
 
 [node name="TileMap" parent="Root" index="1"]
-tile_data = PoolIntArray( 1, 23, 0, 4, 4, 0, 5, 4, 0, 6, 1610612760, 0, 7, 28, 0, 65540, 4, 0, 65541, 4, 0, 65542, 4, 0, 65543, 4, 0, 65544, 4, 0, 131074, -1073741822, 0, 131075, 4, 0, 131076, 4, 0, 131078, -1073741824, 0, 131079, 4, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, -1073741797, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0, 393220, -1610612732, 0 )
+tile_data = PoolIntArray( 4, 4, 0, 5, 4, 0, 6, 1610612760, 0, 7, 28, 0, 65540, 4, 0, 65541, 4, 0, 65542, 4, 0, 65543, 4, 0, 65544, 4, 0, 131074, -1073741822, 0, 131075, 4, 0, 131076, 4, 0, 131078, -1073741824, 0, 131079, 4, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, 23, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0, 393220, -1610612732, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 715.157, 490.021 )

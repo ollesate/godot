@@ -7,6 +7,11 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
+var spawns setget , getSpawns
+
+func getSpawns():
+	return get_tree().get_nodes_in_group(\"spawns\")
+
 func _ready():
 	syncPositions()
 
@@ -31,7 +36,9 @@ func isPlayerInHole(player):
 	return $Background.isHole(getMapPos(player))
 
 func getMapPos(player):
-	return $Background.world_to_map(player.position)"
+	return $Background.world_to_map(player.position)
+
+"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends TileMap

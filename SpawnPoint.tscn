@@ -6,6 +6,7 @@ script/source = "extends Node2D
 var index
 
 func _ready():
+	add_to_group(\"spawns\")
 	print(\"Created spawn point with index\", index)"
 
 [node name="SpawnPoint" type="Node2D"]
