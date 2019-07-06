@@ -73,7 +73,6 @@ class Card:
 	var description
 	var action
 	var type
-	var destroyed
 	
 	func _init(action, description, type).([action]):
 		self.description = description
@@ -86,10 +85,10 @@ class Card:
 			val.connect("onDestroyed", self, "onDestroyed")
 		
 	func onDestroyed(player):
-		destroyed = true
+		character = null
 		
 	func act(delta):
-		if destroyed: # Player has died
+		if !character: # Player has died
 			return true
 		return action.act(delta)
 
