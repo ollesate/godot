@@ -108,13 +108,25 @@ class MovePlayer:
 				player.move_and_slide(moveAction.velocity)
 
 class PlayerFall:
-	extends Sequence
+	extends CompositeAction
 
-	func _init(fallDuration).([ScaleAction.new(0, fallDuration), RemoveAction.new()]):
-		pass
+	var action
+
+	func _init(fallDuration):
+		action = ScaleAction.new(0, fallDuration)
+		actions = [action]
 	
 	func start():
+		.start()
 		character.pendingRemoval = true
+		
+	func act(delta):
+		var isFinished = action.act(delta)
+		if isFinished:
+			print("emit destroyed")
+			character.emit_signal("onDestroyed", character)
+			character.free()
+		return isFinished
 
 class Shoot:
 	extends Action

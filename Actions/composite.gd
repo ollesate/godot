@@ -10,6 +10,10 @@ func _init(actions = []):
 func setActions(val):
 	actions = val
 
+func start():
+	for action in actions:
+		action.emit_signal("started")
+
 func setCharacter(val):
 	character = val
 	for action in actions:

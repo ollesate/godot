@@ -80,7 +80,8 @@ class Card:
 		self.type = type
 		
 	func act(delta):
-		if character.pendingRemoval:
+		print(character)
+		if !character || character.pendingRemoval: # Player has died or is about to die
 			return true
 		return action.act(delta)
 

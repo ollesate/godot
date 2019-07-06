@@ -6,13 +6,28 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
+var turns = []
+var currentTurn = 0
+
 func _ready():
 	beltPushPlayerIntoHole()
 
-func playersAct(cards):	
-	var players = get_tree().get_nodes_in_group(\"players\")
+func onPlayerDestroyed(player):
+	for turn in turns:
+		for card in turn:
+			if card.character == player:
+				print(\"remove player\")
+				card.character = null
+
+func playersAct(cards):
 	var nTurns = 5
-	var turns = []
+	currentTurn = 0
+	turns = []
+	
+	var players = get_tree().get_nodes_in_group(\"players\")
+	for player in players:
+		player.connect(\"onDestroyed\", self, \"onPlayerDestroyed\")
+
 	for i in range(nTurns):
 		turns.append([])
 	for player in players:
@@ -23,13 +38,19 @@ func playersAct(cards):
 				var card = cards[player][i]
 				turns[i].append(card.with(player))
 				
-	for turn in turns:
+	for turnIndex in range(turns.size()):
+		currentTurn = turnIndex
+		var turn = turns[turnIndex]
 		for card in turn:
+			print(\"Next turn\")
 			card.perform()
 			if card.type == Cards.MOVE:
 				var finished = false
 				while(!finished):
 					finished = yield(card, \"stepFinished\") == 0
+					if $Root.isPlayerInHole(card.character):
+						card.character = null
+						print(\"Set character null\")
 					yield(getPlayersFallAction().perform(), \"finished\")
 			else:
 				yield(card, \"finished\")

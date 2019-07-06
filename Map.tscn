@@ -27,6 +27,9 @@ func getPlayersInHole():
 			players.append(player)
 	return players
 
+func isPlayerInHole(player):
+	return $Background.isHole(getMapPos(player))
+
 func getMapPos(player):
 	return $Background.world_to_map(player.position)"
 
