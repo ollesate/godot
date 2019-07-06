@@ -82,7 +82,7 @@ class MovePlayer:
 		self.direction = direction
 	
 	func start():
-		moveAction = ActionMove.new(direction, 1, 100)
+		moveAction = ActionMove.new(direction, 1, 75).with(character)
 		character.get_node("Sprite").isAnimating = true
 		
 	func finish():

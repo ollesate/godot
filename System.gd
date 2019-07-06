@@ -48,7 +48,7 @@ func onDealCards():
 	var cardPhaseDuration = Global.CARD_PHASE_DURATION
 	$HUD/StateProgress.start("Dealing cards...", cardPhaseDuration)
 	for playerId in $Network.joinedPlayers:
-		$Network.dealCardsToPlayer(playerId, CardUtils.generateCards())
+		$Network.dealCardsToPlayer(playerId, Cards.generate(5))
 
 	# Spawn killed players
 	for playerId in $Network.joinedPlayers:
@@ -109,26 +109,10 @@ func onCardFinished(card):
 	$Network.onCardFinished(card)
 
 func getBeltsAction():
-	var parallell = Parallell.new([])
-	var belts = get_tree().get_nodes_in_group("belts")
-	for belt in belts:
-		var action = belt.getAction()
-		if (action != null):
-			parallell.actions.append(action)
-	return parallell
+	pass
 
 func getShootAction():
-	var players = $Players.players.values()
-	var shootActions = []
-	for player in players:
-		var shoot = CardUtils.getShootAction()
-		shoot.character = player
-		shootActions.append(shoot)
-	return Parallell.new(shootActions)
+	pass
 
 func getLaserAction():
-	var lasers = get_tree().get_nodes_in_group("lasers")
-	var laserActions = []
-	for laser in lasers:
-		laserActions.append(laser.getAction())
-	return Parallell.new(laserActions)
+	pass

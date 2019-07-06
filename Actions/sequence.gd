@@ -19,5 +19,6 @@ func act(delta):
 		isNew = true
 		actions[0].emit_signal("started")
 	if (actions[0].act(delta)):
+		actions[0].emit_signal("finished")
 		actions.remove(0)
 		isNew = false
