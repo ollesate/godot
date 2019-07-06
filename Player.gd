@@ -118,15 +118,14 @@ class PlayerFall:
 	
 	func start():
 		.start()
-		character.pendingRemoval = true
+		# Emit in advance stops all actions on this while animating
+		character.emit_signal("onDestroyed", character)
 		
 	func act(delta):
-		var isFinished = action.act(delta)
-		if isFinished:
-			print("emit destroyed")
-			character.emit_signal("onDestroyed", character)
+		if action.act(delta):
 			character.free()
-		return isFinished
+			return true
+		return false
 
 class Shoot:
 	extends Action

@@ -73,15 +73,23 @@ class Card:
 	var description
 	var action
 	var type
+	var destroyed
 	
 	func _init(action, description, type).([action]):
 		self.description = description
 		self.action = action
 		self.type = type
 		
+	func setCharacter(val):
+		.setCharacter(val)
+		if val:
+			val.connect("onDestroyed", self, "onDestroyed")
+		
+	func onDestroyed(player):
+		destroyed = true
+		
 	func act(delta):
-		print(character)
-		if !character || character.pendingRemoval: # Player has died or is about to die
+		if destroyed: # Player has died
 			return true
 		return action.act(delta)
 
