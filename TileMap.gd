@@ -3,6 +3,7 @@ extends TileMap
 const textureSize = 75
 
 var belts = {}
+var checkpoints = {}
 
 func _ready():	
 	for cellPos in get_used_cells():
@@ -15,7 +16,7 @@ func _ready():
 		# print(name)
 		if node:
 			add_child(node)
-			if name != "Spawns":
+			if name != "Spawns" && name != "Checkpoints":
 				set_cellv(cellPos, -1)
 			node.position = map_to_world(cellPos) + Vector2(1, 1) * textureSize / 2
 				
@@ -82,10 +83,15 @@ func create(name, cellPos, flipX, flipY, transposed):
 			return laser
 		"Spawns":
 			var spawnPoint = preload("res://SpawnPoint.tscn").instance()
-			var spawnVector = get_cell_autotile_coord(cellPos.x, cellPos.y)
-			spawnPoint.index = spawnVector.x + 4 * spawnVector.y
+			var tileCoord = get_cell_autotile_coord(cellPos.x, cellPos.y)
+			spawnPoint.index = tileCoord.x + 4 * tileCoord.y
 			return spawnPoint
-			
+		"Checkpoints":
+			var checkpoint = preload("res://Checkpoint.tscn").instance()
+			var tileCoord = get_cell_autotile_coord(cellPos.x, cellPos.y)
+			checkpoint.number = tileCoord.x + 4 * tileCoord.y
+			checkpoints[cellPos] = checkpoint
+			return checkpoint
 
 func modulate(vector, flipX, flipY, transposed):
 	if transposed:

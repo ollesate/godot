@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://tilemap2.tres" type="TileSet" id=1]
 [ext_resource path="res://tilemap.tres" type="TileSet" id=2]
@@ -38,7 +38,8 @@ func isPlayerInHole(player):
 func getMapPos(player):
 	return $Background.world_to_map(player.position)
 
-"
+func getCheckpoint(player):
+	return $TileMap.checkpoints[getMapPos(player)]"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends TileMap
@@ -47,6 +48,8 @@ func isHole(cellPos):
 	var id = get_cellv(cellPos)
 	var name = tile_set.tile_get_name(id)
 	return name == \"Hole\""
+
+[sub_resource type="TileSet" id=3]
 
 [node name="Root" type="Node2D"]
 position = Vector2( 1, 0 )
@@ -63,7 +66,7 @@ script = SubResource( 2 )
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 75, 75 )
 format = 1
-tile_data = PoolIntArray( 2, 27, 0, 6, 1610612760, 0, 65541, 12, 0, 131074, -1073741822, 0, 131075, -2147483644, 0, 131076, 1610612763, 0, 131078, -1073741824, 0, 131079, -1073741824, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, -1073741797, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0 )
+tile_data = PoolIntArray( 2, 27, 0, 6, 1610612760, 0, 65541, 29, 0, 131074, -1073741822, 0, 131075, -2147483644, 0, 131076, 1610612763, 0, 131078, -1073741824, 0, 131079, -1073741824, 0, 131080, 4, 0, 131081, 0, 0, 196608, 1610612740, 0, 196609, 1610612736, 0, 196610, -536870908, 0, 196611, -536870908, 0, 196612, -1610612734, 0, 196613, -1073741797, 0, 196614, -536870912, 0, 196615, -536870911, 0, 196616, 4, 0, 196617, 0, 0, 262144, 536870916, 0, 262145, 536870912, 0, 262146, -1610612732, 0, 262147, -1610612732, 0, 262148, -536870910, 0, 262149, 1, 0, 262150, -1610612736, 0, 262151, -1610612735, 0, 262152, 4, 0, 262153, 0, 0, 327683, -2147483644, 0, 327684, 1073741826, 0, 327685, -1073741823, 0, 327686, -1073741824, 0, 327687, -1073741824, 0, 327688, 4, 0, 327689, 0, 0, 393220, 23, 0 )
 script = ExtResource( 3 )
 
 [node name="Lasers" type="TileMap" parent="."]
@@ -72,3 +75,7 @@ cell_size = Vector2( 75, 75 )
 format = 1
 tile_data = PoolIntArray( 2, 27, 0, 6, -1610612712, 0, 131073, 24, 0, 196614, -1610612709, 0, 393221, -1073741800, 0 )
 script = ExtResource( 3 )
+
+[node name="Checkpoints" type="TileMap" parent="."]
+tile_set = SubResource( 3 )
+format = 1

@@ -1,0 +1,55 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+const MARGIN = 2
+const WIDTH = 4
+const SIZE = 75 - WIDTH - MARGIN
+
+const TOP_LEFT = Vector2.UP + Vector2.LEFT
+const TOP_RIGHT = Vector2.UP + Vector2.RIGHT
+const BOTTOM_LEFT = Vector2.DOWN + Vector2.LEFT
+const BOTTOM_RIGHT = Vector2.DOWN + Vector2.RIGHT
+
+var number
+var rects = []
+var playerInfos = []
+
+func _ready():
+	addColor(Color.gray)
+
+func addColor(color):
+	var size = SIZE - rects.size() * WIDTH * 2
+	
+	var lines = []
+	lines.append([TOP_LEFT * size / 2, TOP_RIGHT * size / 2 + Vector2.RIGHT * WIDTH / 2])
+	lines.append([TOP_RIGHT * size / 2, BOTTOM_RIGHT * size / 2 + Vector2.DOWN * WIDTH / 2])
+	lines.append([BOTTOM_RIGHT * size / 2, BOTTOM_LEFT * size / 2])
+	lines.append([BOTTOM_LEFT * size / 2 + Vector2.DOWN * WIDTH / 2, TOP_LEFT * size / 2 + Vector2.UP * WIDTH / 2])
+	var rect = {\"lines\": lines, \"color\": color}
+	rects.append(rect)
+	update()
+
+func touch(info):
+	if playerInfos.size() == 0 && rects.size() == 1: # We are first, remove default coloring
+		rects.remove(0)
+	playerInfos.append(info)
+	addColor(info.color)
+
+func remove(info):
+	playerInfos.remove(playerInfos.find(info))
+	rects.clear()
+	for info in playerInfos:
+		addColor(info.color)
+	update()
+
+func _draw():
+	for rect in rects:
+		for line in rect.lines:
+			draw_line(line[0], line[1], rect.color, WIDTH)
+	
+	"
+
+[node name="Checkpoint" type="Node2D"]
+position = Vector2( 150, 150 )
+script = SubResource( 1 )

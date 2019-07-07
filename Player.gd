@@ -17,14 +17,14 @@ const HP_MAX = 9
 static func moveAction(movement, steps):
 	var actions = []
 	for i in range(steps):
-		actions.append(MovePlayer.new(movement))
+		actions.append(MovePlayer.new(movement, 0.5))
 		actions.append(Actions.wait(1))
 	return Sequence.new(actions)
 	
 static func moveStep(movement):
 	var actions = []
-	actions.append(Actions.wait(1))
-	actions.append(MovePlayer.new(movement))
+	actions.append(Actions.wait(0.25))
+	actions.append(MovePlayer.new(movement, 0.5))
 	return Sequence.new(actions)
 	
 static func rotateAction(rotation):
@@ -81,12 +81,14 @@ class MovePlayer:
 
 	var moveAction
 	var direction
+	var duration
 	
-	func _init(direction):
+	func _init(direction, duration):
 		self.direction = direction
+		self.duration = duration
 	
 	func start():
-		moveAction = ActionMove.new(direction, 1, 75).with(character)
+		moveAction = ActionMove.new(direction, duration, 75).with(character)
 		character.get_node("Sprite").isAnimating = true
 		
 	func finish():

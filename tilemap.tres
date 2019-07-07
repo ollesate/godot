@@ -1,6 +1,7 @@
-[gd_resource type="TileSet" load_steps=5 format=2]
+[gd_resource type="TileSet" load_steps=6 format=2]
 
 [ext_resource path="res://Assets/2005TilesetA.png" type="Texture" id=1]
+[ext_resource path="res://Assets/check_points.png" type="Texture" id=2]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 1.6284, 74.3406, 0.0779572, 74.3406, 1.82222, 1.27557 )
@@ -55,22 +56,6 @@ func doIt():
 4/navigation_offset = Vector2( 0, 0 )
 4/shapes = [  ]
 4/z_index = 0
-22/name = "2005TilesetA.png 22"
-22/texture = ExtResource( 1 )
-22/tex_offset = Vector2( 0, 0 )
-22/modulate = Color( 1, 1, 1, 1 )
-22/region = Rect2( 450, 225, 75, 75 )
-22/tile_mode = 2
-22/autotile/icon_coordinate = Vector2( 0, 0 )
-22/autotile/tile_size = Vector2( 75, 75 )
-22/autotile/spacing = 0
-22/autotile/occluder_map = [  ]
-22/autotile/navpoly_map = [  ]
-22/autotile/z_index_map = [  ]
-22/occluder_offset = Vector2( 0, 0 )
-22/navigation_offset = Vector2( 0, 0 )
-22/shapes = [  ]
-22/z_index = 0
 23/name = "Spawns"
 23/texture = ExtResource( 1 )
 23/tex_offset = Vector2( 0, 0 )
@@ -149,4 +134,20 @@ func doIt():
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 28/z_index = 0
+29/name = "Checkpoints"
+29/texture = ExtResource( 2 )
+29/tex_offset = Vector2( 0, 0 )
+29/modulate = Color( 1, 1, 1, 1 )
+29/region = Rect2( 0, 0, 300, 150 )
+29/tile_mode = 2
+29/autotile/icon_coordinate = Vector2( 0, 0 )
+29/autotile/tile_size = Vector2( 75, 75 )
+29/autotile/spacing = 0
+29/autotile/occluder_map = [  ]
+29/autotile/navpoly_map = [  ]
+29/autotile/z_index_map = [  ]
+29/occluder_offset = Vector2( 0, 0 )
+29/navigation_offset = Vector2( 0, 0 )
+29/shapes = [  ]
+29/z_index = 0
 script = SubResource( 3 )

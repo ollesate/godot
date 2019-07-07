@@ -42,7 +42,6 @@ func animFinished():
 	if laserIntersect:
 		if laserIntersect.collider.has_method("onHit"):
 			laserIntersect.collider.onHit(1)
-			pass
 	emit_signal("finished")
 	
 func shoot():
@@ -53,7 +52,12 @@ func _process(delta):
 	if laserIntersect:
 		$Laser.points[1] = to_local(laserIntersect.position)
 	else:
-		$Laser.points[1] = $Laser.points[0] + direction * REACH
+		print("dir: ", direction)
+		print("rotat: ", rotation)
+		print("point: ", $Laser.points[0])
+		print("to: ", $Laser.points[0] + direction * REACH)
+		print("local: ", to_local(global_position + direction * REACH))
+		$Laser.points[1] = $Laser.points[0] + to_local(global_position + direction * REACH)
 
 func getLaserIntersect():
 	var spaceState = get_world_2d().direct_space_state
