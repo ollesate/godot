@@ -2,19 +2,59 @@ class_name Cards
 
 enum {MOVE, ROTATE}
 
-static func generate(nCards):
-	var cards = []
+static func generateCardInfos(nCards):
+	var infos = []
 	for i in range(nCards):
-		cards.append(generateCard())
-	return cards
-						
-static func generateCard():
+		infos.append(generateInfo())
+	return infos
+
+static func generateInfo():
 	randomize()
 	var type = randi() % 2
 	match(type):
 		0:
 			var steps = randi() % 4 + 1
 			var movement = randi() % 2
+			var description
+			match movement:
+				0:
+					description = str("Move forward ", steps, " steps")
+				1:
+					description = str("Move backwards ", steps, " steps")
+			return {"description": description, "randSeed": [type, steps, movement]}
+		1:
+			var rotation = randi() % 3
+			var description
+			match rotation:
+				0:
+					description = str("Rotate left")
+				1:
+					description = str("Rotate right")
+				2:
+					description = str("Rotate u-turn")
+			return {"description": description, "randSeed": [type, rotation]}
+
+static func cardFromInfos(infos):
+	var cards = []
+	for info in infos:
+		var card = generateCard(Seed.new(info.randSeed))
+		card.description = info.description
+		cards.append(card)
+	return cards
+
+static func generate(nCards):
+	var cards = []
+	for i in range(nCards):
+		cards.append(generateCard(Seed.new()))
+	return cards
+						
+static func generateCard(randSeed):
+	randomize()
+	var type = randSeed.next(2)
+	match(type):
+		0:
+			var steps = randSeed.next(2, 1)
+			var movement = randSeed.next(2)
 			match(movement):
 				0:
 					var stepActions = []
@@ -33,7 +73,7 @@ static func generateCard():
 						str("Move backwards ", steps, " steps"),
 						MOVE)
 		1:
-			var rotation = randi() % 3
+			var rotation = randSeed.next(3)
 			match(rotation):
 				0:
 					return Card.new(
@@ -66,6 +106,23 @@ static func moveAction(direction, steps):
 		Sequence.new(stepActions),
 		description,
 		MOVE)
+
+class Seed:
+
+	var preset
+	var index
+
+	func _init(preset = null):
+		self.preset
+		if !preset:
+			randomize()
+	
+	func next(i, offset):
+		if preset:
+			var rand = preset[index]
+			index += 1
+			return rand
+		return randi() % i + offset
 
 class Card:
 	extends CompositeAction

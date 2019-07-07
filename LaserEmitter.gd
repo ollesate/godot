@@ -52,11 +52,6 @@ func _process(delta):
 	if laserIntersect:
 		$Laser.points[1] = to_local(laserIntersect.position)
 	else:
-		print("dir: ", direction)
-		print("rotat: ", rotation)
-		print("point: ", $Laser.points[0])
-		print("to: ", $Laser.points[0] + direction * REACH)
-		print("local: ", to_local(global_position + direction * REACH))
 		$Laser.points[1] = $Laser.points[0] + to_local(global_position + direction * REACH)
 
 func getLaserIntersect():
