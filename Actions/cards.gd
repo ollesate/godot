@@ -1,6 +1,8 @@
 class_name Cards
 
 enum {MOVE, ROTATE}
+enum {ROTATE_LEFT, ROTATE_RIGHT, UTURN}
+enum {MOVE_FORWARD, MOVE_BACKWARDS}
 
 static func generateCardInfos(nCards):
 	var infos = []
@@ -11,6 +13,7 @@ static func generateCardInfos(nCards):
 static func generateInfo():
 	randomize()
 	var type = randi() % 2
+	var id = Global.getId()
 	match(type):
 		0:
 			var steps = randi() % 4 + 1
@@ -21,7 +24,7 @@ static func generateInfo():
 					description = str("Move forward ", steps, " steps")
 				1:
 					description = str("Move backwards ", steps, " steps")
-			return {"description": description, "randSeed": [type, steps, movement]}
+			return {"description": description, "randSeed": [type, steps, movement], "id": id}
 		1:
 			var rotation = randi() % 3
 			var description
@@ -32,15 +35,18 @@ static func generateInfo():
 					description = str("Rotate right")
 				2:
 					description = str("Rotate u-turn")
-			return {"description": description, "randSeed": [type, rotation]}
+			return {"description": description, "randSeed": [type, rotation], "id": id}
 
 static func cardFromInfos(infos):
 	var cards = []
 	for info in infos:
-		var card = generateCard(Seed.new(info.randSeed))
-		card.description = info.description
-		cards.append(card)
+		cards.append(cardFromInfo(info))
 	return cards
+
+static func cardFromInfo(info):
+	var card = generateCard(Seed.new(info.randSeed))
+	card.description = info.description
+	return card
 
 static func generate(nCards):
 	var cards = []
@@ -59,7 +65,7 @@ static func generateCard(randSeed):
 				0:
 					var stepActions = []
 					for step in range(steps):
-						stepActions.append(Player.movesStep(Player.FORWARD))
+						stepActions.append(Player.moveStep(Player.FORWARD))
 					return MultiStepCard.new(
 						Sequence.new(stepActions), 
 						str("Move forward ", steps, " steps"),
@@ -67,7 +73,7 @@ static func generateCard(randSeed):
 				1:
 					var stepActions = []
 					for step in range(steps):
-						stepActions.append(Player.movesStep(Player.BACKWARDS))
+						stepActions.append(Player.moveStep(Player.BACKWARDS))
 					return MultiStepCard.new(
 						Sequence.new(stepActions), 
 						str("Move backwards ", steps, " steps"),
@@ -110,14 +116,14 @@ static func moveAction(direction, steps):
 class Seed:
 
 	var preset
-	var index
+	var index = 0
 
 	func _init(preset = null):
-		self.preset
+		self.preset = preset
 		if !preset:
 			randomize()
 	
-	func next(i, offset):
+	func next(i, offset = 0):
 		if preset:
 			var rand = preset[index]
 			index += 1
@@ -126,6 +132,9 @@ class Seed:
 
 class Card:
 	extends CompositeAction
+	
+	signal cardStarted()
+	signal cardFinished()
 	
 	var description
 	var action
@@ -140,7 +149,15 @@ class Card:
 		.setCharacter(val)
 		if val:
 			val.connect("onDestroyed", self, "onDestroyed")
-		
+	
+	func start():
+		.start()
+		emit_signal("cardStarted", self)
+
+	func finish():
+		.finish()
+		emit_signal("cardFinished", self)
+
 	func onDestroyed(player):
 		character = null
 		

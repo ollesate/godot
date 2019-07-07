@@ -4,6 +4,8 @@ extends Control
 signal onSwap(idx1, idx2)
 
 var positions = {}
+var children = {}
+
 export var locked = false setget setLocked
 export var hpLeft = 5 setget setHpLeft
 
@@ -19,7 +21,9 @@ func setCards(cardInfos):
 	for child in get_children():
 		child.state = UiCard.NONE
 	for index in range(cardInfos.size()):
-		get_child(index).title = cardInfos[index].description
+		var info = cardInfos[index]
+		get_child(index).title = info.description
+		children[info.id] = get_child(index)
 
 func setLocked(newLocked):
 	locked = newLocked
@@ -28,17 +32,16 @@ func setLocked(newLocked):
 		child.setLocked(locked)
 
 func setHpLeft(newHpLeft):
-	print(str("set hp left", newHpLeft))
 	hpLeft = newHpLeft
 	for idx in range(get_child_count()):
 		print(str(idx, " set locked ", idx >= hpLeft))
 		get_child(idx).setDisabled(idx >= hpLeft)
 
-func selectCard(index):
-	get_child(index).state = UiCard.SELECTED
+func selectCard(info):
+	children[info.id].state = UiCard.SELECTED
 
-func unselectCard(index):
-	get_child(index).state = UiCard.CONSUMED
+func unselectCard(info):
+	children[info.id].state = UiCard.CONSUMED
 
 func onChildChangedPosition(child, position):
 	for i in range(get_child_count()):

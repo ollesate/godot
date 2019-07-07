@@ -11,23 +11,13 @@ const CARD_PHASE_DURATION = 5 / SPEED_MODIFIER
 const LASER_DURATION = 3 / SPEED_MODIFIER
 const END_TURN_DURATION = 3 / SPEED_MODIFIER
 
-# onready var events = get_node("/root/Root/HUD/Events")
+var id = 0 setget , getId
 
-signal onCardStart(player, card)
-signal onCardEnd(player, card)
-signal onPlayerCards(player, cards)
+func getId():
+	id += 1
+	return id 
 
 var actions = []
-var drawActions = []
-
-func onPlayerCards(player, cards):
-	emit_signal("onPlayerCards", player, cards)
-	
-func onCardStart(player, card):
-	emit_signal("onCardStart", player, card)	
-
-func onCardEnd(player, card):
-	emit_signal("onCardEnd", player, card)
 
 func perform(action):
 	actions.append(action)

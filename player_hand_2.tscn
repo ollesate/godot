@@ -10,12 +10,12 @@ script/source = "extends Control
 func _ready():
 	$CardHand.connect(\"onSwap\", self, \"CardHand_onSwap\")
 	$Network.connect(\"onPlayerCards\", self, \"Network_onPlayerCards\")
+	$Network.connect(\"onSimulationStart\", self, \"Network_onSimulationStart\")
 	$Network.connect(\"onTokenHit\", self, \"Network_onTokenHit\")
-	$Network.connect(\"onStartSimulation\", self, \"onStartSimulation\")
 
 func CardHand_onSwap(idx1, idx2):
 	print(str(\"swap\", idx1, idx2))
-	$Network.rpc(\"swapCards\", idx1, idx2)
+	$Network.swapCards(idx1, idx2)
 	
 func Network_onPlayerCards(cardInfos):
 	print(str(\"on player cards\", cardInfos))
@@ -27,10 +27,7 @@ func Network_onSimulationStart():
 
 func Network_onTokenHit(hpLeft):
 	print(\"on token hit\")
-	$CardHand.hpLeft = hpLeft
-	
-func onStartSimulation():
-	$CardHand.setLocked(true)"
+	$CardHand.hpLeft = hpLeft"
 
 [node name="PlayerHand" type="Control"]
 anchor_right = 1.0

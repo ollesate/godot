@@ -1,12 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://Map.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Network.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Map.tscn" type="PackedScene" id=2]
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
 var playerInfos = []
 var readyPlayers = []
+var cardPlayerInfos = {}
 
 func onPlayerJoined(info):
 	$Game.addPlayer(info)
@@ -25,22 +28,29 @@ func onPlayerInfoUpdated(info):
 	$Game.updatePlayerInfo(info)
 
 func _ready():
-	while true: # Play endlessly...
-		playerInfos = yield(waitForPlayers(), \"completed\")
-		yield(playGame(), \"completed\")
-		resetGame()
-
-func waitForPlayers():
-	print(\"waitForPlayers\")
-	
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
 	$Network.connect(\"onPlayerReady\", self, \"onPlayerReady\")
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
 
+	while true: # Play endlessly...
+		playerInfos = yield(waitForPlayers(), \"completed\")
+		yield(playGame(), \"completed\")
+		resetGame()
+		
+func cardStarted(card):
+	var cardInfo = cardPlayerInfos[card]
+	$Network.rpc_id(cardInfo.player.id, \"onCardStarted\", cardInfo.card)
+		
+func cardFinished(card):
+	var cardInfo = cardPlayerInfos[card]
+	$Network.rpc_id(cardInfo.player.id, \"onCardFinished\", cardInfo.card)
+
+func waitForPlayers():
+	print(\"waitForPlayers\")
 	# Wait for players
-	while $Network.playerInfos.size() == 0 || readyPlayers.size() != $Network.playerInfos.size():
-		var info = yield($Network, \"onPlayerReady\") # Perhaps race condition
+	while $Network.playerInfos.size() == 0:
+		var info = yield($Network, \"onPlayerJoined\") # Perhaps race condition
 		readyPlayers.append(info)
 	# Lock lobby
 	return $Network.playerInfos
@@ -54,105 +64,39 @@ func playGame():
 	var gameFinished = false
 	
 	while !gameFinished:
+		cardPlayerInfos.clear()
+		
 		# Give cards to player
-		for info in playerInfos:
-			var cards = Cards.generate(5) # Need to generate info, not actual cards
-			$Network.rpc_id(info.id, \"dealCards\", cards)
+		for info in playerInfos.values():
+			var cardInfos = Cards.generateCardInfos(5)
+			$Network.dealCardsToPlayer(info.id, cardInfos)
 		
-		$GameUi.countdown(30)
-		yield($GameUi, \"finished\")
+		var countdown = 3
+		while countdown >= 0:
+			print(countdown)
+			yield(Actions.wait(1).perform(), \"finished\")
+			countdown -= 1
+
+		var playerCards = {}
+		var cardInfos = $Network.cardInfos
+		for playerInfo in cardInfos.keys():
+			var cards = []
+			for cardInfo in cardInfos[playerInfo]:
+				var card = Cards.cardFromInfo(cardInfo)
+				cards.append(card)
+				card.connect(\"cardStarted\", self, \"cardStarted\")
+				card.connect(\"cardFinished\", self, \"cardFinished\")
+				cardPlayerInfos[card] = {\"card\": cardInfo, \"player\": playerInfo} 
+			playerCards[playerInfo] = cards
 		
-		var playerCards = []
-		for info in playerInfos:
-			var cards = $Network.getCards(info.id)
-			playerCards.append(info, cards)
+		$Network.rpc(\"startSimulation\")
 		yield($Game.simulateGame(playerCards), \"completed\")
-		
-		gameFinished = $Game.gameFinished
+
+		gameFinished = false
 
 	# Game is finished, wait for some time
 	# Perhaps wait some player response?
 	# Restart game"
-
-[sub_resource type="GDScript" id=2]
-script/source = "extends Node2D
-
-const PORT = 1551
-const MAX_PLAYERS = 4
-
-export var isServer = false
-
-var playerInfos = {}
-
-signal onConnected()
-signal onConnectionFailed()
-signal onServerDisconnect()
-
-signal onPlayerConnected()
-signal onPlayerDisconnected()
-signal onPlayerJoined()
-signal onPlayerLeft()
-signal onPlayerReady()
-signal onPlayerUnready()
-
-func _ready():
-	custom_multiplayer = MultiplayerAPI.new()
-	custom_multiplayer.set_root_node(self)
-	var peer = NetworkedMultiplayerENet.new()
-	if (isServer):
-		print(\"server start\")
-		peer.create_server(PORT, MAX_PLAYERS)
-	else:
-		print(\"client start\")
-		peer.create_client(\"localhost\", PORT)
-	custom_multiplayer.set_network_peer(peer)
-	
-	if isServer:
-		custom_multiplayer.connect(\"network_peer_connected\", self, \"_player_connected\")
-		custom_multiplayer.connect(\"network_peer_disconnected\", self, \"_player_disconnected\")
-	else:
-		custom_multiplayer.connect(\"connected_to_server\", self, \"_connected_ok\")
-		custom_multiplayer.connect(\"connection_failed\", self, \"_connected_fail\")
-		custom_multiplayer.connect(\"server_disconnected\", self, \"_server_disconnected\")
-
-func _process(delta):
-	if custom_multiplayer.has_network_peer():
-		custom_multiplayer.poll()
-
-remote func updateInfo(name, color):
-	var id = custom_multiplayer.get_rpc_sender_id()
-	playerInfos[id] = { id = id, name = name, color = color }
-	emit_signal(\"onPlayerUpdateInfo\", playerInfos[id])
-
-slave func dealCards(cardInfos):
-	emit_signal(\"onPlayerCards\", cardInfos)
-
-func _peer_connected(id):
-	print(\"network peer connected \", id)
-	var tempName = str(\"Player\", custom_multiplayer.get_network_connected_peers().size())
-	playerInfos[id] = { id = id, name = tempName, color = Color.white }
-	emit_signal(\"onPlayerConnected\", id)
-	emit_signal(\"onPlayerJoined\", playerInfos[id])
-
-func _peer_disconnected(id):
-	var playerInfo = playerInfos[id]
-	print(\"network peer disconnected \", playerInfo)
-	playerInfos.erase(id)		
-	emit_signal(\"onPlayerDisconnected\", id)
-	emit_signal(\"onPlayerLeft\", playerInfo)
-
-func _connected_to_server():
-	# Only called on clients, not server.
-	print(\"connected to server\")
-	emit_signal(\"onConnected\")
-
-func _server_disconnected():
-	print(\"server disconnected\")
-	emit_signal(\"onServerDisconnect\")
-
-func _connected_fail():
-	print(\"connected fail\")
-	emit_signal(\"onConnectionFailed\")"
 
 [sub_resource type="GDScript" id=3]
 script/source = "extends Node2D
@@ -162,41 +106,43 @@ var spawnPoints = {}
 var players = {}
 var checkpoints = {}
 
+signal lasersEnd()
+
 func _ready():
-	yield(Actions.wait(0.5).perform(), \"finished\")
-	beltPushPlayerIntoHole()
+	pass
 
-func startGame(allPlayerCards):
-	var nTurns = 5
+func simulateGame(allPlayerCards):
 	var turns = []
+	for turnIndex in range(5):
+		var turn = []
+		turns.append(turn)
+		for info in allPlayerCards.keys():
+			if allPlayerCards[info].size() > turnIndex:
+				var card = allPlayerCards[info][turnIndex]
+				turn.append(card.with(players[info]))
 
-	for i in range(nTurns):
-		turns.append([])
-	for info in playerInfos:
-		if !players.has(info): # The player has no token
-			print(\"player has no token\")
-			continue
-		var player = players[info]
-		var cards = allPlayerCards[info]
-		for i in range(nTurns):
-			if cards.size() > i:
-				var card = cards[i]
-				turns[i].append(card.with(player))
-	
 	for turn in turns:
-		for card in turn:
-			card.perform()
-			if card.type == Cards.MOVE:
-				var finished = false
-				while(not finished and card.character != null):
-					finished = yield(card, \"stepFinished\") == 0
-					yield(getPlayersFallAction().perform(), \"finished\")
-				saveCheckpointsIfPossible()
-			else:
-				yield(card, \"finished\")
+		print(\"Players act\")
+		yield(playersAct(turn), \"completed\")
+		print(\"Lasers shoot\")
+		yield(lasersShoot(), \"completed\")
+		print(\"Belts move\")
+		yield(beltsMove(), \"completed\")
+
+func playersAct(turn):	
+	for card in turn:
+		card.perform()
+		if card.type == Cards.MOVE:
+			var finished = false
+			while(not finished and card.character != null):
+				finished = yield(card, \"stepFinished\") == 0
+				yield(getPlayersFallAction().perform(), \"finished\")
+			saveCheckpointsIfPossible()
+		else:
+			yield(card, \"finished\")
 
 	var shootActions = []
-	for player in get_tree().get_nodes_in_group(\"players\"):
+	for player in players.values():
 		shootActions.append(Player.shootAction().with(player))
 	yield(Parallell.new(shootActions).perform(), \"finished\")
 
@@ -206,6 +152,8 @@ func lasersShoot():
 		laser.shoot()
 	for laser in lasers:
 		yield(laser, \"finished\")
+	yield(Actions.wait(0.25).perform(), \"finished\")
+
 
 func saveCheckpointsIfPossible():
 	for playerInfo in players.keys():
@@ -225,7 +173,7 @@ func beltsMove():
 		var beltAction = $Root/TileMap.getBeltAction(i)
 		yield(beltAction.perform(), \"finished\")
 		yield(getPlayersFallAction().perform(), \"finished\")
-		yield(Actions.wait(0.5).perform(), \"finished\")
+		yield(Actions.wait(0.25).perform(), \"finished\")
 	saveCheckpointsIfPossible()
 
 func getPlayersFallAction():
@@ -236,14 +184,14 @@ func getPlayersFallAction():
 
 func beltPushPlayerIntoHole():
 	var info = {\"name\": \"Olof\", \"color\": Color.blue}
-	var player = addPlayerInfo(info)
+	var player = addPlayer(info)
 	
 	var cards = {info: [Cards.moveAction(Player.FORWARD, 2), Cards.moveAction(Player.FORWARD, 2)]}
-	yield(startGame(cards), \"completed\")
+	yield(simulateGame(cards), \"completed\")
 	print(\"Players finished\")
 	player = spawnPlayer(info)
 	cards = {info: [Cards.moveAction(Player.FORWARD, 2), Cards.moveAction(Player.FORWARD, 2)]}
-	yield(startGame(cards), \"completed\")
+	yield(simulateGame(cards), \"completed\")
 
 func spawnPlayer(info):
 	if players.has(info):
@@ -263,13 +211,13 @@ func onPlayerDestroyed(player):
 		if player == players[info]:
 			players.erase(info)
 
-func addPlayerInfo(info):
+func addPlayer(info):
 	var spawnPoint = $Root.getSpawn(playerInfos.size())
 	playerInfos.append(info)
 	spawnPoints[info] = spawnPoint
 	return spawnPlayer(info)
 
-func removePlayerInfo(info):
+func removePlayer(info):
 	playerInfos.erase(info)
 	spawnPoints.erase(info)
 	var player = players[info]
@@ -279,11 +227,16 @@ func removePlayerInfo(info):
 [node name="Node2D" type="Node2D"]
 script = SubResource( 1 )
 
-[node name="Network" type="Node2D" parent="."]
-script = SubResource( 2 )
+[node name="Network" parent="." instance=ExtResource( 1 )]
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
 script = SubResource( 3 )
 
-[node name="Root" parent="Game" instance=ExtResource( 1 )]
+[node name="Root" parent="Game" instance=ExtResource( 2 )]
+
+[node name="PlayerHand" parent="." instance=ExtResource( 3 )]
+margin_left = 767.477
+margin_top = 6.51193
+margin_right = 767.477
+margin_bottom = 6.51193
