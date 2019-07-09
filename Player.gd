@@ -135,7 +135,6 @@ class Shoot:
 	func start():
 		# Shoot and wait for it to hit something...
 		var bullet = preload("res://Game/Bullet.tscn").instance()
-		bullet.rotation = self.character.rotation
 		bullet.playerOwner = self.character
 		bullet.position = self.character.get_node("Nozzle").position
 		self.character.add_child(bullet)

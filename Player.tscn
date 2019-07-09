@@ -26,7 +26,11 @@ func _process(delta):
 extents = Vector2( 31.9265, 27.225 )
 
 [node name="Player" type="KinematicBody2D"]
+position = Vector2( 128, 128 )
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
 
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 2, 2 )
@@ -39,7 +43,6 @@ script = SubResource( 1 )
 shape = SubResource( 2 )
 
 [node name="UI" type="Control" parent="."]
-editor/display_folded = true
 margin_left = -1.09278e-06
 margin_top = 25.0
 margin_right = -1.09278e-06
@@ -82,12 +85,13 @@ align = 1
 [node name="NameLabel" type="Label" parent="UI"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -27.0
-margin_top = -89.0
-margin_right = 27.0
-margin_bottom = -75.0
+margin_left = -27.3545
+margin_top = -81.5549
+margin_right = 26.6455
+margin_bottom = -67.5549
 grow_horizontal = 2
 text = "<Name>"
+align = 1
 
 [node name="Nozzle" type="Node2D" parent="."]
 position = Vector2( 32, 0 )

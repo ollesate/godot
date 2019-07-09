@@ -1,13 +1,12 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://System.gd" type="Script" id=1]
 [ext_resource path="res://Network.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Assets/icon.png" type="Texture" id=3]
 [ext_resource path="res://conveyor.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Game/ConveyorBelt.gd" type="Script" id=5]
-[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=6]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=7]
-[ext_resource path="res://player_hand.tscn" type="PackedScene" id=8]
+[ext_resource path="res://GameUi.tscn" type="PackedScene" id=6]
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 64, 64 )
@@ -45,31 +44,6 @@ func removePlayer(playerInfo):
 
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 32, 32 )
-
-[sub_resource type="GDScript" id=4]
-script/source = "extends VBoxContainer
-
-var duration
-var startDuration
-
-func _ready():
-	# showText(\"hi\")
-	pass
-
-func start(title, duration):
-	$Label.text = title
-	$Progress.show()
-	self.duration = duration * 1.0
-	startDuration = duration * 1.0
-
-func showText(title):
-	$Label.text = title
-	$Progress.hide()
-	
-func _process(delta):
-	if $Progress.visible:
-		$Progress.value = duration / startDuration * 100
-		duration -= delta"
 
 [node name="Root" type="Node2D"]
 position = Vector2( 1, 0 )
@@ -882,41 +856,7 @@ shape = SubResource( 3 )
 modulate = Color( 0.12549, 0.721569, 0.0941176, 1 )
 texture = ExtResource( 3 )
 
-[node name="HUD" type="Control" parent="."]
-editor/display_folded = true
-margin_right = 1024.0
-margin_bottom = 576.0
-__meta__ = {
-"_edit_lock_": true
-}
-
-[node name="StateProgress" type="VBoxContainer" parent="HUD"]
-editor/display_folded = true
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -294.0
-margin_top = 18.0
-margin_right = 294.0
-margin_bottom = 89.0
-script = SubResource( 4 )
-
-[node name="Label" type="Label" parent="HUD/StateProgress"]
-margin_right = 588.0
-margin_bottom = 14.0
-text = "State"
-align = 1
-
-[node name="Progress" type="TextureProgress" parent="HUD/StateProgress"]
-margin_top = 18.0
-margin_right = 588.0
-margin_bottom = 53.0
-rect_min_size = Vector2( 200, 35 )
-step = 0.0
-texture_under = ExtResource( 6 )
-texture_progress = ExtResource( 7 )
-nine_patch_stretch = true
-stretch_margin_left = 100
-stretch_margin_right = 100
+[node name="GameUi" parent="." instance=ExtResource( 6 )]
 
 [node name="LobbyUI" type="Control" parent="."]
 editor/display_folded = true
@@ -933,4 +873,4 @@ text = "Start game"
 
 [node name="CardHands" type="Node2D" parent="."]
 
-[node name="PlayerHand" parent="." instance=ExtResource( 8 )]
+[node name="PlayerHand" parent="." instance=ExtResource( 7 )]

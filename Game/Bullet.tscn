@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://Assets/icon.png" type="Texture" id=1]
+[ext_resource path="res://Assets/spritesheet.png" type="Texture" id=1]
+[ext_resource path="res://Assets/particleTexture.png" type="Texture" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
@@ -8,7 +9,6 @@ script/source = "extends KinematicBody2D
 signal onHit()
 
 const SPEED = Global.BULLET_SPEED
-const ROTATION_SPEED = 20.0
 const MAX_TIME = 2.0
 
 var direction
@@ -16,10 +16,9 @@ var duration = MAX_TIME
 var playerOwner
 
 func _ready():
-	direction = Vector2.RIGHT.rotated(rotation)
+	direction = Vector2.RIGHT.rotated(global_rotation)
 	
 func _physics_process(delta):
-	rotate(deg2rad(ROTATION_SPEED))
 	move_and_slide(direction * SPEED)
 	duration -= delta
 	if get_slide_count() > 0:
@@ -34,18 +33,53 @@ func _physics_process(delta):
 		free()"
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 64, 64 )
+extents = Vector2( 9.35217, 4.06856 )
+
+[sub_resource type="Gradient" id=3]
+colors = PoolColorArray( 0.695312, 0.609544, 0.567657, 1, 0.628906, 0.360055, 0.122833, 1 )
+
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
+
+[sub_resource type="ParticlesMaterial" id=5]
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 89.57
+initial_velocity_random = 0.5
+angular_velocity = 0.0
+orbit_velocity = 0.0
+orbit_velocity_random = 1.0
+linear_accel = -100.0
+linear_accel_random = 0.18
+radial_accel = -100.0
+scale = 0.3
+scale_random = 0.16
+color_ramp = SubResource( 4 )
 
 [node name="Bullet" type="KinematicBody2D"]
-position = Vector2( 0, -80 )
-scale = Vector2( 0.2, 0.2 )
+position = Vector2( 45.7359, 38.5792 )
+scale = Vector2( 2, 2 )
 script = SubResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
 
 [node name="Sprite" type="Sprite" parent="."]
+position = Vector2( -1.52588e-05, -1.52588e-05 )
 texture = ExtResource( 1 )
+vframes = 10
+hframes = 10
+frame = 41
+region_enabled = true
+region_rect = Rect2( 0, 0, 320, 320 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 2 )
+
+[node name="Particles2D" type="Particles2D" parent="."]
+position = Vector2( 41.1321, 0 )
+amount = 95
+lifetime = 0.3
+speed_scale = 1.3
+explosiveness = 0.5
+randomness = 1.0
+process_material = SubResource( 5 )
+texture = ExtResource( 2 )
