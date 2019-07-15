@@ -27,9 +27,9 @@ func onInfoUpdated(playerName, color):
 	$Network.rpc_id(0, \"updateInfo\", playerName, color)
 	
 func changeScene():
-	get_tree().root.remove_child(self)
+	remove_child($PlayerLobby)
 	var playerHand = load(\"res://player_hand.tscn\").instance()
-	get_tree().root.add_child(playerHand)"
+	add_child(playerHand)"
 
 [node name="PlayerScene" type="Control"]
 anchor_right = 1.0

@@ -263,7 +263,7 @@ script = SubResource( 2 )
 [node name="GameUi" parent="." instance=ExtResource( 3 )]
 
 [node name="PlayerScene" parent="." instance=ExtResource( 4 )]
-margin_left = 1050.0
-margin_top = 257.0
-margin_right = 1050.0
-margin_bottom = 257.0
+margin_left = 750.0
+margin_top = 225.0
+margin_right = 750.0
+margin_bottom = 225.0
