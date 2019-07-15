@@ -15,7 +15,7 @@ func _ready():
 
 func CardHand_onSwap(idx1, idx2):
 	print(str(\"swap\", idx1, idx2))
-	$Network.rpc(\"swapCards\", idx1, idx2)
+	$Network.rpc_id(0, \"swapCards\", idx1, idx2)
 	
 func Network_onPlayerCards(cardInfos):
 	print(str(\"on player cards\", cardInfos))

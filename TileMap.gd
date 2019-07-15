@@ -90,6 +90,8 @@ func create(name, cellPos, flipX, flipY, transposed):
 			var checkpoint = preload("res://Checkpoint.tscn").instance()
 			var tileCoord = get_cell_autotile_coord(cellPos.x, cellPos.y)
 			checkpoint.number = tileCoord.x + 4 * tileCoord.y
+			if checkpoint.number == 0:
+				checkpoint.setNext()
 			checkpoints[cellPos] = checkpoint
 			return checkpoint
 

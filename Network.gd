@@ -13,12 +13,14 @@ signal onPlayerJoined()
 signal onPlayerLeft()
 signal onPlayerReady()
 signal onPlayerUnready()
+signal onPlayerUpdateInfo()
 
 signal onPlayerCards()
 signal onCardStarted()
 signal onCardFinished()
 signal onStartSimulation()
 signal onEndSimulation()
+signal onGameStarted()
 
 export var isServer = false
 
@@ -49,10 +51,20 @@ func _process(delta):
 	if custom_multiplayer.has_network_peer():
 		custom_multiplayer.poll()
 
+remote func playerReady():
+	var id = custom_multiplayer.get_rpc_sender_id()
+	emit_signal("onPlayerReady", playerInfos[id])
+
+remote func playerUnready():
+	var id = custom_multiplayer.get_rpc_sender_id()
+	emit_signal("onPlayerUnready", playerInfos[id])
+
 remote func updateInfo(name, color):
 	var id = custom_multiplayer.get_rpc_sender_id()
-	playerInfos[id] = { id = id, name = name, color = color }
-	emit_signal("onPlayerUpdateInfo", playerInfos[id])
+	var info = playerInfos[id]
+	info.name = name
+	info.color = color
+	emit_signal("onPlayerUpdateInfo", info)
 
 func dealCardsToPlayer(id, cardInfos):
 	rpc_id(id, "dealCards", cardInfos)
@@ -74,8 +86,13 @@ remotesync func startSimulation():
 remotesync func endSimulation():
 	emit_signal("onEndSimulation")
 
+remotesync func onGameStarted():
+	emit_signal("onGameStarted")
+
 remote func swapCards(idx1, idx2):
-	var playerInfo = playerInfos[custom_multiplayer.get_rpc_sender_id()]
+	var playerInfo = playerInfos[custom_multiplayer.get_rpc_sender_id()]	
+	if not cardInfos.has(playerInfo):
+		return
 	var cards = cardInfos[playerInfo]
 	var temp = cards[idx1]
 	cards[idx1] = cards[idx2]
@@ -84,7 +101,8 @@ remote func swapCards(idx1, idx2):
 func _peer_connected(id):
 	print("network peer connected ", id)
 	var tempName = str("Player", custom_multiplayer.get_network_connected_peers().size())
-	playerInfos[id] = { id = id, name = tempName, color = Color.white }
+	#playerInfos[id] = { id = id, name = tempName, color = Color.white }
+	playerInfos[id] = PlayerInfo.new(id, tempName, Color.white)
 	emit_signal("onPlayerConnected", id)
 	emit_signal("onPlayerJoined", playerInfos[id])
 
@@ -107,3 +125,13 @@ func _server_disconnected():
 func _connected_fail():
 	print("connected fail")
 	emit_signal("onConnectionFailed")
+	
+class PlayerInfo:
+	var id
+	var name	
+	var color
+	
+	func _init(id, name, color):
+		self.id = id
+		self.name = name
+		self.color = color

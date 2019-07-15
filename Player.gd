@@ -47,9 +47,13 @@ onready var nameLabel = $UI/NameLabel
 
 var id
 var playerName = "" setget setPlayerName
+var defaultName
 var color = Color.white setget setColor
 var hpMax = HP_MAX
 var currentHp setget , getHp
+
+func setReady(isReady):
+	$Sprite.isAnimating = isReady
 
 func _ready():
 	add_to_group("players")
@@ -62,11 +66,12 @@ func _ready():
 
 func setColor(val):
 	color = val if val != null else Color.white
-	nameLabel.modulate = color
-	modulate = color
+	$Sprite.modulate = color
 
 func setPlayerName(val):
-	playerName = val if val else ""
+	if not defaultName:
+		defaultName = val
+	playerName = val if val else defaultName
 	nameLabel.text = playerName
 
 func getHp():

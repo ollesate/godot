@@ -16,7 +16,11 @@ var rects = []
 var playerInfos = []
 
 func _ready():
-	addColor(Color.gray)
+	add_to_group(\"checkpoints\")
+
+func setNext():
+	if rects.size() == 0:
+		addColor(Color.gray)
 
 func addColor(color):
 	var size = SIZE - rects.size() * WIDTH * 2
