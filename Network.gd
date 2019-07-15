@@ -62,8 +62,10 @@ remote func playerUnready():
 remote func updateInfo(name, color):
 	var id = custom_multiplayer.get_rpc_sender_id()
 	var info = playerInfos[id]
-	info.name = name
-	info.color = color
+	if name:
+		info.name = name
+	if color:
+		info.color = color
 	emit_signal("onPlayerUpdateInfo", info)
 
 func dealCardsToPlayer(id, cardInfos):

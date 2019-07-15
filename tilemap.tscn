@@ -162,7 +162,6 @@ func lasersShoot():
 		yield(laser, \"finished\")
 	yield(Actions.wait(0.25).perform(), \"finished\")
 
-
 func saveCheckpointsIfPossible():
 	var checkpointTouchedIndex
 	for playerInfo in players.keys():

@@ -10,8 +10,6 @@ export var locked = false setget setLocked
 export var hpLeft = 5 setget setHpLeft
 
 func _ready():
-	$"../Network".connect("onCardStarted", self, "selectCard")
-	$"../Network".connect("onCardFinished", self, "unselectCard")
 	for card in get_children():
 		card.connect("onPositionChanged", self, "onChildChangedPosition")
 		card.connect("onDropped", self, "onChildDropped")

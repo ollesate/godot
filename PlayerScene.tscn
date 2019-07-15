@@ -6,8 +6,14 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
+var playerHand
+
 func _ready():
 	$Network.connect(\"onConnectionFailed\", self, \"onConnectionFailed\")
+	$Network.connect(\"onCardStarted\", self, \"onCardStarted\")
+	$Network.connect(\"onCardFinished\", self, \"onCardFinished\")
+	$Network.connect(\"onPlayerCards\", self, \"onPlayerCards\")
+	$Network.connect(\"onStartSimulation\", self, \"onStartSimulation\")
 	$PlayerLobby.connect(\"onReady\", self, \"onReady\")
 	$PlayerLobby.connect(\"onUnready\", self, \"onUnready\")
 	$PlayerLobby.connect(\"onInfoUpdated\", self, \"onInfoUpdated\")
@@ -16,6 +22,22 @@ func _ready():
 	
 func onConnectionFailed():
 	pass # show some message? and retry???
+
+func onStartSimulation():
+	if playerHand:
+		playerHand.setLocked(true)
+
+func onPlayerCards(cards):
+	if playerHand:
+		playerHand.setPlayerCards(cards)
+
+func onCardStarted(card):
+	if playerHand:
+		playerHand.selectCard(card)
+
+func onCardFinished(card):
+	if playerHand:
+		playerHand.unselectCard(card)
 
 func onReady():
 	$Network.rpc_id(0, \"playerReady\")
@@ -26,9 +48,13 @@ func onUnready():
 func onInfoUpdated(playerName, color):
 	$Network.rpc_id(0, \"updateInfo\", playerName, color)
 	
+func onSwap(idx1, idx2):
+	$Network.rpc_id(0, \"swapCards\", idx1, idx2)
+
 func changeScene():
 	remove_child($PlayerLobby)
-	var playerHand = load(\"res://player_hand.tscn\").instance()
+	playerHand = load(\"res://player_hand.tscn\").instance()
+	playerHand.connect(\"onSwap\", self, \"onSwap\")
 	add_child(playerHand)"
 
 [node name="PlayerScene" type="Control"]
