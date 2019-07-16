@@ -111,12 +111,18 @@ _global_script_class_icons={
 [application]
 
 config/name="ElectroRobot"
-run/main_scene="res://main.tscn"
+run/main_scene="res://swatch.tscn"
 config/icon="res://Assets/icon.png"
 
 [autoload]
 
 Global="*res://global.gd"
+
+[display]
+
+window/size/width=1080
+window/size/height=1920
+window/handheld/orientation="portrait"
 
 [layer_names]
 
