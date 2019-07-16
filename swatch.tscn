@@ -1,7 +1,7 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
-[ext_resource path="res://Assets/single_tank.png" type="Texture" id=2]
+[ext_resource path="res://Assets/tank.png" type="Texture" id=2]
 [ext_resource path="res://Assets/box.png" type="Texture" id=3]
 
 [sub_resource type="GDScript" id=1]
@@ -16,8 +16,12 @@ var ready = false
 
 var playerName
 var color
+var textureAnim
 
 func _ready():
+	var delay = 0.1
+	textureAnim = TextureAnimation.new($Tank, Vector2(32, 32), 10, delay)
+	
 	for child in $Colors1.get_children():
 		var color = child.modulate
 		child.connect(\"gui_input\", self, \"on_swatch_input\", [color])
@@ -26,6 +30,9 @@ func _ready():
 		child.connect(\"gui_input\", self, \"on_swatch_input\", [color])
 	$MarginContainer/Button.connect(\"pressed\", self, \"onButtonPressed\")
 	$NameEdit.connect(\"text_changed\", self, \"onTextChanged\")
+
+func _process(delta):
+	textureAnim.process(delta)
 
 func on_swatch_input(ev, color):
 	if ev is InputEventMouseButton:
@@ -36,14 +43,45 @@ func on_swatch_input(ev, color):
 
 func onButtonPressed():
 	ready = !ready
+	textureAnim.isRunning = ready
 	if ready:
+		$MarginContainer/Button.text = \"Press to unready\"
 		emit_signal(\"onReady\")
 	else:
+		$MarginContainer/Button.text = \"Press to ready\"
 		emit_signal(\"onUnready\")
 
 func onTextChanged(text):
 	playerName = text
-	emit_signal(\"onInfoUpdated\", playerName, color)"
+	emit_signal(\"onInfoUpdated\", playerName, color)
+	
+class TextureAnimation:
+	
+	var textureRect
+	var size
+	var frames
+	var delay
+	
+	var currentFrame = 0
+	var time
+	var isRunning = false
+	
+	func _init(textureRect, size, frames, delay):
+		time = delay
+		self.size = size
+		self.frames = frames
+		self.delay = delay
+		self.textureRect = textureRect
+	
+	func process(delta):
+		if not isRunning:
+			return
+		time -= delta
+		if time < 0:
+			time = delay
+			currentFrame = (currentFrame + 1) % frames
+			textureRect.texture.region = Rect2(currentFrame * size.x, 0, size.x, size.y)
+			textureRect.update()"
 
 [sub_resource type="DynamicFont" id=5]
 size = 72
@@ -56,6 +94,11 @@ font_data = ExtResource( 1 )
 [sub_resource type="DynamicFont" id=3]
 size = 50
 font_data = ExtResource( 1 )
+
+[sub_resource type="AtlasTexture" id=6]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 32, 32 )
 
 [sub_resource type="DynamicFont" id=4]
 size = 60
@@ -113,7 +156,7 @@ margin_top = 674.0
 margin_right = 1080.0
 margin_bottom = 974.0
 rect_min_size = Vector2( 0, 300 )
-texture = ExtResource( 2 )
+texture = SubResource( 6 )
 stretch_mode = 6
 
 [node name="Colors1" type="HBoxContainer" parent="."]
@@ -229,4 +272,4 @@ margin_bottom = 125.0
 rect_min_size = Vector2( 200, 0 )
 custom_fonts/font = SubResource( 4 )
 custom_constants/hseparation = 0
-text = "Press when ready"
+text = "Press to ready"
