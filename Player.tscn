@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
 [ext_resource path="res://Assets/tank.png" type="Texture" id=2]
-[ext_resource path="res://player_card_list.gd" type="Script" id=3]
-[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=4]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=5]
+[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=3]
+[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Sprite
@@ -47,8 +46,6 @@ margin_left = -1.09278e-06
 margin_top = 25.0
 margin_right = -1.09278e-06
 margin_bottom = 25.0
-script = ExtResource( 3 )
-position = Vector2( 0, 25 )
 
 [node name="HP" type="TextureProgress" parent="UI"]
 anchor_left = 0.5
@@ -61,8 +58,8 @@ rect_scale = Vector2( 0.2, 0.2 )
 rect_pivot_offset = Vector2( 198, 0 )
 max_value = 9.0
 value = 9.0
-texture_under = ExtResource( 4 )
-texture_progress = ExtResource( 5 )
+texture_under = ExtResource( 3 )
+texture_progress = ExtResource( 4 )
 
 [node name="Cards" type="VBoxContainer" parent="UI"]
 editor/display_folded = true
