@@ -17,6 +17,7 @@ var playerName
 var color
 
 func _ready():
+	return
 	for child in $VBoxContainer/HBoxContainer.get_children():
 		var color = child.modulate
 		child.connect(\"gui_input\", self, \"on_swatch_input\", [color])
@@ -44,142 +45,145 @@ func onTextChanged(text):
 	playerName = text
 	emit_signal(\"onInfoUpdated\", playerName, color)"
 
-[node name="PlayerLobby" type="VBoxContainer"]
-margin_right = 250.0
-margin_bottom = 329.0
+[node name="Viewport" type="Viewport"]
+size = Vector2( 1080, 1920 )
+
+[node name="PlayerLobby" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 50
 script = SubResource( 1 )
 
-[node name="Label" type="Label" parent="."]
-margin_right = 250.0
+[node name="Label" type="Label" parent="PlayerLobby"]
+margin_right = 1080.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 text = "Name"
 align = 1
 valign = 1
 
-[node name="LineEdit" type="LineEdit" parent="."]
-margin_left = 25.0
-margin_top = 54.0
-margin_right = 225.0
-margin_bottom = 78.0
-rect_min_size = Vector2( 200, 0 )
+[node name="LineEdit" type="LineEdit" parent="PlayerLobby"]
+margin_left = 90.0
+margin_top = 100.0
+margin_right = 990.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 900, 50 )
 size_flags_horizontal = 4
 align = 1
 
-[node name="Tank" type="TextureRect" parent="."]
-margin_top = 82.0
-margin_right = 250.0
-margin_bottom = 182.0
-rect_min_size = Vector2( 0, 100 )
+[node name="Tank" type="TextureRect" parent="PlayerLobby"]
+margin_top = 200.0
+margin_right = 1080.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 0, 300 )
 texture = ExtResource( 1 )
 stretch_mode = 6
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_top = 186.0
-margin_right = 250.0
-margin_bottom = 286.0
-rect_min_size = Vector2( 250, 100 )
+[node name="Colors1" type="HBoxContainer" parent="PlayerLobby"]
+editor/display_folded = true
+margin_left = 140.0
+margin_top = 550.0
+margin_right = 940.0
+margin_bottom = 700.0
+rect_min_size = Vector2( 800, 150 )
 size_flags_horizontal = 4
-size_flags_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_right = 250.0
-margin_bottom = 48.0
-size_flags_vertical = 3
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="PlayerLobby/Colors1"]
 modulate = Color( 0.956863, 0.262745, 0.211765, 1 )
-margin_right = 59.0
-margin_bottom = 48.0
+margin_right = 197.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+[node name="TextureRect2" type="TextureRect" parent="PlayerLobby/Colors1"]
 modulate = Color( 0, 0.588235, 0.533333, 1 )
-margin_left = 63.0
-margin_right = 122.0
-margin_bottom = 48.0
+margin_left = 201.0
+margin_right = 398.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect3" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+[node name="TextureRect3" type="TextureRect" parent="PlayerLobby/Colors1"]
 modulate = Color( 0.666667, 0, 1, 1 )
-margin_left = 126.0
-margin_right = 185.0
-margin_bottom = 48.0
+margin_left = 402.0
+margin_right = 599.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect4" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+[node name="TextureRect4" type="TextureRect" parent="PlayerLobby/Colors1"]
 modulate = Color( 0.47451, 0.333333, 0.282353, 1 )
-margin_left = 189.0
-margin_right = 250.0
-margin_bottom = 48.0
+margin_left = 603.0
+margin_right = 800.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 52.0
-margin_right = 250.0
-margin_bottom = 100.0
-size_flags_vertical = 3
+[node name="Colors2" type="HBoxContainer" parent="PlayerLobby"]
+editor/display_folded = true
+margin_left = 140.0
+margin_top = 750.0
+margin_right = 940.0
+margin_bottom = 900.0
+rect_min_size = Vector2( 800, 150 )
+size_flags_horizontal = 4
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+[node name="TextureRect" type="TextureRect" parent="PlayerLobby/Colors2"]
 modulate = Color( 0.545098, 0.764706, 0.290196, 1 )
-margin_right = 59.0
-margin_bottom = 48.0
+margin_right = 197.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+[node name="TextureRect2" type="TextureRect" parent="PlayerLobby/Colors2"]
 modulate = Color( 1, 0.839216, 0, 1 )
-margin_left = 63.0
-margin_right = 122.0
-margin_bottom = 48.0
+margin_left = 201.0
+margin_right = 398.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect3" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+[node name="TextureRect3" type="TextureRect" parent="PlayerLobby/Colors2"]
 modulate = Color( 1, 0.596078, 0, 1 )
-margin_left = 126.0
-margin_right = 185.0
-margin_bottom = 48.0
+margin_left = 402.0
+margin_right = 599.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="TextureRect4" type="TextureRect" parent="VBoxContainer/HBoxContainer2"]
+[node name="TextureRect4" type="TextureRect" parent="PlayerLobby/Colors2"]
 modulate = Color( 0.129412, 0.588235, 0.952941, 1 )
-margin_left = 189.0
-margin_right = 250.0
-margin_bottom = 48.0
+margin_left = 603.0
+margin_right = 800.0
+margin_bottom = 150.0
 size_flags_horizontal = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
-margin_top = 290.0
-margin_right = 250.0
-margin_bottom = 329.0
+[node name="MarginContainer" type="MarginContainer" parent="PlayerLobby"]
+margin_top = 950.0
+margin_right = 1080.0
+margin_bottom = 989.0
 custom_constants/margin_top = 19
 
-[node name="Button" type="Button" parent="MarginContainer"]
+[node name="Button" type="Button" parent="PlayerLobby/MarginContainer"]
 margin_top = 19.0
-margin_right = 250.0
+margin_right = 1080.0
 margin_bottom = 39.0
 rect_min_size = Vector2( 200, 0 )
 custom_constants/hseparation = 0
