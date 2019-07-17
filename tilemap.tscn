@@ -29,6 +29,12 @@ func onPlayerUpdateInfo(info):
 	$Game.updatePlayerInfo(info)
 
 func _ready():
+	print($\"/root\".get_method_list())
+	$\"/root\".usage = Viewport.USAGE_2D
+	var aspect = Vector2(1024, 576)
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_EXPAND, aspect)
+	
+	
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
