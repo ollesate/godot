@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Map.tscn" type="PackedScene" id=2]
 [ext_resource path="res://GameUi.tscn" type="PackedScene" id=3]
+[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -260,8 +261,16 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
+editor/display_folded = true
 script = SubResource( 2 )
 
 [node name="Root" parent="Game" instance=ExtResource( 2 )]
 
 [node name="GameUi" parent="." instance=ExtResource( 3 )]
+
+[node name="PlayerScene" parent="." instance=ExtResource( 4 )]
+margin_left = 675.0
+margin_top = 173.75
+margin_right = 675.0
+margin_bottom = 173.75
+rect_scale = Vector2( 0.25, 0.25 )

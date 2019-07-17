@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://player_hand.gd" type="Script" id=1]
 [ext_resource path="res://PlayerHand/PlayerCard.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -33,6 +34,10 @@ func unselectCard(cardInfo):
 	
 	"
 
+[sub_resource type="DynamicFont" id=2]
+size = 55
+font_data = ExtResource( 3 )
+
 [node name="PlayerHand" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -46,35 +51,103 @@ hpLeft = 10
 
 [node name="PlayerCard" parent="CardHand" instance=ExtResource( 2 )]
 anchor_right = 1.0
-margin_left = 16.0
-margin_top = 16.0
-margin_right = -16.0
-margin_bottom = 66.0
+margin_left = 128.0
+margin_top = 38.0
+margin_right = -56.0
+margin_bottom = 138.0
 
 [node name="PlayerCard2" parent="CardHand" instance=ExtResource( 2 )]
 anchor_right = 1.0
-margin_left = 16.0
-margin_top = 80.0
-margin_right = -16.0
-margin_bottom = 130.0
+margin_left = 128.0
+margin_top = 160.0
+margin_right = -56.0
+margin_bottom = 260.0
 
 [node name="PlayerCard3" parent="CardHand" instance=ExtResource( 2 )]
 anchor_right = 1.0
-margin_left = 16.0
-margin_top = 144.0
-margin_right = -16.0
-margin_bottom = 194.0
+margin_left = 128.0
+margin_top = 288.0
+margin_right = -56.0
+margin_bottom = 388.0
 
 [node name="PlayerCard4" parent="CardHand" instance=ExtResource( 2 )]
 anchor_right = 1.0
-margin_left = 16.0
-margin_top = 208.0
-margin_right = -16.0
-margin_bottom = 258.0
+margin_left = 128.0
+margin_top = 416.0
+margin_right = -56.0
+margin_bottom = 516.0
 
 [node name="PlayerCard5" parent="CardHand" instance=ExtResource( 2 )]
 anchor_right = 1.0
-margin_left = 16.0
-margin_top = 272.0
-margin_right = -16.0
-margin_bottom = 322.0
+margin_left = 128.0
+margin_top = 544.0
+margin_right = -56.0
+margin_bottom = 644.0
+
+[node name="PlayerCard7" parent="CardHand" instance=ExtResource( 2 )]
+anchor_right = 1.0
+margin_left = 128.0
+margin_top = 672.0
+margin_right = -56.0
+margin_bottom = 772.0
+
+[node name="PlayerCard9" parent="CardHand" instance=ExtResource( 2 )]
+anchor_right = 1.0
+margin_left = 128.0
+margin_top = 800.0
+margin_right = -56.0
+margin_bottom = 900.0
+
+[node name="PlayerCard6" parent="CardHand" instance=ExtResource( 2 )]
+anchor_right = 1.0
+margin_left = 128.0
+margin_top = 928.0
+margin_right = -56.0
+margin_bottom = 1028.0
+
+[node name="PlayerCard8" parent="CardHand" instance=ExtResource( 2 )]
+anchor_right = 1.0
+margin_left = 128.0
+margin_top = 1056.0
+margin_right = -56.0
+margin_bottom = 1156.0
+
+[node name="Label" type="Label" parent="."]
+margin_left = 48.0
+margin_top = 48.0
+margin_right = 88.0
+margin_bottom = 121.0
+custom_fonts/font = SubResource( 2 )
+text = "1"
+
+[node name="Label4" type="Label" parent="."]
+margin_left = 48.0
+margin_top = 304.0
+margin_right = 88.0
+margin_bottom = 377.0
+custom_fonts/font = SubResource( 2 )
+text = "3"
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 48.0
+margin_top = 176.0
+margin_right = 88.0
+margin_bottom = 249.0
+custom_fonts/font = SubResource( 2 )
+text = "2"
+
+[node name="Label3" type="Label" parent="."]
+margin_left = 48.0
+margin_top = 432.0
+margin_right = 88.0
+margin_bottom = 505.0
+custom_fonts/font = SubResource( 2 )
+text = "4"
+
+[node name="Label5" type="Label" parent="."]
+margin_left = 48.0
+margin_top = 560.0
+margin_right = 88.0
+margin_bottom = 633.0
+custom_fonts/font = SubResource( 2 )
+text = "5"

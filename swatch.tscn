@@ -83,24 +83,24 @@ class TextureAnimation:
 			textureRect.texture.region = Rect2(currentFrame * size.x, 0, size.x, size.y)
 			textureRect.update()"
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="DynamicFont" id=2]
 size = 72
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=3]
 size = 40
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=4]
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="AtlasTexture" id=6]
+[sub_resource type="AtlasTexture" id=5]
 flags = 4
 atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 32, 32 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=6]
 size = 60
 font_data = ExtResource( 1 )
 
@@ -120,7 +120,7 @@ margin_top = 150.0
 margin_right = 1080.0
 margin_bottom = 245.0
 rect_min_size = Vector2( 0, 50 )
-custom_fonts/font = SubResource( 5 )
+custom_fonts/font = SubResource( 2 )
 text = "Player 1"
 align = 1
 valign = 1
@@ -136,7 +136,7 @@ margin_top = 445.0
 margin_right = 1080.0
 margin_bottom = 498.0
 rect_min_size = Vector2( 0, 50 )
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "Name:"
 align = 1
 valign = 1
@@ -148,7 +148,7 @@ margin_right = 990.0
 margin_bottom = 624.0
 rect_min_size = Vector2( 900, 50 )
 size_flags_horizontal = 4
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 4 )
 align = 1
 
 [node name="Tank" type="TextureRect" parent="."]
@@ -156,7 +156,7 @@ margin_top = 674.0
 margin_right = 1080.0
 margin_bottom = 974.0
 rect_min_size = Vector2( 0, 300 )
-texture = SubResource( 6 )
+texture = SubResource( 5 )
 stretch_mode = 6
 
 [node name="Colors1" type="HBoxContainer" parent="."]
@@ -270,6 +270,6 @@ margin_top = 40.0
 margin_right = 980.0
 margin_bottom = 125.0
 rect_min_size = Vector2( 200, 0 )
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 6 )
 custom_constants/hseparation = 0
 text = "Press to ready"
