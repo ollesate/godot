@@ -14,42 +14,65 @@ var cardPlayerInfos = {}
 
 func onPlayerJoined(info):
 	$Game.addPlayer(info)
+	updateReady()
 	
 func onPlayerLeft(info):
 	$Game.removePlayer(info)
+	updateReady()
 
 func onPlayerReady(info):
 	readyPlayers.append(info)
 	$Game.onPlayerReady(info)
+	updateReady()
 
 func onPlayerUnready(info):
 	readyPlayers.remove(readyPlayers.find(info))
 	$Game.onPlayerUnready(info)
+	updateReady()
+
+func onGameStart():
+	for info in readyPlayers:
+		$Game.onPlayerUnready(info)
+
+func updateReady():
+	var text = str(readyPlayers.size(), \" / \", $Network.playerInfos.size(), \" ready\")
+	$GameUi/Header/Subtitle.text = text
 	
 func onPlayerUpdateInfo(info):
 	$Game.updatePlayerInfo(info)
 
 func _ready():
-	print($\"/root\".get_method_list())
-	$\"/root\".usage = Viewport.USAGE_2D
 	var aspect = Vector2(1024, 576)
 	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_EXPAND, aspect)
-	
 	
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
 	$Network.connect(\"onPlayerUpdateInfo\", self, \"onPlayerUpdateInfo\")
+	
+	$Game.connect(\"onTurnStart\", self, \"onTurnStart\")
+	$Game.connect(\"onPhaseStart\", self, \"onPhaseStart\")
 
 	while true: # Play endlessly...
+		$GameUi/Header/Progress.hide()
+		$GameUi/Header/Title.show()
+		$GameUi/Header/Title.text = \"Waiting for players...\"
 		playerInfos = yield(waitForPlayers(), \"completed\")
+		onGameStart()
 		$Network.rpc(\"onGameStarted\")
 		yield(playGame(), \"completed\")
 		resetGame()
-		
+
+func onPhaseStart(phase):
+	$GameUi/Header/Subtitle.text = phase
+	
+func onTurnStart(turn):
+	$GameUi/Header/Title.text = str(\"Turn \", turn)
+
 func cardStarted(card):
 	var cardInfo = cardPlayerInfos[card]
 	$Network.rpc_id(cardInfo.player.id, \"onCardStarted\", cardInfo.card)
+	$GameUi/Header/Subtitle.text = str(cardInfo.player.name, \"'s turn: \", cardInfo.card.description, \", \", cardInfo.card.priority)
 		
 func cardFinished(card):
 	var cardInfo = cardPlayerInfos[card]
@@ -59,16 +82,19 @@ func waitForPlayers():
 	print(\"waitForPlayers\")
 		
 	while readyPlayers.size() == 0 or readyPlayers.size() != $Network.playerInfos.size():
+		$GameUi/Header/Title.text = \"Waiting for players...\"
 		var info = yield($Network, \"onPlayerReady\")
 		onPlayerReady(info)
 		print(\"on player ready \", readyPlayers.size(), $Network.playerInfos.size())
 		if readyPlayers.size() == $Network.playerInfos.size():
-			print(3)
-			for i in range(3):
+			var time = 5
+			$GameUi/Header/Title.text = str(\"Starting game in \", time)
+			for i in range(time):
 				yield(Actions.wait(1).perform(), \"finished\")
 				if readyPlayers.size() != $Network.playerInfos.size():
 					break
-				print(2 - i)
+				$GameUi/Header/Title.text = str(\"Starting game in \", time - 1 - i)
+				print(time - 1 - i)
 
 	return $Network.playerInfos
 
@@ -85,18 +111,23 @@ func playGame():
 		
 		# Give cards to player
 		for info in playerInfos.values():
-			var cardInfos = Cards.generateCardInfos(5)
+			var cardInfos = CardDeck.generateCardInfos(9)
 			$Network.dealCardsToPlayer(info.id, cardInfos)
 		
 		$GameUi.startCountdown(3)
+		$GameUi/Header/Progress.show()
+		$GameUi/Header/Subtitle.hide()
+		$GameUi/Header/Title.text = \"Card phase\"
 		yield($GameUi, \"countdownFinished\")
+		$GameUi/Header/Progress.hide()
+		$GameUi/Header/Subtitle.show()
 
 		var playerCards = {}
 		var cardInfos = $Network.cardInfos
 		for playerInfo in cardInfos.keys():
 			var cards = []
 			for cardInfo in cardInfos[playerInfo]:
-				var card = Cards.cardFromInfo(cardInfo)
+				var card = CardDeck.cardFromInfo(cardInfo)
 				cards.append(card)
 				card.connect(\"cardStarted\", self, \"cardStarted\")
 				card.connect(\"cardFinished\", self, \"cardFinished\")
@@ -121,6 +152,8 @@ var players = {}
 var checkpoints = {}
 
 signal lasersEnd()
+signal onPhaseStart()
+signal onTurnStart()
 
 func _ready():
 	pass
@@ -134,13 +167,17 @@ func simulateGame(allPlayerCards):
 			if allPlayerCards[info].size() > turnIndex:
 				var card = allPlayerCards[info][turnIndex]
 				turn.append(card.with(players[info]))
-
-	for turn in turns:
+	
+	for i in range(turns.size()):
+		var turn = turns[i]
+		emit_signal(\"onTurnStart\", i + 1)
 		print(\"Players act\")
 		yield(playersAct(turn), \"completed\")
 		print(\"Lasers shoot\")
+		emit_signal(\"onPhaseStart\", \"Lasers shoot\")
 		yield(lasersShoot(), \"completed\")
 		print(\"Belts move\")
+		emit_signal(\"onPhaseStart\", \"Belts move\")
 		yield(beltsMove(), \"completed\")
 
 func playersAct(turn):	
@@ -155,6 +192,7 @@ func playersAct(turn):
 		else:
 			yield(card, \"finished\")
 
+	emit_signal(\"onPhaseStart\", \"Players fire\")
 	var shootActions = []
 	for player in players.values():
 		shootActions.append(Player.shootAction().with(player))
@@ -261,7 +299,6 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
-editor/display_folded = true
 script = SubResource( 2 )
 
 [node name="Root" parent="Game" instance=ExtResource( 2 )]

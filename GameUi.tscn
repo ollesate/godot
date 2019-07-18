@@ -1,21 +1,30 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=1]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=2]
+[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=3]
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
 signal countdownFinished()
 
 func _ready():
-	$VBox/Progress.connect(\"finished\", self, \"countdownFinished\")
+	$Header/Progress.connect(\"finished\", self, \"countdownFinished\")
 
 func startCountdown(time):
-	$VBox/Progress.start(time)
+	$Header/Progress.start(time)
 
 func countdownFinished():
 	emit_signal(\"countdownFinished\")"
+
+[sub_resource type="DynamicFont" id=2]
+size = 32
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 18
+font_data = ExtResource( 1 )
 
 [sub_resource type="GDScript" id=3]
 script/source = "extends TextureProgress
@@ -43,9 +52,9 @@ func _process(delta):
 [node name="GameUi" type="Control"]
 margin_right = 1024.0
 margin_bottom = 576.0
-script = SubResource( 2 )
+script = SubResource( 1 )
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="Header" type="VBoxContainer" parent="."]
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -294.0
@@ -53,13 +62,29 @@ margin_top = 18.0
 margin_right = 294.0
 margin_bottom = 89.0
 
-[node name="Progress" type="TextureProgress" parent="VBox"]
+[node name="Title" type="Label" parent="Header"]
 margin_right = 588.0
-margin_bottom = 35.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 2 )
+text = "Card 1"
+align = 1
+
+[node name="Subtitle" type="Label" parent="Header"]
+margin_top = 47.0
+margin_right = 588.0
+margin_bottom = 71.0
+custom_fonts/font = SubResource( 4 )
+text = "Anna's turn: Rotate Right, 120"
+align = 1
+
+[node name="Progress" type="TextureProgress" parent="Header"]
+margin_top = 75.0
+margin_right = 588.0
+margin_bottom = 110.0
 rect_min_size = Vector2( 200, 35 )
 step = 0.0
-texture_under = ExtResource( 1 )
-texture_progress = ExtResource( 2 )
+texture_under = ExtResource( 2 )
+texture_progress = ExtResource( 3 )
 nine_patch_stretch = true
 stretch_margin_left = 100
 stretch_margin_right = 100

@@ -31,9 +31,9 @@ static func rotateAction(rotation):
 	var actions = []
 	actions.append(Actions.wait(0.25))
 	if rotation == UTURN:
-		actions.append(RotateAction.new(rotation, 0.5))
+		actions.append(RotatePlayer.new(rotation, 0.5))
 	else:
-		actions.append(RotateAction.new(rotation, 0.25))
+		actions.append(RotatePlayer.new(rotation, 0.25))
 	return Sequence.new(actions)
 
 static func fallAction():
@@ -52,6 +52,11 @@ var color = Color.white setget setColor
 var hpMax = HP_MAX
 var currentHp setget , getHp
 
+var selfRotation setget , getSelfRotation
+
+func getSelfRotation():
+	return $Sprite.rotation
+
 func setReady(isReady):
 	$Sprite.isAnimating = isReady
 
@@ -60,13 +65,12 @@ func _ready():
 	hp.max_value = hpMax
 	hp.hide()
 	nameLabel.text = playerName
-	nameLabel.modulate = color
 	for child in $UI/Cards.get_children():
 		$UI/Cards.remove_child(child)
 
 func setColor(val):
 	color = val if val != null else Color.white
-	$Sprite.modulate = color
+	$Sprite.self_modulate = color
 
 func setPlayerName(val):
 	if not defaultName:
@@ -97,7 +101,7 @@ class MovePlayer:
 		self.duration = duration
 	
 	func start():
-		moveAction = ActionMove.new(direction.rotated(character.rotation), duration, 75).with(character)
+		moveAction = ActionMove.new(direction.rotated(character.selfRotation), duration, 75).with(character)
 		character.get_node("Sprite").isAnimating = true
 		
 	func finish():
@@ -141,10 +145,25 @@ class Shoot:
 		# Shoot and wait for it to hit something...
 		var bullet = preload("res://Game/Bullet.tscn").instance()
 		bullet.playerOwner = self.character
-		bullet.position = self.character.get_node("Nozzle").position
-		self.character.add_child(bullet)
+		bullet.position = self.character.get_node("Sprite/Nozzle").position
+		self.character.get_node("Sprite/Nozzle").add_child(bullet)
 		yield(bullet, "onHit")
 		isHit = true
 	
 	func act(delta):
 		return isHit
+
+class RotatePlayer:
+	extends Action
+	
+	var rotationSpeed
+	var duration
+	
+	func _init(rotation, duration):
+		self.rotationSpeed = deg2rad(rotation) / duration
+		self.duration = duration
+	
+	func act(delta):
+		duration -= delta
+		character.get_node("Sprite").rotate(rotationSpeed * delta)
+		return duration <= 0

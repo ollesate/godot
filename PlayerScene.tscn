@@ -17,8 +17,9 @@ func _ready():
 	$PlayerLobby.connect(\"onReady\", self, \"onReady\")
 	$PlayerLobby.connect(\"onUnready\", self, \"onUnready\")
 	$PlayerLobby.connect(\"onInfoUpdated\", self, \"onInfoUpdated\")
+	
 	yield($Network, \"onGameStarted\")
-	changeScene()
+	changeScene()	
 	
 func onConnectionFailed():
 	pass # show some message? and retry???

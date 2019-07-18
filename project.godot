@@ -25,6 +25,11 @@ _global_script_classes=[ {
 "path": "res://Actions/Actions.gd"
 }, {
 "base": "Reference",
+"class": "CardDeck",
+"language": "GDScript",
+"path": "res://deck.gd"
+}, {
+"base": "Reference",
 "class": "Cards",
 "language": "GDScript",
 "path": "res://Actions/cards.gd"
@@ -93,6 +98,7 @@ _global_script_class_icons={
 "Action": "",
 "ActionMove": "",
 "Actions": "",
+"CardDeck": "",
 "Cards": "",
 "CompositeAction": "",
 "MoveStep": "",

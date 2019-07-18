@@ -53,7 +53,48 @@ static func generate(nCards):
 	for i in range(nCards):
 		cards.append(generateCard(Seed.new()))
 	return cards
-						
+
+static func createRotateLeft():
+	return Card.new(
+		Player.rotateAction(Player.LEFT), 
+		"Rotate Left",
+		ROTATE
+	)
+
+static func createRotateRight():
+	return Card.new(
+		Player.rotateAction(Player.RIGHT), 
+		"Rotate Right",
+		ROTATE
+	)
+	
+static func createUturn():
+	return Card.new(
+		Player.rotateAction(Player.UTURN), 
+		"U Turn",
+		ROTATE
+	)
+
+static func createMove(steps):
+	var stepActions = []
+	for step in range(steps):
+		stepActions.append(Player.moveStep(Player.FORWARD))
+	return MultiStepCard.new(
+		Sequence.new(stepActions), 
+		str("Move ", steps),
+		MOVE
+	)
+	
+static func createBackUp():
+	var stepActions = []
+	for step in range(1):
+		stepActions.append(Player.moveStep(Player.BACKWARDS))
+	return MultiStepCard.new(
+		Sequence.new(stepActions), 
+		"Back Up",
+		MOVE
+	)
+	
 static func generateCard(randSeed):
 	randomize()
 	var type = randSeed.next(2)
