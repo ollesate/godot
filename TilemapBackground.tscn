@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://tilemap2.tres" type="TileSet" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends TileMap
+
+var holes = {}
+
+func _ready():
+	add_to_group(\"backgroundTilemaps\")
+	for cellPos in get_used_cells():
+		var cellId = get_cellv(cellPos)
+		var name = tile_set.tile_get_name(cellId)
+		if name == \"Hole\":
+			holes[cellPos] = true"
+
+[node name="TilemapBackground" type="TileMap"]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 75, 75 )
+format = 1
+script = SubResource( 1 )
