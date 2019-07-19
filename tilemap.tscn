@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://DizzyHighway.tscn" type="PackedScene" id=2]
@@ -53,7 +53,6 @@ func onPlayerUpdateInfo(info):
 	$Game.updatePlayerInfo(info)
 
 func _ready():
-	
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
 	$Network.connect(\"onPlayerReady\", self, \"onPlayerReady\")
@@ -354,6 +353,27 @@ func nextPhase():
 		LASER:
 			$\"../Game\".lasersShoot()"
 
+[sub_resource type="GDScript" id=4]
+script/source = "extends Node2D
+
+onready var network = $\"../PlayerScene/Network\"
+onready var rootNetwork = $\"../Network\"
+
+func _ready():
+	yield(Actions.wait(0.5).perform(), \"finished\")
+	$\"../PlayerScene\".onReady()
+	print(\"wait for leave\")
+	yield(network, \"onPlayerCards\")
+	print(\"on cards\")
+	var info = rootNetwork.playerInfos.values()[0]
+	var cardInfos = [
+		CardDeck.createInfo(490),
+		CardDeck.createInfo(490),
+		CardDeck.createInfo(490),
+		CardDeck.createInfo(490)
+	]
+	rootNetwork.dealCardsToPlayer(info.id, cardInfos)"
+
 [node name="Node2D" type="Node2D"]
 script = SubResource( 1 )
 
@@ -361,6 +381,7 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
+editor/display_folded = true
 script = SubResource( 2 )
 
 [node name="Map" parent="Game" instance=ExtResource( 2 )]
@@ -376,3 +397,6 @@ rect_scale = Vector2( 0.25, 0.25 )
 
 [node name="DebugController" type="Node2D" parent="."]
 script = SubResource( 3 )
+
+[node name="Tutorial" type="Node2D" parent="."]
+script = SubResource( 4 )

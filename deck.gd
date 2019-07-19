@@ -4,11 +4,14 @@ static func generateCardInfos(nrCards):
 	var cardInfos = []
 	for i in range(nrCards):
 		var priority = generatePriority()
-		var card = getCard(priority)
-		var id = Global.getId()
-		cardInfos.append({"id": id, "priority": priority, "description": card.description})
+		cardInfos.append(createInfo(priority))
 	return cardInfos
-		
+
+static func createInfo(priority):
+	var card = getCard(priority)
+	var id = Global.getId()
+	return {"id": id, "priority": priority, "description": card.description}	
+
 static func cardFromInfo(info):
 	return getCard(info.priority)
 
