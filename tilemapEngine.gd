@@ -36,6 +36,12 @@ func getCheckpoint(player):
 	var mapPos = getMapPos(player)
 	return checkpoints[mapPos] if checkpoints.has(mapPos) else null
 
+func getCheckpointIndexed(index):
+	for checkpoint in checkpoints.values():
+		if checkpoint.number == index:
+			return checkpoint
+	return null
+
 func getPlayersInHole():
 	var players = []
 	for player in get_tree().get_nodes_in_group("players"):
@@ -46,6 +52,11 @@ func getPlayersInHole():
 
 func getMapPos(player):
 	return $Background.world_to_map(player.position)
+
+func getWorldPos(player):
+	var mapPos = getMapPos(player)
+	return $Background.map_to_world(mapPos) + $Background.cell_size / 2
+	
 
 func getBeltAction(step):
 	var players = get_tree().get_nodes_in_group("players")
@@ -59,7 +70,8 @@ func getBeltAction(step):
 				if belts.has(next):
 					var nextBelt = belts[next]
 					if nextBelt.rotate != 0:
-						actions.append(RotateAction.new(nextBelt.rotate, 1.0).with(player))
+						actions.append(Player.rotateActionDur(nextBelt.rotate, 1.0).with(player))
+						# actions.append(RotateAction.new(nextBelt.rotate, 1.0).with(player))
 				actions.append(BeltMove.new(belt).with(player))
 	return Parallell.new(actions)
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://DizzyHighway.tscn" type="PackedScene" id=2]
@@ -52,6 +52,7 @@ func _ready():
 	
 	$Game.connect(\"onTurnStart\", self, \"onTurnStart\")
 	$Game.connect(\"onPhaseStart\", self, \"onPhaseStart\")
+	$Game.connect(\"onPlayerWon\", self, \"onPlayerWon\")
 
 	while true: # Play endlessly...
 		$GameUi/Header/Progress.hide()
@@ -68,6 +69,10 @@ func onPhaseStart(phase):
 	
 func onTurnStart(turn):
 	$GameUi/Header/Title.text = str(\"Turn \", turn)
+
+func onPlayerWon(info):
+	$GameUi/Header/Title.text = str(info.name, \" wins!\")
+	$Game.pause()
 
 func cardStarted(card):
 	var cardInfo = cardPlayerInfos[card]
@@ -154,6 +159,7 @@ var checkpoints = {}
 signal lasersEnd()
 signal onPhaseStart()
 signal onTurnStart()
+signal onPlayerWon()
 
 func _ready():
 	pass
@@ -189,6 +195,7 @@ func playersAct(turn):
 				finished = yield(card, \"stepFinished\") == 0
 				yield(getPlayersFallAction().perform(), \"finished\")
 			saveCheckpointsIfPossible()
+			yield(syncPositions().perform(), \"finished\")
 		else:
 			yield(card, \"finished\")
 
@@ -207,7 +214,6 @@ func lasersShoot():
 	yield(Actions.wait(0.25).perform(), \"finished\")
 
 func saveCheckpointsIfPossible():
-	var checkpointTouchedIndex
 	for playerInfo in players.keys():
 		var player = players[playerInfo] if players.has(playerInfo) else null
 		if player:
@@ -219,12 +225,11 @@ func saveCheckpointsIfPossible():
 						checkpoint.remove(playerInfo)
 					checkpoints[playerInfo] = checkpoint
 					checkpoint.touch(playerInfo)
-					checkpointTouchedIndex = checkpoint.number
-
-	if checkpointTouchedIndex:
-		for checkpoint in get_tree().get_nodes_in_group(\"checkpoints\"):
-			if checkpoint.number == checkpointTouchedIndex + 1:
-				checkpoint.setNext()
+					var nextCheckpoint = $Map.getCheckpointIndexed(checkpoint.number + 1)
+					if nextCheckpoint:
+						nextCheckpoint.setNext()
+					else:
+						emit_signal(\"onPlayerWon\", playerInfo)
 
 func beltsMove():
 	for i in range(1, 3):
@@ -233,6 +238,17 @@ func beltsMove():
 		yield(getPlayersFallAction().perform(), \"finished\")
 		yield(Actions.wait(0.25).perform(), \"finished\")
 	saveCheckpointsIfPossible()
+	yield(syncPositions().perform(), \"finished\")
+
+func syncPositions():
+	var actions = []
+	for player in players.values():
+		var pos = player.position
+		var adjustedPos = $Map.getWorldPos(player)
+		var action = Actions.moveTo(pos, adjustedPos).with(player)
+		if adjustedPos != player.position:
+			actions.append(action)
+	return Parallell.new(actions)
 
 func getPlayersFallAction():
 	var fallingActions = []
@@ -290,7 +306,56 @@ func onPlayerUnready(info):
 
 func updatePlayerInfo(info):
 	players[info].playerName = info.name
-	players[info].color = info.color"
+	players[info].color = info.color
+
+func pause():
+	Global.clear()"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Node2D
+
+enum {BELT, LASER, SIZE}
+
+var currentPhase = -1
+var player
+
+func _ready():
+	yield($\"../Game\", \"onTurnStart\")
+
+func _input(event):
+	if Input.is_key_pressed(KEY_ENTER):
+		nextPhase()
+	var player = getPlayer()
+	if not player:
+		return
+	if Input.is_key_pressed(KEY_W):
+		player.moveAction(Player.FORWARD, 1).with(player).perform()
+	if Input.is_key_pressed(KEY_S):
+		player.moveAction(Player.BACKWARDS, 1).with(player).perform()
+	if Input.is_key_pressed(KEY_A):
+		player.rotateAction(Player.LEFT).with(player).perform()
+	if Input.is_key_pressed(KEY_D):
+		player.rotateAction(Player.RIGHT).with(player).perform()
+	if Input.is_key_pressed(KEY_SPACE):
+		player.shootAction().with(player).perform()
+
+func getPlayer():
+	if player != null:
+		return player
+	var players = get_tree().get_nodes_in_group(\"players\")
+	if players.size() > 0:
+		player = players[0]
+		return player
+	return null
+
+func nextPhase():
+	$\"../Game\".saveCheckpointsIfPossible()
+	currentPhase = (currentPhase + 1) % SIZE
+	match currentPhase:
+		BELT:
+			$\"../Game\".beltsMove()
+		LASER:
+			$\"../Game\".lasersShoot()"
 
 [node name="Node2D" type="Node2D"]
 script = SubResource( 1 )
@@ -311,3 +376,6 @@ margin_top = 173.75
 margin_right = 675.0
 margin_bottom = 173.75
 rect_scale = Vector2( 0.25, 0.25 )
+
+[node name="DebugController" type="Node2D" parent="."]
+script = SubResource( 3 )

@@ -26,6 +26,9 @@ static func moveStep(movement):
 	actions.append(Actions.wait(0.25))
 	actions.append(MovePlayer.new(movement, 0.25))
 	return Sequence.new(actions)
+
+static func rotateActionDur(rotation, duration):
+	return RotatePlayer.new(rotation, duration)
 	
 static func rotateAction(rotation):
 	var actions = []
@@ -145,7 +148,8 @@ class Shoot:
 		# Shoot and wait for it to hit something...
 		var bullet = preload("res://Game/Bullet.tscn").instance()
 		bullet.playerOwner = self.character
-		bullet.position = self.character.get_node("Sprite/Nozzle").position
+		bullet.position = Vector2.ZERO
+		print(bullet.position)
 		self.character.get_node("Sprite/Nozzle").add_child(bullet)
 		yield(bullet, "onHit")
 		isHit = true

@@ -9,6 +9,12 @@ static func moveLength(dir, length, duration):
 static func wait(duration):
 	return Wait.new(duration)
 
+static func moveTo(from, to):
+	var length = from.distance_to(to)
+	var dir = from.direction_to(to)
+	var duration = 0.1
+	return Move.new(dir, duration, length / duration) 
+
 class Move:
 	extends Action
 	

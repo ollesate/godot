@@ -22,6 +22,9 @@ var actions = []
 func perform(action):
 	actions.append(action)
 
+func clear():
+	actions.clear()
+
 func _physics_process(delta):
 	for action in actions:
 		if !action.isRunning:
