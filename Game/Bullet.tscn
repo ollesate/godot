@@ -28,7 +28,6 @@ func bodyEntered(body: PhysicsBody2D):
 		return
 	if body.has_method(\"onHit\"):
 		body.onHit(1)
-
 	
 func _physics_process(delta):
 	duration -= delta

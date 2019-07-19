@@ -26,7 +26,7 @@ func onConnectionFailed():
 
 func onStartSimulation():
 	if playerHand:
-		playerHand.setLocked(true)
+		playerHand.startSimulation()
 
 func onPlayerCards(cards):
 	if playerHand:
@@ -41,9 +41,11 @@ func onCardFinished(card):
 		playerHand.unselectCard(card)
 
 func onReady():
+	print(\"onReady\")
 	$Network.rpc_id(0, \"playerReady\")
 	
 func onUnready():
+	print(\"onUnready\")
 	$Network.rpc_id(0, \"playerUnready\")
 
 func onInfoUpdated(playerName, color):
@@ -56,6 +58,8 @@ func changeScene():
 	remove_child($PlayerLobby)
 	playerHand = load(\"res://player_hand.tscn\").instance()
 	playerHand.connect(\"onSwap\", self, \"onSwap\")
+	playerHand.connect(\"onReady\", self, \"onReady\")
+	playerHand.connect(\"onUnready\", self, \"onUnready\")
 	add_child(playerHand)"
 
 [node name="PlayerScene" type="Control"]

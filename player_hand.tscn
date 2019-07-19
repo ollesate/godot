@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://player_hand.gd" type="Script" id=1]
 [ext_resource path="res://PlayerHand/PlayerCard.tscn" type="PackedScene" id=2]
@@ -8,15 +8,37 @@
 script/source = "extends Control
 
 signal onSwap()
+signal onUnready()
+signal onReady()
+
+var ready = false
 
 func _ready():
 	$CardHand.connect(\"onSwap\", self, \"onSwap\")
+	$ReadyButton.connect(\"pressed\", self, \"buttonPressed\")
+
+func buttonPressed():
+	setReady(!ready)
+
+func startSimulation():
+	setLocked(true)
+	setReady(false)
+	$ReadyButton.hide()
+
+func setReady(ready):
+	self.ready = ready
+	$ReadyButton.text = \"Press to unready\" if ready else \"Press to ready\"
+	if ready:
+		emit_signal(\"onReady\")
+	else:
+		emit_signal(\"onUnready\")
 
 func onSwap(idx1, idx2):
 	emit_signal(\"onSwap\", idx1, idx2)
 	
 func setPlayerCards(cardInfos):
 	print(str(\"on player cards\", cardInfos))
+	$ReadyButton.show()
 	$CardHand.setCards(cardInfos)
 	$CardHand.setLocked(false)
 	
@@ -34,8 +56,12 @@ func unselectCard(cardInfo):
 	
 	"
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=3]
 size = 55
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 30
 font_data = ExtResource( 3 )
 
 [node name="PlayerHand" type="Control"]
@@ -44,8 +70,11 @@ anchor_bottom = 1.0
 script = SubResource( 1 )
 
 [node name="CardHand" type="Control" parent="."]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_right = 16.0
+margin_bottom = -7.0
 script = ExtResource( 1 )
 hpLeft = 10
 
@@ -117,7 +146,7 @@ margin_left = 48.0
 margin_top = 48.0
 margin_right = 88.0
 margin_bottom = 121.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "1"
 
 [node name="Label4" type="Label" parent="."]
@@ -125,7 +154,7 @@ margin_left = 48.0
 margin_top = 304.0
 margin_right = 88.0
 margin_bottom = 377.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "3"
 
 [node name="Label2" type="Label" parent="."]
@@ -133,7 +162,7 @@ margin_left = 48.0
 margin_top = 176.0
 margin_right = 88.0
 margin_bottom = 249.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "2"
 
 [node name="Label3" type="Label" parent="."]
@@ -141,7 +170,7 @@ margin_left = 48.0
 margin_top = 432.0
 margin_right = 88.0
 margin_bottom = 505.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "4"
 
 [node name="Label5" type="Label" parent="."]
@@ -149,5 +178,14 @@ margin_left = 48.0
 margin_top = 560.0
 margin_right = 88.0
 margin_bottom = 633.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "5"
+
+[node name="ReadyButton" type="Button" parent="."]
+margin_left = 112.0
+margin_top = 1264.0
+margin_right = 976.0
+margin_bottom = 1321.0
+rect_min_size = Vector2( 800, 50 )
+custom_fonts/font = SubResource( 2 )
+text = "Press to ready"

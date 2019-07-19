@@ -9,24 +9,28 @@ script/source = "extends Control
 
 signal countdownFinished()
 
+var finished = false
+
 func _ready():
 	$Header/Progress.connect(\"finished\", self, \"countdownFinished\")
 
 func startCountdown(time):
+	finished = false
 	$Header/Progress.start(time)
 
 func countdownFinished():
+	finished = true
 	emit_signal(\"countdownFinished\")"
 
 [sub_resource type="DynamicFont" id=2]
 size = 32
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=3]
 size = 18
 font_data = ExtResource( 1 )
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends TextureProgress
 
 signal finished()
@@ -73,7 +77,7 @@ align = 1
 margin_top = 47.0
 margin_right = 588.0
 margin_bottom = 71.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 3 )
 text = "Anna's turn: Rotate Right, 120"
 align = 1
 
@@ -88,4 +92,4 @@ texture_progress = ExtResource( 3 )
 nine_patch_stretch = true
 stretch_margin_left = 100
 stretch_margin_right = 100
-script = SubResource( 3 )
+script = SubResource( 4 )

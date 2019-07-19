@@ -8,31 +8,42 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
+signal onAllReady()
+signal onAllReadyCancelled()
+
 var playerInfos = []
 var readyPlayers = []
 var cardPlayerInfos = {}
 
 func onPlayerJoined(info):
 	$Game.addPlayer(info)
+	playerInfos.append(info)
 	updateReady()
 	
 func onPlayerLeft(info):
 	$Game.removePlayer(info)
+	playerInfos.remove(playerInfos.find(info))
 	updateReady()
 
 func onPlayerReady(info):
 	readyPlayers.append(info)
 	$Game.onPlayerReady(info)
 	updateReady()
+	if playerInfos.size() > 0 && playerInfos.size() == readyPlayers.size():
+		emit_signal(\"onAllReady\")
 
 func onPlayerUnready(info):
 	readyPlayers.remove(readyPlayers.find(info))
 	$Game.onPlayerUnready(info)
 	updateReady()
+	if readyPlayers.size() == playerInfos.size() - 1:
+		emit_signal(\"onAllReadyCancelled\")
 
-func onGameStart():
+func clearReady():
 	for info in readyPlayers:
 		$Game.onPlayerUnready(info)
+	readyPlayers.clear()
+	updateReady()
 
 func updateReady():
 	var text = str(readyPlayers.size(), \" / \", $Network.playerInfos.size(), \" ready\")
@@ -42,11 +53,10 @@ func onPlayerUpdateInfo(info):
 	$Game.updatePlayerInfo(info)
 
 func _ready():
-	var aspect = Vector2(1024, 576)
-	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_EXPAND, aspect)
 	
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
+	$Network.connect(\"onPlayerReady\", self, \"onPlayerReady\")
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
 	$Network.connect(\"onPlayerUpdateInfo\", self, \"onPlayerUpdateInfo\")
 	
@@ -58,11 +68,21 @@ func _ready():
 		$GameUi/Header/Progress.hide()
 		$GameUi/Header/Title.show()
 		$GameUi/Header/Title.text = \"Waiting for players...\"
-		playerInfos = yield(waitForPlayers(), \"completed\")
-		onGameStart()
+		var countdown = 5
+		var time = countdown
+		var sleep = 0.5
+		clearReady()
+		while time > 0:
+			if playerInfos.size() == 0 or readyPlayers.size() != playerInfos.size():
+				$GameUi/Header/Title.text = \"Waiting for players...\"
+				time = countdown
+				yield(self, \"onAllReady\")
+			$GameUi/Header/Title.text = str(\"Starting game in \", floor(time))
+			yield(Actions.wait(sleep).perform(), \"finished\")
+			time -= sleep
 		$Network.rpc(\"onGameStarted\")
 		yield(playGame(), \"completed\")
-		resetGame()
+		# resetGame()
 
 func onPhaseStart(phase):
 	$GameUi/Header/Subtitle.text = phase
@@ -83,29 +103,6 @@ func cardFinished(card):
 	var cardInfo = cardPlayerInfos[card]
 	$Network.rpc_id(cardInfo.player.id, \"onCardFinished\", cardInfo.card)
 
-func waitForPlayers():
-	print(\"waitForPlayers\")
-		
-	while readyPlayers.size() == 0 or readyPlayers.size() != $Network.playerInfos.size():
-		$GameUi/Header/Title.text = \"Waiting for players...\"
-		var info = yield($Network, \"onPlayerReady\")
-		onPlayerReady(info)
-		print(\"on player ready \", readyPlayers.size(), $Network.playerInfos.size())
-		if readyPlayers.size() == $Network.playerInfos.size():
-			var time = 5
-			$GameUi/Header/Title.text = str(\"Starting game in \", time)
-			for i in range(time):
-				yield(Actions.wait(1).perform(), \"finished\")
-				if readyPlayers.size() != $Network.playerInfos.size():
-					break
-				$GameUi/Header/Title.text = str(\"Starting game in \", time - 1 - i)
-				print(time - 1 - i)
-
-	return $Network.playerInfos
-
-func resetGame():
-	pass
-
 func playGame():
 	print(\"playGame\")
 	
@@ -114,18 +111,19 @@ func playGame():
 	while !gameFinished:
 		cardPlayerInfos.clear()
 		
+		clearReady()
 		# Give cards to player
-		for info in playerInfos.values():
+		for info in playerInfos:
 			var cardInfos = CardDeck.generateCardInfos(9)
 			$Network.dealCardsToPlayer(info.id, cardInfos)
 		
-		$GameUi.startCountdown(3)
+		$GameUi.startCountdown(20)
 		$GameUi/Header/Progress.show()
-		$GameUi/Header/Subtitle.hide()
 		$GameUi/Header/Title.text = \"Card phase\"
-		yield($GameUi, \"countdownFinished\")
+		while not $GameUi.finished && playerInfos.size() != readyPlayers.size():
+			yield(Actions.wait(0.5).perform(), \"finished\")
 		$GameUi/Header/Progress.hide()
-		$GameUi/Header/Subtitle.show()
+		$GameUi/Header/Subtitle.text = \"\"
 
 		var playerCards = {}
 		var cardInfos = $Network.cardInfos
@@ -236,7 +234,6 @@ func beltsMove():
 		var beltAction = $Map.getBeltAction(i)
 		yield(beltAction.perform(), \"finished\")
 		yield(getPlayersFallAction().perform(), \"finished\")
-		yield(Actions.wait(0.25).perform(), \"finished\")
 	saveCheckpointsIfPossible()
 	yield(syncPositions().perform(), \"finished\")
 
