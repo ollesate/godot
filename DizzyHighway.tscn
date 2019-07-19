@@ -1,8 +1,22 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://tilemapEngine.gd" type="Script" id=1]
 [ext_resource path="res://TilemapBackground.tscn" type="PackedScene" id=2]
 [ext_resource path="res://TilemapForeground.tscn" type="PackedScene" id=3]
+
+[sub_resource type="SegmentShape2D" id=1]
+b = Vector2( 975, 0 )
+
+[sub_resource type="SegmentShape2D" id=2]
+b = Vector2( 0, 750 )
+
+[sub_resource type="SegmentShape2D" id=3]
+a = Vector2( 975, 0 )
+b = Vector2( 975, 750 )
+
+[sub_resource type="SegmentShape2D" id=4]
+a = Vector2( 0, 750 )
+b = Vector2( 975, 750 )
 
 [node name="DizzyHighway" type="Node2D"]
 script = ExtResource( 1 )
@@ -15,3 +29,20 @@ tile_data = PoolIntArray( 2, -1610612732, 0, 4, 1610612736, 0, 5, 1610612736, 0,
 
 [node name="Lasers" parent="." instance=ExtResource( 3 )]
 tile_data = PoolIntArray( 196616, 24, 0, 262150, -1073741800, 0, 327689, -1610612712, 0, 393223, 1610612760, 0 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 2 )
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 3 )
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 4 )

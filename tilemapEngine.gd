@@ -24,6 +24,7 @@ func _ready():
 	var height = (rect.size.y - rect.position.y) * $Background.cell_size.y
 	var aspect = Vector2(width, height)
 	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP_WIDTH, aspect)
+	
 
 func getSpawn(number):
 	for spawn in spawns.values():
