@@ -34,11 +34,11 @@ func onPlayerCards(cards):
 
 func onCardStarted(card):
 	if playerHand:
-		playerHand.selectCard(card)
+		playerHand.cardStarted(card)
 
 func onCardFinished(card):
 	if playerHand:
-		playerHand.unselectCard(card)
+		playerHand.cardFinished(card)
 
 func onReady():
 	print(\"onReady\")

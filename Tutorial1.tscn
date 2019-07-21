@@ -1,0 +1,74 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://tilemapRoot.gd" type="Script" id=1]
+[ext_resource path="res://TilemapBackground.tscn" type="PackedScene" id=2]
+[ext_resource path="res://TilemapForeground.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=4]
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=5]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var initPos
+var cardInfos = {}
+
+func cardStarted(card):
+	$PlayerHand.cardStarted(cardInfos[card])
+
+func cardFinished(card):
+	$PlayerHand.cardFinished(cardInfos[card])
+
+func _ready():
+	# Have some text printed / controlled by space
+	$Player.info = PlayerInfo.new(1, \"Tutorial\", Color.white)
+	var cards = [
+		Cards.createMove(1),
+		Cards.createBackUp(),
+		Cards.createMove(1),
+		Cards.createRotateLeft(),
+		Cards.createRotateRight(),
+		Cards.createUturn(),
+		Cards.createMove(3),
+	]
+	for card in cards:
+		cardInfos[card] = CardDeck.infoFromCard(card)
+		card.connect(\"cardStarted\", self, \"cardStarted\")
+		card.connect(\"cardFinished\", self, \"cardFinished\")
+	$PlayerHand.setPlayerCards(cardInfos.values())
+
+	yield(Actions.wait(1).perform(), \"finished\")	
+	#yield($PlayerHand.manualSwap(1, 2), \"completed\")
+	#cards = Util.swap(cards, 1, 2)
+	#yield(Actions.wait(2).perform(), \"finished\")
+	
+	for card in cards:
+		card.with($Player).perform()
+		yield(card, \"cardStarted\")
+		yield(card, \"cardFinished\")
+		$Map.touch()
+	# Incorrect... Move back pawn
+	# Verify checkpoints are touched...
+	pass"
+
+[node name="Tutorial1" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Map" type="Node2D" parent="."]
+script = ExtResource( 1 )
+
+[node name="Background" parent="Map" instance=ExtResource( 2 )]
+tile_data = PoolIntArray( 0, -1610612735, 0, 1, -1610612735, 0, 2, -1610612735, 0, 3, -1610612735, 0, 4, -1610612735, 0, 5, -1610612735, 0, 6, -1610612735, 0, 7, -1610612735, 0, 8, -1610612735, 0, 65536, -1610612735, 0, 65537, -1610612735, 0, 65538, -1610612735, 0, 65539, -1610612735, 0, 65540, -1610612735, 0, 65541, -1610612735, 0, 65542, -1610612735, 0, 65543, -1610612735, 0, 65544, -1610612735, 0, 131072, -1610612735, 0, 131073, -1610612735, 0, 131074, -1610612735, 0, 131075, -1610612735, 0, 131076, -1610612735, 0, 131077, -1610612735, 0, 131078, -1610612735, 0, 131079, -1610612735, 0, 131080, -1610612735, 0, 196608, -1610612735, 0, 196609, -1610612735, 0, 196610, -1610612735, 0, 196611, -1610612735, 0, 196612, -1610612735, 0, 196613, -1610612735, 0, 196614, -1610612735, 0, 196615, -1610612735, 0, 196616, -1610612735, 0, 262144, -1610612735, 0, 262145, -1610612735, 0, 262146, -1610612735, 0, 262147, -1610612735, 0, 262148, -1610612735, 0, 262149, -1610612735, 0, 262150, -1610612735, 0, 262151, -1610612735, 0, 262152, -1610612735, 0 )
+
+[node name="Foreground" parent="Map" instance=ExtResource( 3 )]
+tile_data = PoolIntArray( 65539, 29, 1, 196611, 29, 0 )
+
+[node name="Player" parent="." instance=ExtResource( 4 )]
+position = Vector2( 40.2477, 261.892 )
+
+[node name="PlayerHand" parent="." instance=ExtResource( 5 )]
+margin_left = 300.0
+margin_top = 38.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_scale = Vector2( 0.5, 0.5 )
+nrCards = 3

@@ -59,6 +59,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://playerCard.gd"
 }, {
+"base": "Reference",
+"class": "PlayerInfo",
+"language": "GDScript",
+"path": "res://playerInfo.gd"
+}, {
 "base": "Card",
 "class": "PlayerMove",
 "language": "GDScript",
@@ -94,6 +99,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://PlayerHand/Card.gd"
 }, {
+"base": "Reference",
+"class": "Util",
+"language": "GDScript",
+"path": "res://util.gd"
+}, {
 "base": "Action",
 "class": "Wait",
 "language": "GDScript",
@@ -110,6 +120,7 @@ _global_script_class_icons={
 "Parallell": "",
 "Player": "",
 "PlayerCard": "",
+"PlayerInfo": "",
 "PlayerMove": "",
 "RemoveAction": "",
 "RotateAction": "",
@@ -117,6 +128,7 @@ _global_script_class_icons={
 "Sequence": "",
 "Tiles": "",
 "UiCard": "",
+"Util": "",
 "Wait": ""
 }
 

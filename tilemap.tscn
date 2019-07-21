@@ -271,8 +271,7 @@ func spawnPlayer(info):
 	add_child(player)
 	player.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
 	players[info] = player
-	player.playerName = info.name if info.name else null
-	player.color = info.color if info.color else null
+	player.info = info
 	return player
 
 func onPlayerDestroyed(player):
@@ -360,6 +359,7 @@ onready var network = $\"../PlayerScene/Network\"
 onready var rootNetwork = $\"../Network\"
 
 func _ready():
+	return
 	yield(Actions.wait(0.5).perform(), \"finished\")
 	$\"../PlayerScene\".onReady()
 	print(\"wait for leave\")
@@ -381,7 +381,6 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
-editor/display_folded = true
 script = SubResource( 2 )
 
 [node name="Map" parent="Game" instance=ExtResource( 2 )]

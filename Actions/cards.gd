@@ -76,21 +76,15 @@ static func createUturn():
 	)
 
 static func createMove(steps):
-	var stepActions = []
-	for step in range(steps):
-		stepActions.append(Player.moveStep(Player.FORWARD))
 	return MultiStepCard.new(
-		Sequence.new(stepActions), 
+		Player.moveAction(Player.FORWARD, steps), 
 		str("Move ", steps),
 		MOVE
 	)
 	
 static func createBackUp():
-	var stepActions = []
-	for step in range(1):
-		stepActions.append(Player.moveStep(Player.BACKWARDS))
 	return MultiStepCard.new(
-		Sequence.new(stepActions), 
+		Player.moveAction(Player.BACKWARDS, 1),
 		"Back Up",
 		MOVE
 	)

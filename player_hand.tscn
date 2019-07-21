@@ -5,17 +5,48 @@
 [ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends Control
+script/source = "tool
+
+extends Control
 
 signal onSwap()
 signal onUnready()
 signal onReady()
 
 var ready = false
+var cardInfos
+export var nrCards = 9 setget setNrCards
+
+func setNrCards(val):
+	if not $CardHand:
+		return
+	print(\"no cards\", nrCards)
+	nrCards = val
+	for child in $CardHand.get_children():
+		child.hide()
+	for i in range(nrCards):
+		$CardHand.get_child(i).show()
+	for i in range(5):
+		if i <= nrCards - 1:
+			get_node(str(i + 1)).show()
+		else:
+			get_node(str(i + 1)).hide()
 
 func _ready():
 	$CardHand.connect(\"onSwap\", self, \"onSwap\")
 	$ReadyButton.connect(\"pressed\", self, \"buttonPressed\")
+
+func manualSwap(idx1, idx2):
+	var card = $CardHand.get_child(idx1)
+	card.move($CardHand.get_child(idx2).rect_position + Vector2.DOWN * 20)
+	var tween: Tween = card.get_node(\"Tween\")
+	tween.playback_speed = 0.2
+	while(card.get_node(\"Tween\").is_active()):
+		$CardHand.onChildChangedPosition(card, card.rect_position)
+		yield(Actions.wait(0.01).perform(), \"finished\")
+	tween.playback_speed = 1
+	yield(Actions.wait(0.1).perform(), \"finished\")
+	$CardHand.onChildDropped(card)
 
 func buttonPressed():
 	setReady(!ready)
@@ -37,6 +68,7 @@ func onSwap(idx1, idx2):
 	emit_signal(\"onSwap\", idx1, idx2)
 	
 func setPlayerCards(cardInfos):
+	self.cardInfos = cardInfos
 	print(str(\"on player cards\", cardInfos))
 	$ReadyButton.show()
 	$CardHand.setCards(cardInfos)
@@ -48,19 +80,19 @@ func setLocked(locked):
 func onTokenHit(hpLeft):
 	$CardHand.hpLeft = hpLeft
 	
-func selectCard(cardInfo):
+func cardStarted(cardInfo):
 	$CardHand.selectCard(cardInfo)
 
-func unselectCard(cardInfo):
+func cardFinished(cardInfo):
 	$CardHand.unselectCard(cardInfo)
 	
 	"
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=2]
 size = 55
 font_data = ExtResource( 3 )
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=3]
 size = 30
 font_data = ExtResource( 3 )
 
@@ -70,7 +102,6 @@ anchor_bottom = 1.0
 script = SubResource( 1 )
 
 [node name="CardHand" type="Control" parent="."]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 16.0
@@ -121,6 +152,7 @@ margin_right = -56.0
 margin_bottom = 772.0
 
 [node name="PlayerCard9" parent="CardHand" instance=ExtResource( 2 )]
+visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 800.0
@@ -128,6 +160,7 @@ margin_right = -56.0
 margin_bottom = 900.0
 
 [node name="PlayerCard6" parent="CardHand" instance=ExtResource( 2 )]
+visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 928.0
@@ -135,50 +168,51 @@ margin_right = -56.0
 margin_bottom = 1028.0
 
 [node name="PlayerCard8" parent="CardHand" instance=ExtResource( 2 )]
+visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 1056.0
 margin_right = -56.0
 margin_bottom = 1156.0
 
-[node name="Label" type="Label" parent="."]
+[node name="1" type="Label" parent="."]
 margin_left = 48.0
 margin_top = 48.0
 margin_right = 88.0
 margin_bottom = 121.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "1"
 
-[node name="Label4" type="Label" parent="."]
+[node name="2" type="Label" parent="."]
 margin_left = 48.0
 margin_top = 304.0
 margin_right = 88.0
 margin_bottom = 377.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "3"
 
-[node name="Label2" type="Label" parent="."]
+[node name="3" type="Label" parent="."]
 margin_left = 48.0
 margin_top = 176.0
 margin_right = 88.0
 margin_bottom = 249.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "2"
 
-[node name="Label3" type="Label" parent="."]
+[node name="4" type="Label" parent="."]
 margin_left = 48.0
 margin_top = 432.0
 margin_right = 88.0
 margin_bottom = 505.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "4"
 
-[node name="Label5" type="Label" parent="."]
+[node name="5" type="Label" parent="."]
 margin_left = 48.0
 margin_top = 560.0
 margin_right = 88.0
 margin_bottom = 633.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 2 )
 text = "5"
 
 [node name="ReadyButton" type="Button" parent="."]
@@ -187,5 +221,5 @@ margin_top = 1264.0
 margin_right = 976.0
 margin_bottom = 1321.0
 rect_min_size = Vector2( 800, 50 )
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
 text = "Press to ready"

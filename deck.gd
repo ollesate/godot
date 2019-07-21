@@ -14,6 +14,11 @@ static func createInfo(priority):
 
 static func cardFromInfo(info):
 	return getCard(info.priority)
+	
+static func infoFromCard(card):
+	var id = Global.getId()
+	var priority = 100
+	return {"id": id, "priority": priority, "description": card.description}
 
 static func generatePriority():
 	randomize()

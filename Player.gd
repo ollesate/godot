@@ -12,13 +12,24 @@ const LEFT = -90
 const RIGHT = 90
 const UTURN = 180
 
+const SPEED_MOD = 1.0
+const MOVE_DUR = 2 / SPEED_MOD
+const ACT_WAIT = 1 / SPEED_MOD
+const ROTATE_DUR = 1 / SPEED_MOD
+
 const HP_MAX = 9
 
 static func moveAction(movement, steps):
 	var actions = []
 	for i in range(steps):
-		actions.append(MovePlayer.new(movement, 0.25))
-		actions.append(Actions.wait(0.25))
+		var moveStepAction = []
+		var stepLeft = steps - i
+		var res = load("res://Assets/icon_up.png") if movement == FORWARD else load("res://Assets/icon_down.png")
+		moveStepAction.append(ChangePanelAction.new(res, stepLeft))
+		moveStepAction.append(MovePlayer.new(movement, MOVE_DUR))
+		moveStepAction.append(Actions.wait(ACT_WAIT))
+		actions.append(Sequence.new(moveStepAction))
+	actions.append(HidePanelAction.new())
 	return Sequence.new(actions)
 	
 static func moveStep(movement):
@@ -32,11 +43,21 @@ static func rotateActionDur(rotation, duration):
 	
 static func rotateAction(rotation):
 	var actions = []
-	actions.append(Actions.wait(0.25))
+	var resource
+	match rotation:
+		LEFT:
+			resource = load("res://Assets/icon_rotate_left.png")
+		RIGHT:
+			resource = load("res://Assets/icon_rotate_right.png")
+		UTURN:
+			resource = load("res://Assets/icon_rotate_uturn.png")
+	actions.append(ChangePanelAction.new(resource))
+	actions.append(Actions.wait(ACT_WAIT))
 	if rotation == UTURN:
-		actions.append(RotatePlayer.new(rotation, 0.5))
+		actions.append(RotatePlayer.new(rotation, ROTATE_DUR * 2))
 	else:
-		actions.append(RotatePlayer.new(rotation, 0.25))
+		actions.append(RotatePlayer.new(rotation, ROTATE_DUR))
+	actions.append(HidePanelAction.new())
 	return Sequence.new(actions)
 
 static func fallAction():
@@ -47,11 +68,15 @@ static func shootAction():
 
 onready var hp = $UI/HP
 onready var nameLabel = $UI/NameLabel
+onready var cardPanel = $UI/Panel
+onready var cardText = $UI/Panel/CenterContainer/HBox/Label
+onready var cardTexture = $UI/Panel/CenterContainer/HBox/Container/Texture
 
 var id
 var playerName = "" setget setPlayerName
 var defaultName
 var color = Color.white setget setColor
+var info setget setInfo
 var hpMax = HP_MAX
 var currentHp setget , getHp
 
@@ -64,12 +89,23 @@ func setReady(isReady):
 	$Sprite.isAnimating = isReady
 
 func _ready():
+	cardPanel.hide()
 	add_to_group("players")
 	hp.max_value = hpMax
 	hp.hide()
 	nameLabel.text = playerName
 	for child in $UI/Cards.get_children():
 		$UI/Cards.remove_child(child)
+
+func setInfo(val: PlayerInfo):
+	info = val
+	color = info.color
+	playerName = info.name
+	info.connect("onUpdate", self, "onInfoUpdate")
+
+func onInfoUpdated(info):
+	color = info.color
+	playerName = info.name	
 
 func setColor(val):
 	color = val if val != null else Color.white
@@ -171,3 +207,36 @@ class RotatePlayer:
 		duration -= delta
 		character.get_node("Sprite").rotate(rotationSpeed * delta)
 		return duration <= 0
+
+class ChangePanelAction:
+	extends Action
+	
+	var textureRes
+	var text
+	
+	func _init(textureRes, text = null):
+		self.textureRes = textureRes
+		self.text = text
+	
+	func act(delta):
+		.act(delta)
+		var spriteRotation = character.get_node("Sprite").rotation
+		var rot = rad2deg(spriteRotation) + 90
+		print("get rot ", rot)
+		character.cardPanel.show()
+		character.cardTexture.texture = textureRes
+		character.cardTexture.rect_rotation = rot
+		if text:
+			character.cardText.text = str(text)
+			character.cardText.show()
+		else:
+			character.cardText.hide()
+		return true
+
+class HidePanelAction:
+	extends Action
+	
+	func act(delta):
+		.act(delta)
+		character.cardPanel.hide()
+		return true

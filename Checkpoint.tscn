@@ -37,8 +37,9 @@ func addColor(color):
 func touch(info):
 	if playerInfos.size() == 0 && rects.size() == 1: # We are first, remove default coloring
 		rects.remove(0)
-	playerInfos.append(info)
-	addColor(info.color)
+	if playerInfos.find(info) == -1:
+		playerInfos.append(info)
+		addColor(info.color)
 
 func remove(info):
 	playerInfos.remove(playerInfos.find(info))

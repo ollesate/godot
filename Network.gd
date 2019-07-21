@@ -103,7 +103,6 @@ remote func swapCards(idx1, idx2):
 func _peer_connected(id):
 	print("network peer connected ", id)
 	var tempName = str("Player", custom_multiplayer.get_network_connected_peers().size())
-	#playerInfos[id] = { id = id, name = tempName, color = Color.white }
 	playerInfos[id] = PlayerInfo.new(id, tempName, Color.white)
 	emit_signal("onPlayerConnected", id)
 	emit_signal("onPlayerJoined", playerInfos[id])
@@ -127,13 +126,3 @@ func _server_disconnected():
 func _connected_fail():
 	print("connected fail")
 	emit_signal("onConnectionFailed")
-	
-class PlayerInfo:
-	var id
-	var name	
-	var color
-	
-	func _init(id, name, color):
-		self.id = id
-		self.name = name
-		self.color = color

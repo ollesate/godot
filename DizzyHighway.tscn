@@ -31,7 +31,6 @@ tile_data = PoolIntArray( 2, -1610612732, 0, 4, 1610612740, 0, 5, 1610612740, 0,
 tile_data = PoolIntArray( 196616, 24, 0, 262150, -1073741800, 0, 327689, -1610612712, 0, 393223, 1610612760, 0 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-editor/display_folded = true
 __meta__ = {
 "_edit_group_": true
 }
