@@ -29,7 +29,7 @@ static func getCard(priority):
 	if priority < 70:
 		return Cards.createUturn()
 	elif priority < 430:
-		if priority % 2 == 0:
+		if (priority / 10) % 2 == 0:
 			return Cards.createRotateRight()
 		else:
 			return Cards.createRotateLeft()

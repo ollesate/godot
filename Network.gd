@@ -26,6 +26,7 @@ export var isServer = false
 
 var playerInfos = {}
 var cardInfos = {}
+var networkId
 
 func _ready():
 	custom_multiplayer = MultiplayerAPI.new()
@@ -38,6 +39,7 @@ func _ready():
 		print("client start")
 		peer.create_client("localhost", PORT)
 	custom_multiplayer.set_network_peer(peer)
+	networkId = custom_multiplayer.get_network_unique_id()
 	
 	if isServer:
 		custom_multiplayer.connect("network_peer_connected", self, "_peer_connected")
@@ -62,10 +64,8 @@ remote func playerUnready():
 remote func updateInfo(name, color):
 	var id = custom_multiplayer.get_rpc_sender_id()
 	var info = playerInfos[id]
-	if name:
-		info.name = name
-	if color:
-		info.color = color
+	info.name = name
+	info.color = color
 	emit_signal("onPlayerUpdateInfo", info)
 
 func dealCardsToPlayer(id, cardInfos):

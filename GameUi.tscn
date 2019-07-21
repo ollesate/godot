@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=2]
@@ -13,6 +13,7 @@ var finished = false
 
 func _ready():
 	$Header/Progress.connect(\"finished\", self, \"countdownFinished\")
+	$Toast.hide()
 
 func startCountdown(time):
 	finished = false
@@ -20,7 +21,17 @@ func startCountdown(time):
 
 func countdownFinished():
 	finished = true
-	emit_signal(\"countdownFinished\")"
+	emit_signal(\"countdownFinished\")
+	
+func showToast(text, duration):
+	$Toast.show()
+	$Toast.modulate.a = 1
+	$Toast.text = text
+	var from = $Toast.modulate
+	var to = from
+	to.a = 0
+	$Toast/Tween.interpolate_property($Toast, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
+	$Toast/Tween.start()"
 
 [sub_resource type="DynamicFont" id=2]
 size = 32
@@ -53,12 +64,29 @@ func _process(delta):
 		emit_signal(\"finished\")
 		started = false"
 
+[sub_resource type="DynamicFont" id=5]
+size = 40
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 16.0
+expand_margin_right = 16.0
+expand_margin_top = 16.0
+expand_margin_bottom = 16.0
+
 [node name="GameUi" type="Control"]
 margin_right = 1024.0
 margin_bottom = 576.0
+mouse_filter = 2
 script = SubResource( 1 )
 
 [node name="Header" type="VBoxContainer" parent="."]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -294.0
@@ -93,3 +121,27 @@ nine_patch_stretch = true
 stretch_margin_left = 100
 stretch_margin_right = 100
 script = SubResource( 4 )
+
+[node name="Toast" type="Label" parent="."]
+modulate = Color( 1, 1, 1, 0.752941 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -250.0
+margin_top = -26.5
+margin_right = 250.0
+margin_bottom = 26.5
+rect_min_size = Vector2( 500, 0 )
+custom_fonts/font = SubResource( 5 )
+text = "Phase: Lasers"
+align = 1
+
+[node name="Panel" type="Panel" parent="Toast"]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0.1, 0 )
+custom_styles/panel = SubResource( 6 )
+
+[node name="Tween" type="Tween" parent="Toast"]

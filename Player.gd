@@ -99,13 +99,13 @@ func _ready():
 
 func setInfo(val: PlayerInfo):
 	info = val
-	color = info.color
-	playerName = info.name
+	setColor(info.color)
+	setPlayerName(info.name)
 	info.connect("onUpdate", self, "onInfoUpdate")
 
-func onInfoUpdated(info):
+func onInfoUpdate(info):
 	color = info.color
-	playerName = info.name	
+	playerName = info.name
 
 func setColor(val):
 	color = val if val != null else Color.white

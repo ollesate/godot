@@ -42,17 +42,17 @@ func onCardFinished(card):
 
 func onReady():
 	print(\"onReady\")
-	$Network.rpc_id(0, \"playerReady\")
+	$Network.rpc_id(1, \"playerReady\")
 	
 func onUnready():
 	print(\"onUnready\")
-	$Network.rpc_id(0, \"playerUnready\")
+	$Network.rpc_id(1, \"playerUnready\")
 
 func onInfoUpdated(playerName, color):
-	$Network.rpc_id(0, \"updateInfo\", playerName, color)
+	$Network.rpc_id(1, \"updateInfo\", playerName, color)
 	
 func onSwap(idx1, idx2):
-	$Network.rpc_id(0, \"swapCards\", idx1, idx2)
+	$Network.rpc_id(1, \"swapCards\", idx1, idx2)
 
 func changeScene():
 	remove_child($PlayerLobby)

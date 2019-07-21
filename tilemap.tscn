@@ -2,8 +2,8 @@
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://DizzyHighway.tscn" type="PackedScene" id=2]
-[ext_resource path="res://GameUi.tscn" type="PackedScene" id=3]
-[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=4]
+[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GameUi.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -84,7 +84,7 @@ func _ready():
 		# resetGame()
 
 func onPhaseStart(phase):
-	$GameUi/Header/Subtitle.text = phase
+	$GameUi.showToast(phase, 2)
 	
 func onTurnStart(turn):
 	$GameUi/Header/Title.text = str(\"Turn \", turn)
@@ -145,7 +145,7 @@ func playGame():
 	# Perhaps wait some player response?
 	# Restart game"
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Node2D
 
 var playerInfos = []
@@ -181,6 +181,7 @@ func simulateGame(allPlayerCards):
 		yield(lasersShoot(), \"completed\")
 		print(\"Belts move\")
 		emit_signal(\"onPhaseStart\", \"Belts move\")
+		yield(Actions.wait(2).perform(), \"finished\")
 		yield(beltsMove(), \"completed\")
 
 func playersAct(turn):	
@@ -197,10 +198,12 @@ func playersAct(turn):
 			yield(card, \"finished\")
 
 	emit_signal(\"onPhaseStart\", \"Players fire\")
+	yield(Actions.wait(2).perform(), \"finished\")
 	var shootActions = []
 	for player in players.values():
 		shootActions.append(Player.shootAction().with(player))
 	yield(Parallell.new(shootActions).perform(), \"finished\")
+	yield(Actions.wait(1).perform(), \"finished\")
 
 func lasersShoot():
 	var lasers = get_tree().get_nodes_in_group(\"lasers\")
@@ -306,7 +309,7 @@ func updatePlayerInfo(info):
 func pause():
 	Global.clear()"
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Node2D
 
 enum {BELT, LASER, SIZE}
@@ -318,6 +321,7 @@ func _ready():
 	yield($\"../Game\", \"onTurnStart\")
 
 func _input(event):
+	return
 	if Input.is_key_pressed(KEY_ENTER):
 		nextPhase()
 	var player = getPlayer()
@@ -381,21 +385,28 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
-script = SubResource( 2 )
+script = SubResource( 5 )
 
 [node name="Map" parent="Game" instance=ExtResource( 2 )]
 
-[node name="GameUi" parent="." instance=ExtResource( 3 )]
-
-[node name="PlayerScene" parent="." instance=ExtResource( 4 )]
+[node name="PlayerScene" parent="." instance=ExtResource( 3 )]
 margin_left = 675.0
 margin_top = 173.75
 margin_right = 675.0
 margin_bottom = 173.75
 rect_scale = Vector2( 0.25, 0.25 )
 
+[node name="PlayerScene2" parent="." instance=ExtResource( 3 )]
+margin_left = 450.0
+margin_top = 173.75
+margin_right = 450.0
+margin_bottom = 173.75
+rect_scale = Vector2( 0.25, 0.25 )
+
+[node name="GameUi" parent="." instance=ExtResource( 4 )]
+
 [node name="DebugController" type="Node2D" parent="."]
-script = SubResource( 3 )
+script = SubResource( 6 )
 
 [node name="Tutorial" type="Node2D" parent="."]
 script = SubResource( 4 )

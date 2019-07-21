@@ -152,7 +152,6 @@ margin_right = -56.0
 margin_bottom = 772.0
 
 [node name="PlayerCard9" parent="CardHand" instance=ExtResource( 2 )]
-visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 800.0
@@ -160,7 +159,6 @@ margin_right = -56.0
 margin_bottom = 900.0
 
 [node name="PlayerCard6" parent="CardHand" instance=ExtResource( 2 )]
-visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 928.0
@@ -168,7 +166,6 @@ margin_right = -56.0
 margin_bottom = 1028.0
 
 [node name="PlayerCard8" parent="CardHand" instance=ExtResource( 2 )]
-visible = false
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 1056.0

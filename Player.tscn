@@ -1,11 +1,11 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
 [ext_resource path="res://Assets/tank.png" type="Texture" id=2]
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=3]
 [ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=4]
-[ext_resource path="res://Assets/icon_up.png" type="Texture" id=5]
-[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=5]
+[ext_resource path="res://Assets/icon_up.png" type="Texture" id=6]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Sprite
@@ -26,6 +26,10 @@ func _process(delta):
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 31.9265, 27.225 )
 
+[sub_resource type="DynamicFont" id=5]
+size = 20
+font_data = ExtResource( 5 )
+
 [sub_resource type="StyleBoxFlat" id=3]
 bg_color = Color( 0.309804, 0.564706, 0.14902, 1 )
 corner_radius_top_left = 3
@@ -35,7 +39,7 @@ corner_radius_bottom_left = 3
 
 [sub_resource type="DynamicFont" id=4]
 size = 22
-font_data = ExtResource( 6 )
+font_data = ExtResource( 5 )
 
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 96, 128 )
@@ -97,11 +101,12 @@ align = 1
 [node name="NameLabel" type="Label" parent="UI"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -27.3545
-margin_top = -81.5549
-margin_right = 26.6455
-margin_bottom = -67.5549
+margin_left = -36.8545
+margin_top = -89.0
+margin_right = 36.1455
+margin_bottom = -62.0
 grow_horizontal = 2
+custom_fonts/font = SubResource( 5 )
 text = "<Name>"
 align = 1
 
@@ -141,7 +146,7 @@ margin_right = 8.0
 margin_bottom = 15.0
 rect_min_size = Vector2( 16, 16 )
 rect_pivot_offset = Vector2( 8, 15 )
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
 expand = true
 stretch_mode = 6
 
