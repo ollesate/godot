@@ -1,7 +1,7 @@
 extends Node
 
 const PORT = 1551
-const MAX_PLAYERS = 4
+const MAX_PLAYERS = 6
 
 signal onConnected()
 signal onConnectionFailed()

@@ -2,8 +2,8 @@
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://DizzyHighway.tscn" type="PackedScene" id=2]
-[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=3]
-[ext_resource path="res://GameUi.tscn" type="PackedScene" id=4]
+[ext_resource path="res://GameUi.tscn" type="PackedScene" id=3]
+[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -14,6 +14,7 @@ signal onAllReadyCancelled()
 var playerInfos = []
 var readyPlayers = []
 var cardPlayerInfos = {}
+var isPlaying
 
 func onPlayerJoined(info):
 	$Game.addPlayer(info)
@@ -43,11 +44,12 @@ func clearReady():
 	for info in readyPlayers:
 		$Game.onPlayerUnready(info)
 	readyPlayers.clear()
-	updateReady()
+	$GameUi/Header/Subtitle.text = \"\"
 
 func updateReady():
-	var text = str(readyPlayers.size(), \" / \", $Network.playerInfos.size(), \" ready\")
-	$GameUi/Header/Subtitle.text = text
+	if not isPlaying:
+		var text = str(readyPlayers.size(), \" / \", $Network.playerInfos.size(), \" ready\")
+		$GameUi/Header/Subtitle.text = text
 	
 func onPlayerUpdateInfo(info):
 	$Game.updatePlayerInfo(info)
@@ -96,7 +98,7 @@ func onPlayerWon(info):
 func cardStarted(card):
 	var cardInfo = cardPlayerInfos[card]
 	$Network.rpc_id(cardInfo.player.id, \"onCardStarted\", cardInfo.card)
-	$GameUi/Header/Subtitle.text = str(cardInfo.player.name, \"'s turn: \", cardInfo.card.description, \", \", cardInfo.card.priority)
+	# $GameUi/Header/Subtitle.text = str(cardInfo.player.name, \"'s turn: \", cardInfo.card.description, \", \", cardInfo.card.priority)
 		
 func cardFinished(card):
 	var cardInfo = cardPlayerInfos[card]
@@ -116,36 +118,47 @@ func playGame():
 			var cardInfos = CardDeck.generateCardInfos(9)
 			$Network.dealCardsToPlayer(info.id, cardInfos)
 		
-		$GameUi.startCountdown(20)
+		$GameUi.startCountdown(60)
 		$GameUi/Header/Progress.show()
 		$GameUi/Header/Title.text = \"Card phase\"
+		updateReady()
 		while not $GameUi.finished && playerInfos.size() != readyPlayers.size():
 			yield(Actions.wait(0.5).perform(), \"finished\")
 		$GameUi/Header/Progress.hide()
 		$GameUi/Header/Subtitle.text = \"\"
 
-		var playerCards = {}
 		var cardInfos = $Network.cardInfos
-		for playerInfo in cardInfos.keys():
-			var cards = []
-			for cardInfo in cardInfos[playerInfo]:
-				var card = CardDeck.cardFromInfo(cardInfo)
-				cards.append(card)
-				card.connect(\"cardStarted\", self, \"cardStarted\")
-				card.connect(\"cardFinished\", self, \"cardFinished\")
-				cardPlayerInfos[card] = {\"card\": cardInfo, \"player\": playerInfo} 
-			playerCards[playerInfo] = cards
+		var turns = []
+		for turnIndex in range(5):
+			var turn = []
+			for playerInfo in cardInfos.keys():
+				if cardInfos[playerInfo].size() > turnIndex:
+					var cardInfo = cardInfos[playerInfo][turnIndex]
+					var card = CardDeck.cardFromInfo(cardInfo)
+					card.connect(\"cardStarted\", self, \"cardStarted\")
+					card.connect(\"cardFinished\", self, \"cardFinished\")
+					turn.append({\"card\": card, \"playerInfo\": playerInfo, \"priority\": cardInfo.priority})
+					cardPlayerInfos[card] = {\"card\": cardInfo, \"player\": playerInfo} 
+			turn.sort_custom(self, \"prioritySort\")
+			turns.append(turn)
+			print(turn)
 		
+		isPlaying = true		
+		$GameUi/Header/Subtitle.text = \"\"
 		$Network.rpc(\"startSimulation\")
-		yield($Game.simulateGame(playerCards), \"completed\")
+		yield($Game.simulateGame(turns), \"completed\")
+		isPlaying = false		
 
 		gameFinished = false
 
 	# Game is finished, wait for some time
 	# Perhaps wait some player response?
-	# Restart game"
+	# Restart game
 
-[sub_resource type="GDScript" id=5]
+func prioritySort(a, b):
+    return a.priority > b.priority"
+
+[sub_resource type="GDScript" id=2]
 script/source = "extends Node2D
 
 var playerInfos = []
@@ -161,15 +174,15 @@ signal onPlayerWon()
 func _ready():
 	pass
 
-func simulateGame(allPlayerCards):
-	var turns = []
-	for turnIndex in range(5):
-		var turn = []
-		turns.append(turn)
-		for info in allPlayerCards.keys():
-			if allPlayerCards[info].size() > turnIndex:
-				var card = allPlayerCards[info][turnIndex]
-				turn.append(card.with(players[info]))
+func simulateGame(turns):
+	var cardTurns = []
+	for turn in turns:
+		var cardTurn = []
+		for action in turn:
+			action.card.with(players[action.playerInfo])
+			cardTurn.append(action.card)
+		cardTurns.append(cardTurn)
+	turns = cardTurns
 	
 	for i in range(turns.size()):
 		var turn = turns[i]
@@ -179,6 +192,7 @@ func simulateGame(allPlayerCards):
 		print(\"Lasers shoot\")
 		emit_signal(\"onPhaseStart\", \"Lasers shoot\")
 		yield(lasersShoot(), \"completed\")
+		yield(Actions.wait(2).perform(), \"finished\")
 		print(\"Belts move\")
 		emit_signal(\"onPhaseStart\", \"Belts move\")
 		yield(Actions.wait(2).perform(), \"finished\")
@@ -307,9 +321,9 @@ func updatePlayerInfo(info):
 	players[info].color = info.color
 
 func pause():
-	Global.clear()"
+	get_tree().paused = true"
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=3]
 script/source = "extends Node2D
 
 enum {BELT, LASER, SIZE}
@@ -385,28 +399,28 @@ script = SubResource( 1 )
 isServer = true
 
 [node name="Game" type="Node2D" parent="."]
-script = SubResource( 5 )
+script = SubResource( 2 )
 
 [node name="Map" parent="Game" instance=ExtResource( 2 )]
 
-[node name="PlayerScene" parent="." instance=ExtResource( 3 )]
-margin_left = 675.0
-margin_top = 173.75
-margin_right = 675.0
-margin_bottom = 173.75
-rect_scale = Vector2( 0.25, 0.25 )
-
-[node name="PlayerScene2" parent="." instance=ExtResource( 3 )]
-margin_left = 450.0
-margin_top = 173.75
-margin_right = 450.0
-margin_bottom = 173.75
-rect_scale = Vector2( 0.25, 0.25 )
-
-[node name="GameUi" parent="." instance=ExtResource( 4 )]
+[node name="GameUi" parent="." instance=ExtResource( 3 )]
 
 [node name="DebugController" type="Node2D" parent="."]
-script = SubResource( 6 )
+script = SubResource( 3 )
 
 [node name="Tutorial" type="Node2D" parent="."]
 script = SubResource( 4 )
+
+[node name="PlayerScene" parent="." instance=ExtResource( 4 )]
+margin_left = 722.1
+margin_top = 150.0
+margin_right = 722.1
+margin_bottom = 150.0
+rect_scale = Vector2( 0.3, 0.3 )
+
+[node name="PlayerScene2" parent="." instance=ExtResource( 4 )]
+margin_left = 449.1
+margin_top = 150.0
+margin_right = 449.1
+margin_bottom = 150.0
+rect_scale = Vector2( 0.3, 0.3 )

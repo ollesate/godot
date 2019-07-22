@@ -135,7 +135,7 @@ _global_script_class_icons={
 [application]
 
 config/name="ElectroRobot"
-run/main_scene="res://swatch.tscn"
+run/main_scene="res://PlayerScene.tscn"
 config/icon="res://Assets/icon.png"
 
 [autoload]
