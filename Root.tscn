@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+func _ready():
+	print(\"Root\")"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Node2D
+
+func _ready():
+	print(\"One\")"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Node2D
+
+func _ready():
+	print(\"Two\")"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Node2D
+
+func _ready():
+	print(\"Two_One\")"
+
+[node name="Root" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="One" type="Node2D" parent="."]
+script = SubResource( 2 )
+
+[node name="Two" type="Node2D" parent="."]
+script = SubResource( 3 )
+
+[node name="Two_One" type="Node2D" parent="Two"]
+script = SubResource( 4 )

@@ -1,8 +1,12 @@
 extends Node
 
-const PORT = 1551
-const MAX_PLAYERS = 6
+class_name Network
 
+const PORT = 9999
+const MAX_PLAYERS = 6
+const USE_ENET = false
+
+signal onConnectionChanged()
 signal onConnected()
 signal onConnectionFailed()
 signal onServerDisconnect()
@@ -21,33 +25,58 @@ signal onCardFinished()
 signal onStartSimulation()
 signal onEndSimulation()
 signal onGameStarted()
+signal onPlayerHpChanged()
+
+enum { CONNECTED, FAILED, DISCONNECT }
 
 export var isServer = false
 
 var playerInfos = {}
 var cardInfos = {}
-var networkId
 
 func _ready():
 	custom_multiplayer = MultiplayerAPI.new()
 	custom_multiplayer.set_root_node(self)
-	var peer = NetworkedMultiplayerENet.new()
 	if (isServer):
 		print("server start")
-		peer.create_server(PORT, MAX_PLAYERS)
+		var peer = startServer(PORT)
+		custom_multiplayer.set_network_peer(peer)
 	else:
 		print("client start")
-		peer.create_client("localhost", PORT)
-	custom_multiplayer.set_network_peer(peer)
-	networkId = custom_multiplayer.get_network_unique_id()
 	
 	if isServer:
 		custom_multiplayer.connect("network_peer_connected", self, "_peer_connected")
 		custom_multiplayer.connect("network_peer_disconnected", self, "_peer_disconnected")
+		print(IP.get_local_addresses())
 	else:
-		custom_multiplayer.connect("connected_to_server", self, "connected_to_server")
+		custom_multiplayer.connect("connected_to_server", self, "_connected_to_server")
 		custom_multiplayer.connect("connection_failed", self, "_connected_fail")
 		custom_multiplayer.connect("server_disconnected", self, "_server_disconnected")
+
+func startClient(host, port):
+	var peer
+	if USE_ENET:
+		peer = NetworkedMultiplayerENet.new()
+		peer.create_client(host, port)
+	else:
+		peer = WebSocketClient.new()
+		peer.connect_to_url("ws://%s:%s/" % [host, port], PoolStringArray(["demo"]), true)
+	return peer
+
+func startServer(port):
+	var peer
+	if USE_ENET:
+		peer = NetworkedMultiplayerENet.new()
+		peer.create_server(port)
+	else:
+		peer = WebSocketServer.new()
+		peer.listen(port, PoolStringArray(["demo"]), true)
+	return peer
+
+func clientConnect(ip):
+	print("client connecting to ", ip)
+	var peer = startClient(ip, PORT)
+	custom_multiplayer.set_network_peer(peer)
 
 func _process(delta):
 	if custom_multiplayer.has_network_peer():
@@ -100,8 +129,12 @@ remote func swapCards(idx1, idx2):
 	cards[idx1] = cards[idx2]
 	cards[idx2] = temp
 
+remote func onPlayerHpChanged(hpLeft):
+	emit_signal("onPlayerHpChanged", hpLeft)
+
 func _peer_connected(id):
 	print("network peer connected ", id)
+	print(IP.get_local_addresses())
 	var tempName = str("Player", custom_multiplayer.get_network_connected_peers().size())
 	playerInfos[id] = PlayerInfo.new(id, tempName, Color.white)
 	emit_signal("onPlayerConnected", id)
@@ -118,11 +151,14 @@ func _connected_to_server():
 	# Only called on clients, not server.
 	print("connected to server")
 	emit_signal("onConnected")
+	emit_signal("onConnectionChanged", CONNECTED)
 
 func _server_disconnected():
 	print("server disconnected")
 	emit_signal("onServerDisconnect")
+	emit_signal("onConnectionChanged", DISCONNECT)
 
 func _connected_fail():
 	print("connected fail")
 	emit_signal("onConnectionFailed")
+	emit_signal("onConnectionChanged", FAILED)

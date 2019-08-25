@@ -19,12 +19,12 @@ func _ready():
 			lasers[pos] = map.lasers[pos]
 		for pos in map.spawns.keys():
 			spawns[pos] = map.spawns[pos]
+	
+func getSize():
 	var rect = $Background.get_used_rect()
 	var width = (rect.size.x - rect.position.x) * $Background.cell_size.x
 	var height = (rect.size.y - rect.position.y) * $Background.cell_size.y
-	var aspect = Vector2(width, height)
-	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP_WIDTH, aspect)
-	
+	return Vector2(width, height)
 
 func getSpawn(number):
 	for spawn in spawns.values():

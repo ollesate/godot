@@ -1,18 +1,21 @@
-[gd_resource type="TileSet" load_steps=7 format=2]
+[gd_resource type="TileSet" load_steps=8 format=2]
 
 [ext_resource path="res://Assets/2005TilesetA.png" type="Texture" id=1]
 [ext_resource path="res://Assets/check_points.png" type="Texture" id=2]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
-points = PoolVector2Array( 1.6284, 74.3406, 0.0779572, 74.3406, 1.82222, 1.27557 )
+points = PoolVector2Array( 0, 0, 10, 0, 10, 75, 0, 75 )
 
 [sub_resource type="ConvexPolygonShape2D" id=2]
-points = PoolVector2Array( 0.468735, 0.500305, 9.96527, 1.27557, 9.96527, 64.8441, 73.7277, 66.007, 74.1153, 73.5654, 0.856354, 74.5345 )
+points = PoolVector2Array( 0, 0, 0, 0, 0, 0, 0, 75, 0, 75 )
 
 [sub_resource type="ConvexPolygonShape2D" id=3]
+points = PoolVector2Array( 0.468735, 0.500305, 9.96527, 1.27557, 9.96527, 64.8441, 73.7277, 66.007, 74.1153, 73.5654, 0.856354, 74.5345 )
+
+[sub_resource type="ConvexPolygonShape2D" id=4]
 points = PoolVector2Array( 0, 0, 75, 0, 75, 75, 0, 75 )
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=5]
 script/source = "class_name SomeClass
 
 func doIt():
@@ -119,6 +122,12 @@ func doIt():
 "one_way_margin": 1.0,
 "shape": SubResource( 1 ),
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
+}, {
+"autotile_coord": Vector2( 0, 0 ),
+"one_way": false,
+"one_way_margin": 1.0,
+"shape": SubResource( 2 ),
+"shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 27/z_index = 0
 28/name = "CornerWall"
@@ -133,7 +142,7 @@ func doIt():
 "autotile_coord": Vector2( 0, 0 ),
 "one_way": false,
 "one_way_margin": 1.0,
-"shape": SubResource( 2 ),
+"shape": SubResource( 3 ),
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 28/z_index = 0
@@ -165,8 +174,8 @@ func doIt():
 "autotile_coord": Vector2( 0, 0 ),
 "one_way": false,
 "one_way_margin": 1.0,
-"shape": SubResource( 3 ),
+"shape": SubResource( 4 ),
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 30/z_index = 0
-script = SubResource( 4 )
+script = SubResource( 5 )

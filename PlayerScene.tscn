@@ -1,28 +1,70 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://swatch.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
+const KEY_SAVED_IP = \"savedIp\"
+
 var playerHand
 
+onready var title = $ConnectionBox/VBoxContainer/Label
+onready var edit = $ConnectionBox/VBoxContainer/LineEdit
+onready var connectButton = $ConnectionBox/VBoxContainer/Button
+
 func _ready():
-	$Network.connect(\"onConnectionFailed\", self, \"onConnectionFailed\")
+	add_to_group(\"clients\")
+	ScreenUtils.viewportMobile(self)
+	
 	$Network.connect(\"onCardStarted\", self, \"onCardStarted\")
 	$Network.connect(\"onCardFinished\", self, \"onCardFinished\")
 	$Network.connect(\"onPlayerCards\", self, \"onPlayerCards\")
 	$Network.connect(\"onStartSimulation\", self, \"onStartSimulation\")
+	$Network.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
 	$PlayerLobby.connect(\"onReady\", self, \"onReady\")
 	$PlayerLobby.connect(\"onUnready\", self, \"onUnready\")
 	$PlayerLobby.connect(\"onInfoUpdated\", self, \"onInfoUpdated\")
 	
+	$Network.connect(\"onConnected\", self, \"onConnected\")
+	$Network.connect(\"onServerDisconnect\", self, \"onServerDisconnect\")
+	$Network.connect(\"onConnectionFailed\", self, \"onConnectionFailed\")
+	connectButton.connect(\"pressed\", self, \"pressed\")
+	
+	var prevIp = Prefs.load(KEY_SAVED_IP)
+	if prevIp:
+		edit.text = prevIp
+	
 	yield($Network, \"onGameStarted\")
 	changeScene()	
-	
-func onConnectionFailed():
-	pass # show some message? and retry???
+
+var isConnecting = false
+
+func pressed():
+	if isConnecting:
+		return
+	isConnecting = true
+	var ip = edit.text
+	connectTo(ip)
+
+func connectTo(ip):
+	$Network.clientConnect(ip)
+	Prefs.save(KEY_SAVED_IP, ip)
+	title.text = \"Connecting...\"
+	var status = yield($Network, \"onConnectionChanged\")
+	match status:
+		Network.CONNECTED:
+			title.text = \"Connected!\"
+			yield(Actions.wait(1).perform(), \"finished\")
+			$ConnectionBox.hide()
+			$PlayerLobby.show()
+		Network.DISCONNECT:
+			title.text = \"Server disconnected\"
+		Network.FAILED:
+			title.text = \"Connection failed...\"
+	isConnecting = false
 
 func onStartSimulation():
 	if playerHand:
@@ -39,6 +81,10 @@ func onCardStarted(card):
 func onCardFinished(card):
 	if playerHand:
 		playerHand.cardFinished(card)
+
+func onPlayerHpChanged(hpLeft):
+	if playerHand:
+		playerHand.setHpLeft(hpLeft)
 
 func onReady():
 	print(\"onReady\")
@@ -62,6 +108,14 @@ func changeScene():
 	playerHand.connect(\"onUnready\", self, \"onUnready\")
 	add_child(playerHand)"
 
+[sub_resource type="DynamicFont" id=2]
+size = 72
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 46
+font_data = ExtResource( 3 )
+
 [node name="PlayerScene" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -70,3 +124,44 @@ script = SubResource( 1 )
 [node name="Network" parent="." instance=ExtResource( 1 )]
 
 [node name="PlayerLobby" parent="." instance=ExtResource( 2 )]
+visible = false
+
+[node name="ConnectionBox" type="MarginContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -400.0
+margin_right = 400.0
+margin_bottom = 735.0
+rect_min_size = Vector2( 800, 0 )
+custom_constants/margin_top = 400
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConnectionBox"]
+margin_top = 400.0
+margin_right = 800.0
+margin_bottom = 735.0
+custom_constants/separation = 40
+alignment = 1
+
+[node name="Label" type="Label" parent="ConnectionBox/VBoxContainer"]
+margin_right = 800.0
+margin_bottom = 95.0
+custom_fonts/font = SubResource( 2 )
+text = "Connect to game"
+align = 1
+
+[node name="LineEdit" type="LineEdit" parent="ConnectionBox/VBoxContainer"]
+margin_top = 135.0
+margin_right = 800.0
+margin_bottom = 215.0
+rect_min_size = Vector2( 0, 80 )
+custom_fonts/font = SubResource( 3 )
+align = 1
+placeholder_text = "IP address"
+
+[node name="Button" type="Button" parent="ConnectionBox/VBoxContainer"]
+margin_top = 255.0
+margin_right = 800.0
+margin_bottom = 335.0
+rect_min_size = Vector2( 0, 80 )
+custom_fonts/font = SubResource( 3 )
+text = "Connect"

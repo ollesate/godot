@@ -31,6 +31,7 @@ func _ready():
 	$MarginContainer/Button.connect(\"pressed\", self, \"onButtonPressed\")
 	$NameEdit.connect(\"text_changed\", self, \"onTextChanged\")
 
+
 func _process(delta):
 	textureAnim.process(delta)
 
@@ -111,13 +112,13 @@ custom_constants/separation = 50
 script = SubResource( 1 )
 
 [node name="Space1" type="Control" parent="."]
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 0, 100 )
 
 [node name="Title" type="Label" parent="."]
 margin_top = 150.0
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 245.0
 rect_min_size = Vector2( 0, 50 )
 custom_fonts/font = SubResource( 2 )
@@ -127,13 +128,13 @@ valign = 1
 
 [node name="Space2" type="Control" parent="."]
 margin_top = 295.0
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 395.0
 rect_min_size = Vector2( 0, 100 )
 
 [node name="Name" type="Label" parent="."]
 margin_top = 445.0
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 498.0
 rect_min_size = Vector2( 0, 50 )
 custom_fonts/font = SubResource( 3 )
@@ -142,9 +143,9 @@ align = 1
 valign = 1
 
 [node name="NameEdit" type="LineEdit" parent="."]
-margin_left = 90.0
+margin_left = 62.0
 margin_top = 548.0
-margin_right = 990.0
+margin_right = 962.0
 margin_bottom = 624.0
 rect_min_size = Vector2( 900, 50 )
 size_flags_horizontal = 4
@@ -153,7 +154,7 @@ align = 1
 
 [node name="Tank" type="TextureRect" parent="."]
 margin_top = 674.0
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 974.0
 rect_min_size = Vector2( 0, 300 )
 texture = SubResource( 5 )
@@ -161,9 +162,9 @@ stretch_mode = 6
 
 [node name="Colors1" type="HBoxContainer" parent="."]
 editor/display_folded = true
-margin_left = 140.0
+margin_left = 112.0
 margin_top = 1024.0
-margin_right = 940.0
+margin_right = 912.0
 margin_bottom = 1174.0
 rect_min_size = Vector2( 800, 150 )
 size_flags_horizontal = 4
@@ -209,9 +210,9 @@ stretch_mode = 6
 
 [node name="Colors2" type="HBoxContainer" parent="."]
 editor/display_folded = true
-margin_left = 140.0
+margin_left = 112.0
 margin_top = 1224.0
-margin_right = 940.0
+margin_right = 912.0
 margin_bottom = 1374.0
 rect_min_size = Vector2( 800, 150 )
 size_flags_horizontal = 4
@@ -257,7 +258,7 @@ stretch_mode = 6
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 margin_top = 1424.0
-margin_right = 1080.0
+margin_right = 1024.0
 margin_bottom = 1589.0
 custom_constants/margin_right = 100
 custom_constants/margin_top = 40
@@ -267,7 +268,7 @@ custom_constants/margin_bottom = 40
 [node name="Button" type="Button" parent="MarginContainer"]
 margin_left = 100.0
 margin_top = 40.0
-margin_right = 980.0
+margin_right = 924.0
 margin_bottom = 125.0
 rect_min_size = Vector2( 200, 0 )
 custom_fonts/font = SubResource( 6 )
