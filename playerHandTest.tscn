@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://player_hand.tscn" type="PackedScene" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _ready():
+	ScreenUtils.viewportFromControl(self)
+	var infos = []
+	infos.append({\"id\": 1, \"description\": \"Card1\"})
+	infos.append({\"id\": 2, \"description\": \"Card2\"})
+	infos.append({\"id\": 3, \"description\": \"Card3\"})
+	infos.append({\"id\": 4, \"description\": \"Card4\"})
+	infos.append({\"id\": 5, \"description\": \"Card5\"})
+	$PlayerHand.setPlayerCards(infos)
+	$PlayerHand.setHpLeft(2)
+	$PlayerHand.setLocked(true)
+	yield(Actions.wait(1).perform(), \"finished\")
+	$PlayerHand.setPlayerCards(infos)
+	$PlayerHand.setLocked(true)
+	for i in range(infos.size()):
+		var info = infos[i]
+		$PlayerHand.cardStarted(info)
+		yield(Actions.wait(0.5).perform(), \"finished\")
+		$PlayerHand.cardFinished(info)
+		yield(Actions.wait(0.5).perform(), \"finished\")
+	$PlayerHand.setLocked(false)
+	$PlayerHand.setPlayerCards(infos)"
+
+[node name="Test" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_bottom = 1320.0
+script = SubResource( 1 )
+
+[node name="PlayerHand" parent="." instance=ExtResource( 1 )]

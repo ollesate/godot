@@ -17,32 +17,32 @@ var cardPlayerInfos = {}
 var isPlaying
 
 func onPlayerJoined(info):
-	$Game.addPlayer(info)
+	$GameBoard.addPlayer(info)
 	playerInfos.append(info)
 	updateReady()
 	
 func onPlayerLeft(info):
-	$Game.removePlayer(info)
+	$GameBoard.removePlayer(info)
 	playerInfos.remove(playerInfos.find(info))
 	updateReady()
 
 func onPlayerReady(info):
 	readyPlayers.append(info)
-	$Game.onPlayerReady(info)
+	$GameBoard.onPlayerReady(info)
 	updateReady()
 	if playerInfos.size() > 0 && playerInfos.size() == readyPlayers.size():
 		emit_signal(\"onAllReady\")
 
 func onPlayerUnready(info):
 	readyPlayers.remove(readyPlayers.find(info))
-	$Game.onPlayerUnready(info)
+	$GameBoard.onPlayerUnready(info)
 	updateReady()
 	if readyPlayers.size() == playerInfos.size() - 1:
 		emit_signal(\"onAllReadyCancelled\")
 
 func clearReady():
 	for info in readyPlayers:
-		$Game.onPlayerUnready(info)
+		$GameBoard.onPlayerUnready(info)
 	readyPlayers.clear()
 	$GameUi/Header/Subtitle.text = \"\"
 
@@ -52,10 +52,10 @@ func updateReady():
 		$GameUi/Header/Subtitle.text = text
 	
 func onPlayerUpdateInfo(info):
-	$Game.updatePlayerInfo(info)
+	$GameBoard.updatePlayerInfo(info)
 
 func _ready():
-	ScreenUtils.viewport(self, 	$Game/Map.getSize())
+	ScreenUtils.viewport(self, 	$GameBoard/Map.getSize())
 
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
@@ -63,10 +63,10 @@ func _ready():
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
 	$Network.connect(\"onPlayerUpdateInfo\", self, \"onPlayerUpdateInfo\")
 	
-	$Game.connect(\"onTurnStart\", self, \"onTurnStart\")
-	$Game.connect(\"onPhaseStart\", self, \"onPhaseStart\")
-	$Game.connect(\"onPlayerWon\", self, \"onPlayerWon\")
-	$Game.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
+	$GameBoard.connect(\"onTurnStart\", self, \"onTurnStart\")
+	$GameBoard.connect(\"onPhaseStart\", self, \"onPhaseStart\")
+	$GameBoard.connect(\"onPlayerWon\", self, \"onPlayerWon\")
+	$GameBoard.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
 
 	while true: # Play endlessly...
 		$GameUi/Header/Progress.hide()
@@ -156,7 +156,7 @@ func playGame():
 		isPlaying = true		
 		$GameUi/Header/Subtitle.text = \"\"
 		$Network.rpc(\"startSimulation\")
-		yield($Game.simulateGame(turns), \"completed\")
+		yield($GameBoard.simulateGame(turns), \"completed\")
 		isPlaying = false		
 
 		gameFinished = false
@@ -359,7 +359,7 @@ var currentPhase = -1
 var player
 
 func _ready():
-	yield($\"../Game\", \"onTurnStart\")
+	yield($\"../GameBoard\", \"onTurnStart\")
 
 func _input(event):
 	if Input.is_key_pressed(KEY_ENTER):
@@ -407,13 +407,13 @@ func speedDown():
 	$\"../GameUi\".showSmallToast(text, TOAST_DURATION * scale)
 
 func nextPhase():
-	$\"../Game\".saveCheckpointsIfPossible()
+	$\"../GameBoard\".saveCheckpointsIfPossible()
 	currentPhase = (currentPhase + 1) % SIZE
 	match currentPhase:
 		BELT:
-			$\"../Game\".beltsMove()
+			$\"../GameBoard\".beltsMove()
 		LASER:
-			$\"../Game\".lasersShoot()"
+			$\"../GameBoard\".lasersShoot()"
 
 [sub_resource type="GDScript" id=5]
 script/source = "extends Node2D
@@ -436,7 +436,7 @@ func _ready():
 	]
 	rootNetwork.dealCardsToPlayer(info.id, cardInfos)"
 
-[node name="Node2D" type="Node2D"]
+[node name="Game" type="Node2D"]
 script = SubResource( 1 )
 
 [node name="DebugConnecter" type="Node2D" parent="."]
@@ -447,10 +447,10 @@ script = SubResource( 2 )
 [node name="Network" parent="." instance=ExtResource( 1 )]
 isServer = true
 
-[node name="Game" type="Node2D" parent="."]
+[node name="GameBoard" type="Node2D" parent="."]
 script = SubResource( 3 )
 
-[node name="Map" parent="Game" instance=ExtResource( 2 )]
+[node name="Map" parent="GameBoard" instance=ExtResource( 2 )]
 
 [node name="GameUi" parent="." instance=ExtResource( 3 )]
 

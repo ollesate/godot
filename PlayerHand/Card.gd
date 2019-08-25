@@ -28,7 +28,12 @@ func setState(newState):
 	if newState >= COLOR_STATES.size() or newState < 0:
 		return
 	state = newState
+	updateColor()
+
+func updateColor():
 	self_modulate = COLOR_STATES[state]
+	if disabled:
+		self_modulate += Color(0.66, 0.66, 0.66, -0.3)
 
 func setTitle(title):
 	title = title
@@ -42,8 +47,7 @@ func setLocked(locked):
 
 func setDisabled(disabled):
 	self.disabled = disabled
-	if disabled:
-		self_modulate = Color.darkgray
+	updateColor()
 
 func _gui_input(event):
 	if (locked or disabled):

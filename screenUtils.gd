@@ -4,7 +4,14 @@ static func viewport(caller: Node, size: Vector2):
 	if caller.get_parent() != caller.get_tree().root:
 		return # Only allow our root node to set viewport
 	caller.get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP_WIDTH, size)
-	
+
+static func viewportFromControl(control: Control):
+	control.get_tree().set_screen_stretch(
+		SceneTree.STRETCH_MODE_2D, 
+		SceneTree.STRETCH_ASPECT_KEEP_WIDTH, 
+		control.rect_size
+	)
+
 static func viewportMobile(caller):
 	if caller.get_parent() != caller.get_tree().root:
 		return # Only allow our root node to set viewport
