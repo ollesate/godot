@@ -100,7 +100,7 @@ func onTurnStart(turn):
 
 func onPlayerWon(info):
 	$GameUi/Header/Title.text = str(info.name, \" wins!\")
-	$Game.pause()
+	$GameBoard.pause()
 
 func onPlayerHpChanged(info, hpLeft):
 	$Network.rpc_id(info.id, \"onPlayerHpChanged\", hpLeft)
@@ -249,20 +249,28 @@ func lasersShoot():
 func saveCheckpointsIfPossible():
 	for playerInfo in players.keys():
 		var player = players[playerInfo] if players.has(playerInfo) else null
-		if player:
-			var checkpoint = $Map.getCheckpoint(player)
-			if checkpoint:
-				print(\"on checkpoint\")
-				if !checkpoints.has(playerInfo) || checkpoint.number > checkpoints[playerInfo].number:
-					if checkpoints.has(playerInfo):
-						checkpoint.remove(playerInfo)
-					checkpoints[playerInfo] = checkpoint
-					checkpoint.touch(playerInfo)
-					var nextCheckpoint = $Map.getCheckpointIndexed(checkpoint.number + 1)
-					if nextCheckpoint:
-						nextCheckpoint.setNext()
-					else:
-						emit_signal(\"onPlayerWon\", playerInfo)
+		if not player: # Player might have died
+			continue
+			
+		var checkpoint = $Map.getCheckpoint(player)
+		if not checkpoint: # Check if player is on a cp
+			continue
+			
+		print(\"on checkpoint\")
+		var playerNumber = checkpoints[playerInfo].number if checkpoints.has(playerInfo) else 0
+		if checkpoint.number - playerNumber != 1:
+			continue # not next checkpoint...
+
+		if playerNumber != 0: # Remove old if not first
+			checkpoint.remove(playerInfo)
+		checkpoints[playerInfo] = checkpoint
+		checkpoint.touch(playerInfo)
+		
+		var nextCheckpoint = $Map.getCheckpointIndexed(checkpoint.number + 1)
+		if nextCheckpoint:
+			nextCheckpoint.setNext()
+		else: # There's no next cp so this player won
+			emit_signal(\"onPlayerWon\", playerInfo)
 
 func beltsMove():
 	for i in range(1, 3):
