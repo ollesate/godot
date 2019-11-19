@@ -1,9 +1,9 @@
 [gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://Network.tscn" type="PackedScene" id=1]
-[ext_resource path="res://DizzyHighway.tscn" type="PackedScene" id=2]
-[ext_resource path="res://GameUi.tscn" type="PackedScene" id=3]
-[ext_resource path="res://PlayerScene.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Map/Levels/DizzyHighway.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/Client/PlayerScene.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -310,7 +310,7 @@ func beltPushPlayerIntoHole():
 func spawnPlayer(info):
 	if players.has(info):
 		return
-	var player = preload(\"res://Player.tscn\").instance()
+	var player = preload(\"res://Scenes/Game/Player.tscn\").instance()
 	player.connect(\"onDestroyed\", self, \"onPlayerDestroyed\")
 	player.connect(\"onHit\", self, \"onPlayerHit\")
 	add_child(player)
