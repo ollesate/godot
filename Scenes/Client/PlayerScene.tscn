@@ -4,14 +4,14 @@
 [ext_resource path="res://Scenes/Client/swatch.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
 
-
-
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
 const KEY_SAVED_IP = \"savedIp\"
 
 var playerHand
+
+onready var playerHandScene = preload(\"res://Scenes/Client/player_hand.tscn\")
 
 onready var title = $ConnectionBox/VBoxContainer/Label
 onready var edit = $ConnectionBox/VBoxContainer/LineEdit
@@ -104,7 +104,7 @@ func onSwap(idx1, idx2):
 
 func changeScene():
 	remove_child($PlayerLobby)
-	playerHand = load(\"res://player_hand.tscn\").instance()
+	playerHand = playerHandScene.instance()
 	playerHand.connect(\"onSwap\", self, \"onSwap\")
 	playerHand.connect(\"onReady\", self, \"onReady\")
 	playerHand.connect(\"onUnready\", self, \"onUnready\")

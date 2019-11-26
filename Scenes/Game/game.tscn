@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/Map/Levels/DizzyHighway.tscn" type="PackedScene" id=2]
@@ -167,14 +167,6 @@ func playGame():
 
 func prioritySort(a, b):
     return a.priority > b.priority"
-
-[sub_resource type="GDScript" id=2]
-script/source = "extends Node2D
-
-func _ready():
-	yield(Actions.wait(1).perform(), \"finished\")
-	for client in get_tree().get_nodes_in_group(\"clients\"):
-		client.connectTo(\"localhost\")"
 
 [sub_resource type="GDScript" id=3]
 script/source = "extends Node2D
@@ -356,6 +348,14 @@ func updatePlayerInfo(info):
 func pause():
 	get_tree().paused = true"
 
+[sub_resource type="GDScript" id=2]
+script/source = "extends Node2D
+
+func _ready():
+	yield(Actions.wait(1).perform(), \"finished\")
+	for client in get_tree().get_nodes_in_group(\"clients\"):
+		client.connectTo(\"localhost\")"
+
 [sub_resource type="GDScript" id=4]
 script/source = "extends Node2D
 
@@ -370,6 +370,7 @@ func _ready():
 	yield($\"../GameBoard\", \"onTurnStart\")
 
 func _input(event):
+	pass
 	if Input.is_key_pressed(KEY_ENTER):
 		nextPhase()
 	var player = getPlayer()
@@ -423,34 +424,8 @@ func nextPhase():
 		LASER:
 			$\"../GameBoard\".lasersShoot()"
 
-[sub_resource type="GDScript" id=5]
-script/source = "extends Node2D
-
-func _ready():
-	return
-	var rootNetwork = $\"../Network\"
-	var network = $\"../PlayerScene/Network\"
-	yield(Actions.wait(0.5).perform(), \"finished\")
-	$\"../PlayerScene\".onReady()
-	print(\"wait for leave\")
-	yield(network, \"onPlayerCards\")
-	print(\"on cards\")
-	var info = rootNetwork.playerInfos.values()[0]
-	var cardInfos = [
-		CardDeck.createInfo(490),
-		CardDeck.createInfo(490),
-		CardDeck.createInfo(490),
-		CardDeck.createInfo(490)
-	]
-	rootNetwork.dealCardsToPlayer(info.id, cardInfos)"
-
 [node name="Game" type="Node2D"]
 script = SubResource( 1 )
-
-[node name="DebugConnecter" type="Node2D" parent="."]
-scale = Vector2( 0.2, 0.2 )
-z_index = 3
-script = SubResource( 2 )
 
 [node name="Network" parent="." instance=ExtResource( 1 )]
 isServer = true
@@ -462,13 +437,17 @@ script = SubResource( 3 )
 
 [node name="GameUi" parent="." instance=ExtResource( 3 )]
 
-[node name="DebugController" type="Node2D" parent="."]
+[node name="Debug" type="Node" parent="."]
+
+[node name="InstaConnect" type="Node2D" parent="Debug"]
+scale = Vector2( 0.2, 0.2 )
+z_index = 3
+script = SubResource( 2 )
+
+[node name="DebugController" type="Node2D" parent="Debug"]
 script = SubResource( 4 )
 
-[node name="Tutorial" type="Node2D" parent="."]
-script = SubResource( 5 )
-
-[node name="PlayerScene" parent="." instance=ExtResource( 4 )]
+[node name="PlayerScene" parent="Debug" instance=ExtResource( 4 )]
 margin_left = 675.0
 margin_top = 261.5
 margin_right = 675.0
