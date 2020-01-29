@@ -1,4 +1,36 @@
-extends Node2D
+tool
+extends Control
+
+const DIZZY_HIGHWAY = "DizzyHighway"
+
+const maps = [
+	preload("res://Scenes/Map/Levels/DizzyHighway.tscn")
+]
+
+var currentMap = null
+export(String, "DizzyHighway", "Other") var map = "DizzyHighway" setget setMap
+
+func setMap(newMap):
+	print("setMap", newMap)
+	map = newMap
+	if get_child_count() > 0:
+		remove_child(get_child(0))
+	match map:
+		DIZZY_HIGHWAY:
+			var map = maps[0].instance()
+			currentMap = map
+			add_child(map)
+			rect_min_size = getMapSize(map)
+
+func getMapSize(map):
+	var background: TileMap = null
+	for child in map.get_children():
+		if child.name == "Background":
+			background = child
+	var rect = background.get_used_rect()
+	var width = (rect.size.x - rect.position.x) * background.cell_size.x
+	var height = (rect.size.y - rect.position.y) * background.cell_size.y
+	return Vector2(width, height)
 
 var holes = {}
 var belts = {}
@@ -7,6 +39,10 @@ var lasers = {}
 var spawns = {}
 
 func _ready():
+	print("current map", map)
+	if currentMap == null:
+		setMap(map)
+	
 	for map in get_tree().get_nodes_in_group("backgroundTilemaps"):
 		for pos in map.holes.keys():
 			holes[pos] = map.holes[pos]
@@ -51,12 +87,12 @@ func getPlayersInHole():
 	return players
 
 func getMapPos(player):
-	return $Background.world_to_map(player.position)
+	return currentMap.get_node("Background").world_to_map(player.position)
 
 func getWorldPos(player):
 	var mapPos = getMapPos(player)
-	return $Background.map_to_world(mapPos) + $Background.cell_size / 2
-	
+	var background = currentMap.get_node("Background")
+	return background.map_to_world(mapPos) + background.cell_size / 2
 
 func getBeltAction(step):
 	var players = get_tree().get_nodes_in_group("players")

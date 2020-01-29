@@ -34,6 +34,7 @@ export var isServer = false
 
 var playerInfos = {}
 var cardInfos = {}
+var id setget , getId
 
 func _ready():
 	custom_multiplayer = MultiplayerAPI.new()
@@ -53,6 +54,9 @@ func _ready():
 		custom_multiplayer.connect(\"connected_to_server\", self, \"_connected_to_server\")
 		custom_multiplayer.connect(\"connection_failed\", self, \"_connected_fail\")
 		custom_multiplayer.connect(\"server_disconnected\", self, \"_server_disconnected\")
+
+func getId():
+	return custom_multiplayer.get_network_unique_id()
 
 func startClient(host, port):
 	var peer

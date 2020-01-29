@@ -73,6 +73,7 @@ func doIt():
 23/autotile/spacing = 0
 23/autotile/occluder_map = [  ]
 23/autotile/navpoly_map = [  ]
+23/autotile/priority_map = [  ]
 23/autotile/z_index_map = [  ]
 23/occluder_offset = Vector2( 0, 0 )
 23/navigation_offset = Vector2( 0, 0 )
@@ -157,6 +158,7 @@ func doIt():
 29/autotile/spacing = 0
 29/autotile/occluder_map = [  ]
 29/autotile/navpoly_map = [  ]
+29/autotile/priority_map = [  ]
 29/autotile/z_index_map = [  ]
 29/occluder_offset = Vector2( 0, 0 )
 29/navigation_offset = Vector2( 0, 0 )

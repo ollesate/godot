@@ -19,6 +19,7 @@ var color
 var textureAnim
 
 func _ready():
+	add_to_group(\"player_lobby\")
 	var delay = 0.1
 	textureAnim = TextureAnimation.new($Tank, Vector2(32, 32), 10, delay)
 	

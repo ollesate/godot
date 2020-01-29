@@ -63,7 +63,6 @@ spread = 180.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 89.57
 initial_velocity_random = 0.5
-angular_velocity = 0.0
 orbit_velocity = 0.0
 orbit_velocity_random = 1.0
 linear_accel = -100.0
@@ -82,7 +81,7 @@ scale = Vector2( 2, 2 )
 script = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( -1.52588e-05, -1.52588e-05 )
+position = Vector2( -1.52588e-005, -1.52588e-005 )
 texture = ExtResource( 1 )
 vframes = 10
 hframes = 10

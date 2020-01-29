@@ -13,6 +13,8 @@ const END_TURN_DURATION = 3 / SPEED_MODIFIER
 
 var id = 0 setget , getId
 
+var font = load("res://small_font.tres")
+
 func getId():
 	id += 1
 	return id 

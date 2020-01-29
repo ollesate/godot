@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
 [ext_resource path="res://Assets/tank.png" type="Texture" id=2]
@@ -6,6 +6,8 @@
 [ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=4]
 [ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=5]
 [ext_resource path="res://Assets/icon_up.png" type="Texture" id=6]
+[ext_resource path="res://Scenes/Game/DraggableHand.gd" type="Script" id=7]
+[ext_resource path="res://PlayerCardLittle.tscn" type="PackedScene" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Sprite
@@ -41,6 +43,37 @@ corner_radius_bottom_left = 3
 size = 22
 font_data = ExtResource( 5 )
 
+[sub_resource type="GDScript" id=6]
+script/source = "extends Control
+
+signal onReadyPressed()
+
+var showUi = true
+onready var cardHand = $CardHand
+
+func _ready():
+	$ReadyButton.connect(\"pressed\", self, \"onReadyPressed\")
+
+func onReadyPressed():
+	emit_signal(\"onReadyPressed\")
+
+func _gui_input(event):
+	if event is InputEventMouseButton:
+		var mouseEvent: InputEventMouseButton = event
+		if mouseEvent.is_pressed():
+			toggleUi()
+
+func showUi(visible):
+	showUi = visible
+	for child in get_children():
+		child.visible = visible
+
+func toggleUi():
+	showUi(!showUi)
+
+func showReadyButton(visible):
+	$ReadyButton.visible = visible"
+
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 96, 128 )
 script = ExtResource( 1 )
@@ -60,9 +93,10 @@ scale = Vector2( 0.5, 0.5 )
 shape = SubResource( 2 )
 
 [node name="UI" type="Control" parent="."]
-margin_left = -1.09278e-06
+editor/display_folded = true
+margin_left = -1.09278e-006
 margin_top = 25.0
-margin_right = -1.09278e-06
+margin_right = -1.09278e-006
 margin_bottom = 25.0
 
 [node name="HP" type="TextureProgress" parent="UI"]
@@ -157,3 +191,58 @@ margin_bottom = 30.0
 size_flags_vertical = 1
 custom_fonts/font = SubResource( 5 )
 text = "1"
+
+[node name="DebugUi" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -25.0
+margin_top = -25.0
+margin_right = 25.0
+margin_bottom = 25.0
+script = SubResource( 6 )
+
+[node name="ReadyButton" type="Button" parent="DebugUi"]
+margin_left = 1.02667
+margin_top = -43.6342
+margin_right = 51.0267
+margin_bottom = -23.6342
+text = "Ready"
+
+[node name="CardHand" type="Control" parent="DebugUi"]
+script = ExtResource( 7 )
+
+[node name="PlayerCard1" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+
+[node name="PlayerCard2" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = -25.336
+margin_bottom = -5.33595
+
+[node name="PlayerCard3" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = -2.29744
+margin_bottom = 17.7026
+
+[node name="PlayerCard4" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 19.9466
+margin_bottom = 39.9466
+
+[node name="PlayerCard5" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 42.1907
+margin_bottom = 62.1907
+
+[node name="PlayerCard6" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 65.2292
+margin_bottom = 85.2292
+
+[node name="PlayerCard7" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 64.4348
+margin_bottom = 84.4348
+
+[node name="PlayerCard8" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 87.0761
+margin_bottom = 107.076
+
+[node name="PlayerCard9" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+margin_top = 110.512
+margin_bottom = 130.512

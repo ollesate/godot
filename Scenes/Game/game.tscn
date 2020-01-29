@@ -1,12 +1,13 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Scenes/Map/Levels/DizzyHighway.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Scenes/Client/PlayerScene.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Game/ViewportTarget.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=2]
+[ext_resource path="res://BaseMap.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=4]
+[ext_resource path="res://new_dynamicfont.tres" type="DynamicFont" id=5]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends Node2D
+script/source = "extends Control
 
 signal onAllReady()
 signal onAllReadyCancelled()
@@ -16,26 +17,32 @@ var readyPlayers = []
 var cardPlayerInfos = {}
 var isPlaying
 
+onready var gameUi = $GameBoard/Ui
+onready var subtitle = $GameBoard/Ui/Header/Subtitle
+onready var gameBoard = $GameBoard
+onready var progress = $GameBoard/Ui/Header/Progress
+onready var title = $GameBoard/Ui/Header/Title
+
 func onPlayerJoined(info):
-	$GameBoard.addPlayer(info)
+	gameBoard.addPlayer(info)
 	playerInfos.append(info)
 	updateReady()
 	
 func onPlayerLeft(info):
-	$GameBoard.removePlayer(info)
+	gameBoard.removePlayer(info)
 	playerInfos.remove(playerInfos.find(info))
 	updateReady()
 
 func onPlayerReady(info):
 	readyPlayers.append(info)
-	$GameBoard.onPlayerReady(info)
+	gameBoard.onPlayerReady(info)
 	updateReady()
 	if playerInfos.size() > 0 && playerInfos.size() == readyPlayers.size():
 		emit_signal(\"onAllReady\")
 
 func onPlayerUnready(info):
 	readyPlayers.remove(readyPlayers.find(info))
-	$GameBoard.onPlayerUnready(info)
+	gameBoard.onPlayerUnready(info)
 	updateReady()
 	if readyPlayers.size() == playerInfos.size() - 1:
 		emit_signal(\"onAllReadyCancelled\")
@@ -44,18 +51,19 @@ func clearReady():
 	for info in readyPlayers:
 		$GameBoard.onPlayerUnready(info)
 	readyPlayers.clear()
-	$GameUi/Header/Subtitle.text = \"\"
+	subtitle.text = \"\"
 
 func updateReady():
 	if not isPlaying:
 		var text = str(readyPlayers.size(), \" / \", $Network.playerInfos.size(), \" ready\")
-		$GameUi/Header/Subtitle.text = text
+		subtitle.text = text
 	
 func onPlayerUpdateInfo(info):
-	$GameBoard.updatePlayerInfo(info)
+	gameBoard.updatePlayerInfo(info)
 
 func _ready():
-	ScreenUtils.viewport(self, 	$GameBoard/Map.getSize())
+	#var size = gameBoard.get_node(\"Map\").getSize()
+	#ScreenUtils.viewport(self, Vector2(size.x + 800, size.y))
 
 	$Network.connect(\"onPlayerJoined\", self, \"onPlayerJoined\")
 	$Network.connect(\"onPlayerLeft\", self, \"onPlayerLeft\")
@@ -63,25 +71,25 @@ func _ready():
 	$Network.connect(\"onPlayerUnready\", self, \"onPlayerUnready\")
 	$Network.connect(\"onPlayerUpdateInfo\", self, \"onPlayerUpdateInfo\")
 	
-	$GameBoard.connect(\"onTurnStart\", self, \"onTurnStart\")
-	$GameBoard.connect(\"onPhaseStart\", self, \"onPhaseStart\")
-	$GameBoard.connect(\"onPlayerWon\", self, \"onPlayerWon\")
-	$GameBoard.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
+	gameBoard.connect(\"onTurnStart\", self, \"onTurnStart\")
+	gameBoard.connect(\"onPhaseStart\", self, \"onPhaseStart\")
+	gameBoard.connect(\"onPlayerWon\", self, \"onPlayerWon\")
+	gameBoard.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
 
 	while true: # Play endlessly...
-		$GameUi/Header/Progress.hide()
-		$GameUi/Header/Title.show()
-		$GameUi/Header/Title.text = getWaitingTitle()
+		progress.hide()
+		title.show()
+		title.text = getWaitingTitle()
 		var countdown = 5
 		var time = countdown
 		var sleep = 0.5
 		clearReady()
 		while time > 0:
 			if playerInfos.size() == 0 or readyPlayers.size() != playerInfos.size():
-				$GameUi/Header/Title.text = getWaitingTitle()
+				title.text = getWaitingTitle()
 				time = countdown
 				yield(self, \"onAllReady\")
-			$GameUi/Header/Title.text = str(\"Starting game in \", floor(time))
+			title.text = str(\"Starting game in \", floor(time))
 			yield(Actions.wait(sleep).perform(), \"finished\")
 			time -= sleep
 		$Network.rpc(\"onGameStarted\")
@@ -93,13 +101,13 @@ func getWaitingTitle():
 	return \"IP: %s\\nWaiting for players...\" % ip
 
 func onPhaseStart(phase):
-	$GameUi.showToast(phase, 2)
+	gameUi.showToast(phase, 2)
 	
 func onTurnStart(turn):
-	$GameUi/Header/Title.text = str(\"Turn \", turn)
+	title.text = str(\"Turn \", turn)
 
 func onPlayerWon(info):
-	$GameUi/Header/Title.text = str(info.name, \" wins!\")
+	title.text = str(info.name, \" wins!\")
 	$GameBoard.pause()
 
 func onPlayerHpChanged(info, hpLeft):
@@ -128,14 +136,14 @@ func playGame():
 			var cardInfos = CardDeck.generateCardInfos(9)
 			$Network.dealCardsToPlayer(info.id, cardInfos)
 		
-		$GameUi.startCountdown(60)
-		$GameUi/Header/Progress.show()
-		$GameUi/Header/Title.text = \"Card phase\"
+		gameUi.startCountdown(60)
+		progress.show()
+		title.text = \"Card phase\"
 		updateReady()
-		while not $GameUi.finished && playerInfos.size() != readyPlayers.size():
+		while not $GameBoard/Ui.finished && playerInfos.size() != readyPlayers.size():
 			yield(Actions.wait(0.5).perform(), \"finished\")
-		$GameUi/Header/Progress.hide()
-		$GameUi/Header/Subtitle.text = \"\"
+		progress.hide()
+		subtitle.text = \"\"
 
 		var cardInfos = $Network.cardInfos
 		var turns = []
@@ -154,9 +162,9 @@ func playGame():
 			print(turn)
 		
 		isPlaying = true		
-		$GameUi/Header/Subtitle.text = \"\"
+		subtitle.text = \"\"
 		$Network.rpc(\"startSimulation\")
-		yield($GameBoard.simulateGame(turns), \"completed\")
+		yield(gameBoard.simulateGame(turns), \"completed\")
 		isPlaying = false		
 
 		gameFinished = false
@@ -166,10 +174,11 @@ func playGame():
 	# Restart game
 
 func prioritySort(a, b):
-    return a.priority > b.priority"
+	return a.priority > b.priority
+"
 
-[sub_resource type="GDScript" id=3]
-script/source = "extends Node2D
+[sub_resource type="GDScript" id=2]
+script/source = "extends Control
 
 var playerInfos = []
 var spawnPoints = {}
@@ -181,9 +190,7 @@ signal onPhaseStart()
 signal onTurnStart()
 signal onPlayerWon()
 signal onPlayerHpChanged()
-
-func _ready():
-	pass
+signal onPlayerTokenSpawned()
 
 func simulateGame(turns):
 	var cardTurns = []
@@ -208,6 +215,11 @@ func simulateGame(turns):
 		emit_signal(\"onPhaseStart\", \"Belts move\")
 		yield(Actions.wait(2).perform(), \"finished\")
 		yield(beltsMove(), \"completed\")
+
+	# Spawn players again
+	for playerInfo in playerInfos:
+		spawnPlayer(playerInfo)
+	
 
 func playersAct(turn):	
 	for card in turn:
@@ -309,7 +321,7 @@ func spawnPlayer(info):
 	player.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
 	players[info] = player
 	player.info = info
-	return player
+	emit_signal(\"onPlayerTokenSpawned\", player)
 
 func onPlayerDestroyed(player):
 	var index = players.values().find(player)
@@ -326,7 +338,7 @@ func addPlayer(info):
 	var spawnPoint = $Map.getSpawn(playerInfos.size())
 	playerInfos.append(info)
 	spawnPoints[info] = spawnPoint
-	return spawnPlayer(info)
+	spawnPlayer(info)
 
 func removePlayer(info):
 	playerInfos.erase(info)
@@ -348,7 +360,143 @@ func updatePlayerInfo(info):
 func pause():
 	get_tree().paused = true"
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0, 0, 0, 0.596078 )
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends PanelContainer
+
+onready var addPlayerButton: Button = $Margin/VBox/HBox/AddPlayerButton
+var playerScene = preload(\"res://Scenes/Client/PlayerScene.tscn\")
+
+onready var gameBoard = $\"/root/Game/GameBoard\"
+
+func _ready():
+	addPlayerButton.connect(\"pressed\", self, \"addPlayer\")
+	gameBoard.connect(\"onPlayerTokenSpawned\", self, \"onPlayerTokenSpawned\")
+	
+func addPlayer():
+	var player = playerScene.instance()
+	player.rect_scale = Vector2(0.0, 0.5)
+	$\"/root/Game/Debug\".add_child(player)
+	player.connectTo(\"localhost\")
+
+func onPlayerTokenSpawned(token):
+	var debugUi = token.get_node(\"DebugUi\")
+	debugUi.showUi(false)
+	debugUi.cardHand.modulate.a = 0
+	var id = token.info.id
+	var client = yield(getPlayerClient(id), \"completed\")
+	var playerNetwork = client.get_node(\"Network\")
+	
+	debugUi.connect(\"onReadyPressed\", self, \"onReadyPressed\", [client])
+	debugUi.cardHand.connect(\"onSwap\", client, \"onSwap\")
+	playerNetwork.connect(\"onCardStarted\", debugUi.cardHand, \"selectCard\")
+	playerNetwork.connect(\"onCardFinished\", debugUi.cardHand, \"unselectCard\")
+	playerNetwork.connect(\"onStartSimulation\", debugUi.cardHand, \"setLocked\", [true])
+	playerNetwork.connect(\"onPlayerHpChanged\", debugUi.cardHand, \"setHpLeft\")
+	playerNetwork.connect(\"onStartSimulation\", debugUi, \"showReadyButton\", [false])
+	playerNetwork.connect(\"onPlayerCards\", self, \"onPlayerCards\", [id])
+
+func onPlayerCards(cards, id):
+	var token = getPlayerToken(id)
+	if token:
+		var debugUi = token.get_node(\"DebugUi\")
+		debugUi.cardHand.modulate.a = 1
+		debugUi.showReadyButton(true)
+		debugUi.cardHand.setCards(cards)
+		debugUi.cardHand.visible = true
+
+func onReadyPressed(client):
+	if !client.playerHand:
+		client.lobby.onButtonPressed()
+	else:
+		client.playerHand.buttonPressed()
+
+func getPlayerToken(id):
+	for player in get_tree().get_nodes_in_group(\"players\"):
+		if player.info.id == id:
+			return player
+
+func getPlayerClient(id):
+	for client in get_tree().get_nodes_in_group(\"clients\"):
+		if client.network.id == 0:
+			yield(client.network, \"onConnected\")
+		if client.network.id == id:
+			yield(Actions.wait(0.1).perform(), \"finished\")
+			return client
+
+func onPlayerReadyPressed(token):
+	for client in get_tree().get_nodes_in_group(\"clients\"):
+		if client.get_node(\"Network\").id == token.info.id:
+			client.lobby.onButtonPressed()"
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Control
+
+var outlines = {}
+var drawOutlines = false
+
+func _draw():
+	if !drawOutlines:
+		return
+	outlines.clear()
+	outlineNode(get_tree().root.get_node(\"Game\"))
+
+func outlineNode(node: Node):
+	var script: Resource = node.get_script()
+	if script == null:
+		return
+	var outline: Rect2
+	if node is Node2D:
+		outline = getOutlineNode2D(node)
+	if !outline:
+		return
+	draw_rect(outline, Color.red, false)
+	var idx = script.resource_path.find_last(\"/\") + 1
+	var name = script.resource_path.substr(idx, script.resource_path.length() - idx)
+	draw_string(Global.font, outline.position, name)
+	outlines[node] = outline
+	for child in node.get_children():
+		outlineNode(child)
+
+func getOutlineNode2D(node: Node2D):
+	for child in node.get_children():
+		if child is Sprite:
+			var sprite: Sprite = child
+			var rectSprite: Rect2 = sprite.region_rect
+			rectSprite.size *= sprite.scale
+			rectSprite.position += node.position - rectSprite.size / 2
+			return rectSprite
+	var size = Vector2.ONE * 20
+	var pos = Vector2(node.position.x, node.position.y) - size / 2
+	return Rect2(pos, size)
+
+func _input(event):
+	var prevDraw = drawOutlines
+	if Input.is_key_pressed(KEY_TAB):
+		print(\"pressed tab\")
+		drawOutlines = true
+	else:
+		drawOutlines = false
+	if prevDraw != drawOutlines:
+		update()
+
+func _gui_input(event):
+	if !drawOutlines:
+		return
+	print(\"draw outliines\")
+	if event is InputEventMouseButton:
+		var mouseEvent: InputEventMouseButton = event
+		if mouseEvent.is_pressed():
+			for node in outlines:
+				var rect: Rect2 = outlines[node]
+				var pointRect = Rect2(mouseEvent.position, Vector2.ONE)
+				if rect.intersects(pointRect):
+					LiveEditor.editScript(node.get_script())
+					return"
+
+[sub_resource type="GDScript" id=6]
 script/source = "extends Node2D
 
 func _ready():
@@ -356,21 +504,31 @@ func _ready():
 	for client in get_tree().get_nodes_in_group(\"clients\"):
 		client.connectTo(\"localhost\")"
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Node2D
 
 const TOAST_DURATION = 0.5
+const SPEEDUP_DUR = 5
+const SPEEDUP_SCALE = 50
 
 enum {BELT, LASER, SIZE}
 
+var currentSpeedupDur = 0
 var currentPhase = -1
 var player
 
-func _ready():
-	yield($\"../GameBoard\", \"onTurnStart\")
+var speedupScale = 1
+
+onready var gameUi = get_tree().root.get_node(\"Game/Gameboard/Ui\")
+onready var gameboard = get_tree().root.get_node(\"Game/GameBoard\")
+
+func _process(delta):
+	if currentSpeedupDur > 0:
+		currentSpeedupDur -= delta 
+		if currentSpeedupDur <= 0:
+			Engine.time_scale = speedupScale
 
 func _input(event):
-	pass
 	if Input.is_key_pressed(KEY_ENTER):
 		nextPhase()
 	var player = getPlayer()
@@ -384,11 +542,13 @@ func _input(event):
 		player.rotateAction(Player.LEFT).with(player).perform()
 	if Input.is_key_pressed(KEY_D):
 		player.rotateAction(Player.RIGHT).with(player).perform()
-	if Input.is_key_pressed(KEY_SPACE):
+	if Input.is_key_pressed(KEY_F):
 		player.shootAction().with(player).perform()
 	if Input.is_key_pressed(KEY_RIGHT):
+		forwardGame()
+	if Input.is_key_pressed(KEY_KP_ADD):
 		speedUp()
-	if Input.is_key_pressed(KEY_LEFT):
+	if Input.is_key_pressed(KEY_KP_SUBTRACT):
 		speedDown()
 
 func getPlayer():
@@ -400,56 +560,118 @@ func getPlayer():
 		return player
 	return null
 
+func forwardGame():
+	print(\"forward game\")
+	currentSpeedupDur = SPEEDUP_DUR
+	Engine.time_scale = SPEEDUP_SCALE
+
 func speedUp():
-	var scale = Engine.time_scale
-	scale *= 2.0
-	Engine.time_scale = scale
-	var text = \"Speed %s\" % scale
-	$\"../GameUi\".showSmallToast(text, TOAST_DURATION * scale)
+	print(\"Speed up\")
+	speedupScale = speedupScale + 1
+	if speedupScale > 3:
+		speedupScale = 3
+	if currentSpeedupDur > 0:
+		return
+	Engine.time_scale = speedupScale
 	
 func speedDown():
-	var scale = Engine.time_scale
-	scale /= 2.0
-	scale = scale if scale >= 1.0 else 1.0
-	Engine.time_scale = scale
-	var text = \"Speed %s\" % scale
-	$\"../GameUi\".showSmallToast(text, TOAST_DURATION * scale)
+	print(\"Speed down\")
+	speedupScale = speedupScale - 1
+	if speedupScale < 1:
+		speedupScale = 1
+	if currentSpeedupDur > 0:
+		return
+	Engine.time_scale = speedupScale
 
 func nextPhase():
-	$\"../GameBoard\".saveCheckpointsIfPossible()
+	gameboard.saveCheckpointsIfPossible()
 	currentPhase = (currentPhase + 1) % SIZE
 	match currentPhase:
 		BELT:
-			$\"../GameBoard\".beltsMove()
+			gameboard.beltsMove()
 		LASER:
-			$\"../GameBoard\".lasersShoot()"
+			gameboard.lasersShoot()"
 
-[node name="Game" type="Node2D"]
+[node name="Game" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = SubResource( 1 )
 
-[node name="Network" parent="." instance=ExtResource( 1 )]
+[node name="ViewportTarget" type="Node" parent="."]
+script = ExtResource( 1 )
+target = NodePath("../GameBoard/Map")
+
+[node name="Network" parent="." instance=ExtResource( 2 )]
 isServer = true
 
-[node name="GameBoard" type="Node2D" parent="."]
-script = SubResource( 3 )
+[node name="GameBoard" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 2 )
 
-[node name="Map" parent="GameBoard" instance=ExtResource( 2 )]
+[node name="Map" parent="GameBoard" instance=ExtResource( 3 )]
+margin_right = 975.0
+margin_bottom = 750.0
 
-[node name="GameUi" parent="." instance=ExtResource( 3 )]
+[node name="Ui" parent="GameBoard" instance=ExtResource( 4 )]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.663452
+margin_right = 0.663452
+margin_bottom = 0.0
+
+[node name="DebugOptions" type="PanelContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -83.0
+custom_styles/panel = SubResource( 3 )
+script = SubResource( 4 )
+
+[node name="Margin" type="MarginContainer" parent="DebugOptions"]
+margin_right = 1024.0
+margin_bottom = 83.0
+custom_constants/margin_top = 16
+custom_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="DebugOptions/Margin"]
+margin_top = 16.0
+margin_right = 1024.0
+margin_bottom = 67.0
+
+[node name="Title" type="Label" parent="DebugOptions/Margin/VBox"]
+margin_right = 1024.0
+margin_bottom = 27.0
+custom_fonts/font = ExtResource( 5 )
+text = "Debug Options"
+align = 1
+valign = 1
+
+[node name="HBox" type="HBoxContainer" parent="DebugOptions/Margin/VBox"]
+margin_top = 31.0
+margin_right = 1024.0
+margin_bottom = 51.0
+alignment = 1
+
+[node name="AddPlayerButton" type="Button" parent="DebugOptions/Margin/VBox/HBox"]
+margin_left = 472.0
+margin_right = 552.0
+margin_bottom = 20.0
+text = "Add player"
 
 [node name="Debug" type="Node" parent="."]
 
+[node name="LiveEditLayer" type="Control" parent="Debug"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 5 )
+
 [node name="InstaConnect" type="Node2D" parent="Debug"]
+visible = false
 scale = Vector2( 0.2, 0.2 )
 z_index = 3
-script = SubResource( 2 )
+script = SubResource( 6 )
 
 [node name="DebugController" type="Node2D" parent="Debug"]
-script = SubResource( 4 )
-
-[node name="PlayerScene" parent="Debug" instance=ExtResource( 4 )]
-margin_left = 675.0
-margin_top = 261.5
-margin_right = 675.0
-margin_bottom = 261.5
-rect_scale = Vector2( 0.25, 0.25 )
+script = SubResource( 7 )
