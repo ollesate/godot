@@ -109,11 +109,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Actions/sequence.gd"
 }, {
-"base": "Reference",
-"class": "Tiles",
-"language": "GDScript",
-"path": "res://Scripts/tiles.gd"
-}, {
 "base": "Control",
 "class": "UiCard",
 "language": "GDScript",
@@ -145,7 +140,6 @@ _global_script_class_icons={
 "ScaleAction": "",
 "ScreenUtils": "",
 "Sequence": "",
-"Tiles": "",
 "UiCard": "",
 "Wait": ""
 }
