@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/uturn.png-0c2af0f2b5266bcf9b7a0ae16a289243.stex"
+path="res://.import/white_box.png-16af18a96015ce92e4ab781c2a58d285.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://uturn.png"
-dest_files=[ "res://.import/uturn.png-0c2af0f2b5266bcf9b7a0ae16a289243.stex" ]
+source_file="res://Assets/white_box.png"
+dest_files=[ "res://.import/white_box.png-16af18a96015ce92e4ab781c2a58d285.stex" ]
 
 [params]
 

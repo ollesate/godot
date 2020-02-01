@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Scenes/Game/ViewportTarget.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=2]
-[ext_resource path="res://BaseMap.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/BaseMap.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=4]
 [ext_resource path="res://new_dynamicfont.tres" type="DynamicFont" id=5]
 
@@ -358,7 +358,8 @@ func updatePlayerInfo(info):
 	players[info].color = info.color
 
 func pause():
-	get_tree().paused = true"
+	get_tree().paused = true
+"
 
 [sub_resource type="StyleBoxFlat" id=3]
 bg_color = Color( 0, 0, 0, 0.596078 )
@@ -596,6 +597,9 @@ func nextPhase():
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ViewportTarget" type="Node" parent="."]
 script = ExtResource( 1 )

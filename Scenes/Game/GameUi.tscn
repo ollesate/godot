@@ -34,7 +34,8 @@ func showToast(text, duration):
 	var to = from
 	to.a = 0
 	$Toast/Tween.interpolate_property($Toast, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
-	$Toast/Tween.start()"
+	$Toast/Tween.start()
+"
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )

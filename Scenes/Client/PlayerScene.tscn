@@ -112,7 +112,8 @@ func changeScene():
 	playerHand.connect(\"onSwap\", self, \"onSwap\")
 	playerHand.connect(\"onReady\", self, \"onReady\")
 	playerHand.connect(\"onUnready\", self, \"onUnready\")
-	add_child(playerHand)"
+	add_child(playerHand)
+"
 
 [sub_resource type="DynamicFont" id=2]
 size = 72
