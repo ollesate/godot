@@ -1,0 +1,214 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=2]
+[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=3]
+
+[sub_resource type="GDScript" id=10]
+script/source = "extends Control
+
+signal countdownFinished()
+
+var finished = false
+
+func _ready():
+	$Header/Progress.connect(\"finished\", self, \"countdownFinished\")
+	$Toast.hide()
+
+func startCountdown(time):
+	finished = false
+	$Header/Progress.start(time)
+
+func countdownFinished():
+	finished = true
+	emit_signal(\"countdownFinished\")
+
+func showSmallToast(text, duration):
+	$SmallToast.showToast(text, duration)
+
+func showToast(text, duration):
+	$Toast.show()
+	$Toast.modulate.a = 1
+	$Toast.text = text
+	var from = $Toast.modulate
+	var to = from
+	to.a = 0
+	$Toast/Tween.interpolate_property($Toast, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
+	$Toast/Tween.start()
+"
+
+[sub_resource type="StyleBoxFlat" id=11]
+bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )
+border_color = Color( 1, 1, 1, 1 )
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="DynamicFont" id=12]
+size = 32
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 18
+font_data = ExtResource( 1 )
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends TextureProgress
+
+signal finished()
+
+var duration
+var startDuration
+var started
+
+func start(duration):
+	startDuration = duration
+	self.duration = duration
+	started = true
+	
+func _process(delta):
+	if !started:
+		return
+	value = duration / startDuration * 100
+	duration -= delta
+	if duration < 0:
+		emit_signal(\"finished\")
+		started = false"
+
+[sub_resource type="DynamicFont" id=6]
+size = 40
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 16.0
+expand_margin_right = 16.0
+expand_margin_top = 16.0
+expand_margin_bottom = 16.0
+
+[sub_resource type="DynamicFont" id=8]
+size = 14
+font_data = ExtResource( 1 )
+
+[sub_resource type="GDScript" id=9]
+script/source = "extends Label
+
+const DURATION = 0.5
+
+func _ready():
+	hide()
+
+func showToast(text, duration = DURATION):
+	show()
+	modulate.a = 1
+	self.text = str(text)
+	var from = modulate
+	var to = from
+	to.a = 0
+	print(\"from \", from)
+	print(\"to \", to)
+	print(\"duration \", duration)
+	$Tween.interpolate_property(self, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
+	$Tween.start()"
+
+[node name="GameUi" type="Control"]
+margin_right = 1024.0
+margin_bottom = 576.0
+mouse_filter = 2
+script = SubResource( 10 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Header" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -294.0
+margin_top = 18.0
+margin_right = 294.0
+margin_bottom = 89.0
+
+[node name="Title" type="Label" parent="Header"]
+modulate = Color( 1, 1, 1, 0.752941 )
+margin_right = 588.0
+margin_bottom = 43.0
+custom_styles/normal = SubResource( 11 )
+custom_fonts/font = SubResource( 12 )
+text = "Card 1"
+align = 1
+
+[node name="Subtitle" type="Label" parent="Header"]
+margin_top = 47.0
+margin_right = 588.0
+margin_bottom = 71.0
+custom_fonts/font = SubResource( 4 )
+text = "Anna's turn: Rotate Right, 120"
+align = 1
+
+[node name="Progress" type="TextureProgress" parent="Header"]
+margin_top = 75.0
+margin_right = 588.0
+margin_bottom = 110.0
+rect_min_size = Vector2( 200, 35 )
+step = 0.0
+texture_under = ExtResource( 2 )
+texture_progress = ExtResource( 3 )
+nine_patch_stretch = true
+stretch_margin_left = 100
+stretch_margin_right = 100
+script = SubResource( 5 )
+
+[node name="Toast" type="Label" parent="."]
+modulate = Color( 1, 1, 1, 0.752941 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -250.0
+margin_top = -26.5
+margin_right = 250.0
+margin_bottom = 26.5
+rect_min_size = Vector2( 500, 0 )
+custom_fonts/font = SubResource( 6 )
+text = "Phase: Lasers"
+align = 1
+
+[node name="Panel" type="Panel" parent="Toast"]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0.1, 0 )
+custom_styles/panel = SubResource( 7 )
+
+[node name="Tween" type="Tween" parent="Toast"]
+
+[node name="SmallToast" type="Label" parent="."]
+modulate = Color( 1, 1, 1, 0.752941 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 388.0
+margin_top = -213.0
+margin_right = 399.0
+margin_bottom = -194.0
+rect_min_size = Vector2( 20, 0 )
+custom_fonts/font = SubResource( 8 )
+text = "+1"
+align = 1
+script = SubResource( 9 )
+
+[node name="Panel" type="Panel" parent="SmallToast"]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+custom_styles/panel = SubResource( 7 )
+
+[node name="Tween" type="Tween" parent="SmallToast"]

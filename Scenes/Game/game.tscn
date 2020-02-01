@@ -75,7 +75,7 @@ func _ready():
 	gameBoard.connect(\"onTurnStart\", self, \"onTurnStart\")
 	gameBoard.connect(\"onPhaseStart\", self, \"onPhaseStart\")
 	gameBoard.connect(\"onPlayerWon\", self, \"onPlayerWon\")
-	gameBoard.connect(\"onPlayerHpChanged\", self, \"onPlayerHpChanged\")
+	gameBoard.connect(\"onRobotHpChanged\", self, \"onRobotHpChanged\")
 
 	while true: # Play endlessly...
 		progress.hide()
@@ -111,8 +111,8 @@ func onPlayerWon(info):
 	title.text = str(info.name, \" wins!\")
 	$GameBoard.pause()
 
-func onPlayerHpChanged(info, hpLeft):
-	$Network.rpc_id(info.id, \"onPlayerHpChanged\", hpLeft)
+func onRobotHpChanged(info, hpLeft):
+	$Network.rpc_id(info.id, \"onRobotHpChanged\", hpLeft)
 
 func cardStarted(card):
 	var cardInfo = cardPlayerInfos[card]
@@ -194,22 +194,22 @@ script/source = "extends Control
 
 var playerInfos = []
 var spawnPoints = {}
-var players = {}
+var robots = {}
 var checkpoints = {}
 
 signal lasersEnd()
 signal onPhaseStart()
 signal onTurnStart()
 signal onPlayerWon()
-signal onPlayerHpChanged()
-signal onPlayerTokenSpawned()
+signal onRobotHpChanged()
+signal onRobotSpawned()
 
 func simulateGame(turns):
 	var cardTurns = []
 	for turn in turns:
 		var cardTurn = []
 		for action in turn:
-			action.card.with(players[action.playerInfo])
+			action.card.with(robots[action.playerInfo])
 			cardTurn.append(action.card)
 		cardTurns.append(cardTurn)
 	turns = cardTurns
@@ -230,8 +230,7 @@ func simulateGame(turns):
 
 	# Spawn players again
 	for playerInfo in playerInfos:
-		spawnPlayer(playerInfo)
-	
+		spawnRobot(playerInfo)
 
 func playersAct(turn):	
 	for card in turn:
@@ -240,7 +239,7 @@ func playersAct(turn):
 			var finished = false
 			while(not finished and card.character != null):
 				finished = yield(card, \"stepFinished\") == 0
-				yield(getPlayersFallAction().perform(), \"finished\")
+				yield(getRobotsFallAction().perform(), \"finished\")
 			saveCheckpointsIfPossible()
 			yield(syncPositions().perform(), \"finished\")
 		else:
@@ -249,8 +248,8 @@ func playersAct(turn):
 	emit_signal(\"onPhaseStart\", \"Players fire\")
 	yield(Actions.wait(2).perform(), \"finished\")
 	var shootActions = []
-	for player in players.values():
-		shootActions.append(Player.shootAction().with(player))
+	for robot in robots.values():
+		shootActions.append(Robot.shootAction().with(robot))
 	yield(Parallell.new(shootActions).perform(), \"finished\")
 	yield(Actions.wait(1).perform(), \"finished\")
 
@@ -263,111 +262,100 @@ func lasersShoot():
 	yield(Actions.wait(0.25).perform(), \"finished\")
 
 func saveCheckpointsIfPossible():
-	for playerInfo in players.keys():
-		var player = players[playerInfo] if players.has(playerInfo) else null
-		if not player: # Player might have died
+	for info in robots.keys():
+		var robot = robots[info] if robots.has(info) else null
+		if not robot: # Player might have died
 			continue
 			
-		var checkpoint = $Map.getCheckpoint(player)
+		var checkpoint = $Map.getCheckpoint(robot)
 		if not checkpoint: # Check if player is on a cp
 			continue
 			
 		print(\"on checkpoint\")
-		var playerNumber = checkpoints[playerInfo].number if checkpoints.has(playerInfo) else 0
-		if checkpoint.number - playerNumber != 1:
+		var currentCheckpointNo = checkpoints[info].number if checkpoints.has(info) else 0
+		if checkpoint.number - currentCheckpointNo != 1:
 			continue # not next checkpoint...
 
-		if playerNumber != 0: # Remove old if not first
-			checkpoint.remove(playerInfo)
-		checkpoints[playerInfo] = checkpoint
-		checkpoint.touch(playerInfo)
+		if currentCheckpointNo != 0: # Remove old if not first
+			checkpoint.remove(info)
+		checkpoints[info] = checkpoint
+		checkpoint.touch(info)
 		
 		var nextCheckpoint = $Map.getCheckpointIndexed(checkpoint.number + 1)
 		if nextCheckpoint:
 			nextCheckpoint.setNext()
 		else: # There's no next cp so this player won
-			emit_signal(\"onPlayerWon\", playerInfo)
+			emit_signal(\"onPlayerWon\", info)
 
 func beltsMove():
 	for i in range(1, 3):
 		var beltAction = $Map.getBeltAction(i)
 		yield(beltAction.perform(), \"finished\")
-		yield(getPlayersFallAction().perform(), \"finished\")
+		yield(getRobotsFallAction().perform(), \"finished\")
 	saveCheckpointsIfPossible()
 	yield(syncPositions().perform(), \"finished\")
 
 func syncPositions():
 	var actions = []
-	for player in players.values():
-		var pos = player.position
-		var adjustedPos = $Map.getWorldPos(player)
-		var action = Actions.moveTo(pos, adjustedPos).with(player)
-		if adjustedPos != player.position:
+	for robot in robots.values():
+		var pos = robot.position
+		var adjustedPos = $Map.getWorldPos(robot)
+		var action = Actions.moveTo(pos, adjustedPos).with(robot)
+		if adjustedPos != robot.position:
 			actions.append(action)
 	return Parallell.new(actions)
 
-func getPlayersFallAction():
+func getRobotsFallAction():
 	var fallingActions = []
-	for fallingPlayer in $Map.getPlayersInHole():
-		fallingActions.append(Player.fallAction().with(fallingPlayer))
+	for fallingRobot in $Map.getPlayersInHole():
+		fallingActions.append(Robot.fallAction().with(fallingRobot))
 	return Parallell.new(fallingActions)
 
-func beltPushPlayerIntoHole():
-	var info = {\"name\": \"Olof\", \"color\": Color.blue}
-	var player = addPlayer(info)
-	
-	var cards = {info: [Cards.moveAction(Player.FORWARD, 2), Cards.moveAction(Player.FORWARD, 2)]}
-	yield(simulateGame(cards), \"completed\")
-	print(\"Players finished\")
-	player = spawnPlayer(info)
-	cards = {info: [Cards.moveAction(Player.FORWARD, 2), Cards.moveAction(Player.FORWARD, 2)]}
-	yield(simulateGame(cards), \"completed\")
-
-func spawnPlayer(info):
-	if players.has(info):
+func spawnRobot(info):
+	if robots.has(info):
 		return
 	var robot = preload(\"res://Scenes/Game/Robot.tscn\").instance()
-	robot.connect(\"onDestroyed\", self, \"onPlayerDestroyed\")
-	robot.connect(\"onHit\", self, \"onPlayerHit\")
+	robot.connect(\"onDestroyed\", self, \"onRobotDestroyed\")
+	robot.connect(\"onHit\", self, \"onRobotHit\")
 	add_child(robot)
 	robot.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
-	players[info] = robot
+	robots[info] = robot
 	robot.info = info
-	emit_signal(\"onPlayerTokenSpawned\", robot)
+	emit_signal(\"onRobotSpawned\", robot)
 
-func onPlayerDestroyed(player):
-	var index = players.values().find(player)
-	for info in players.keys():
-		if player == players[info]:
-			players.erase(info)
+func onRobotDestroyed(robot):
+	var index = robots.values().find(robot)
+	for info in robots.keys():
+		if robot == robots[info]:
+			robots.erase(info)
 
-func onPlayerHit(player):
-	for info in players.keys():
-		if player == players[info]:
-			emit_signal(\"onPlayerHpChanged\", info, player.currentHp)
+func onRobotHit(robot):
+	for info in robots.keys():
+		if robot == robots[info]:
+			emit_signal(\"onPlayerHpChanged\", info, robot.currentHp)
 
 func addPlayer(info):
 	var spawnPoint = $Map.getSpawn(playerInfos.size())
 	playerInfos.append(info)
 	spawnPoints[info] = spawnPoint
-	spawnPlayer(info)
+	spawnRobot(info)
 
 func removePlayer(info):
 	playerInfos.erase(info)
 	spawnPoints.erase(info)
-	var player = players[info]
-	players.erase(info)
-	remove_child(player)
+	var robot = robots[info]
+	robots.erase(info)
+	remove_child(robot)
 
 func onPlayerReady(info):
-	players[info].setReady(true)
+	robots[info].setReady(true)
 	
 func onPlayerUnready(info):
-	players[info].setReady(false)
+	robots[info].setReady(false)
 
 func updatePlayerInfo(info):
-	players[info].playerName = info.name
-	players[info].color = info.color
+	robots[info].playerName = info.name
+	robots[info].color = info.color
 
 func pause():
 	get_tree().paused = true
@@ -498,7 +486,7 @@ onready var gameBoard = $\"/root/Game/GameBoard\"
 
 func _ready():
 	addPlayerButton.connect(\"pressed\", self, \"addPlayer\")
-	gameBoard.connect(\"onPlayerTokenSpawned\", self, \"onPlayerTokenSpawned\")
+	gameBoard.connect(\"onRobotSpawned\", self, \"onRobotSpawned\")
 	
 func addPlayer():
 	var player = playerScene.instance()
@@ -506,11 +494,11 @@ func addPlayer():
 	$\"/root/Game/Debug\".add_child(player)
 	player.connectTo(\"localhost\")
 
-func onPlayerTokenSpawned(token):
-	var debugUi = token.get_node(\"DebugUi\")
+func onRobotSpawned(robot):
+	var debugUi = robot.get_node(\"DebugUi\")
 	debugUi.showUi(false)
 	debugUi.cardHand.modulate.a = 0
-	var id = token.info.id
+	var id = robot.info.id
 	var client = yield(getPlayerClient(id), \"completed\")
 	var playerNetwork = client.get_node(\"Network\")
 	
@@ -524,9 +512,9 @@ func onPlayerTokenSpawned(token):
 	playerNetwork.connect(\"onPlayerCards\", self, \"onPlayerCards\", [id])
 
 func onPlayerCards(cards, id):
-	var token = getPlayerToken(id)
-	if token:
-		var debugUi = token.get_node(\"DebugUi\")
+	var robot = getPlayerRobot(id)
+	if robot:
+		var debugUi = robot.get_node(\"DebugUi\")
 		debugUi.cardHand.modulate.a = 1
 		debugUi.showReadyButton(true)
 		debugUi.cardHand.setCards(cards)
@@ -538,7 +526,7 @@ func onReadyPressed(client):
 	else:
 		client.playerHand.buttonPressed()
 
-func getPlayerToken(id):
+func getPlayerRobot(id):
 	for player in get_tree().get_nodes_in_group(\"players\"):
 		if player.info.id == id:
 			return player
@@ -657,19 +645,19 @@ func _process(delta):
 func _input(event):
 	if Input.is_key_pressed(KEY_ENTER):
 		nextPhase()
-	var player = getPlayer()
-	if not player:
+	var robot = getRobot()
+	if not robot:
 		return
 	if Input.is_key_pressed(KEY_W):
-		player.moveAction(Player.FORWARD, 1).with(player).perform()
+		robot.moveAction(Robot.FORWARD, 1).with(robot).perform()
 	if Input.is_key_pressed(KEY_S):
-		player.moveAction(Player.BACKWARDS, 1).with(player).perform()
+		robot.moveAction(Robot.BACKWARDS, 1).with(robot).perform()
 	if Input.is_key_pressed(KEY_A):
-		player.rotateAction(Player.LEFT).with(player).perform()
+		robot.rotateAction(Robot.LEFT).with(robot).perform()
 	if Input.is_key_pressed(KEY_D):
-		player.rotateAction(Player.RIGHT).with(player).perform()
+		robot.rotateAction(Robot.RIGHT).with(robot).perform()
 	if Input.is_key_pressed(KEY_F):
-		player.shootAction().with(player).perform()
+		robot.shootAction().with(robot).perform()
 	if Input.is_key_pressed(KEY_RIGHT):
 		forwardGame()
 	if Input.is_key_pressed(KEY_KP_ADD):
@@ -677,7 +665,7 @@ func _input(event):
 	if Input.is_key_pressed(KEY_KP_SUBTRACT):
 		speedDown()
 
-func getPlayer():
+func getRobot():
 	if player != null:
 		return player
 	var players = get_tree().get_nodes_in_group(\"players\")

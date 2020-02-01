@@ -5,7 +5,7 @@
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=3]
 [ext_resource path="res://Assets/tank.png" type="Texture" id=4]
 [ext_resource path="res://Assets/icon_up.png" type="Texture" id=5]
-[ext_resource path="res://Scripts/Player.gd" type="Script" id=6]
+[ext_resource path="res://Scripts/Robot.gd" type="Script" id=6]
 [ext_resource path="res://Scripts/DraggableHand.gd" type="Script" id=7]
 [ext_resource path="res://Scenes/Game/PlayerCardLittle.tscn" type="PackedScene" id=8]
 

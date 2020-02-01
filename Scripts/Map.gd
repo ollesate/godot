@@ -106,7 +106,7 @@ func getBeltAction(step):
 				if belts.has(next):
 					var nextBelt = belts[next]
 					if nextBelt.rotate != 0:
-						actions.append(Player.rotateActionDur(nextBelt.rotate, 1.0).with(player))
+						actions.append(Robot.rotateActionDur(nextBelt.rotate, 1.0).with(player))
 						# actions.append(RotateAction.new(nextBelt.rotate, 1.0).with(player))
 				actions.append(BeltMove.new(belt).with(player))
 	return Parallell.new(actions)

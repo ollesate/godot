@@ -56,35 +56,35 @@ static func generate(nCards):
 
 static func createRotateLeft():
 	return Card.new(
-		Player.rotateAction(Player.LEFT), 
+		Robot.rotateAction(Robot.LEFT), 
 		"Rotate Left",
 		ROTATE
 	)
 
 static func createRotateRight():
 	return Card.new(
-		Player.rotateAction(Player.RIGHT), 
+		Robot.rotateAction(Robot.RIGHT), 
 		"Rotate Right",
 		ROTATE
 	)
 	
 static func createUturn():
 	return Card.new(
-		Player.rotateAction(Player.UTURN), 
+		Robot.rotateAction(Robot.UTURN), 
 		"U Turn",
 		ROTATE
 	)
 
 static func createMove(steps):
 	return MultiStepCard.new(
-		Player.moveAction(Player.FORWARD, steps), 
+		Robot.moveAction(Robot.FORWARD, steps), 
 		str("Move ", steps),
 		MOVE
 	)
 	
 static func createBackUp():
 	return MultiStepCard.new(
-		Player.moveAction(Player.BACKWARDS, 1),
+		Robot.moveAction(Robot.BACKWARDS, 1),
 		"Back Up",
 		MOVE
 	)
@@ -100,7 +100,7 @@ static func generateCard(randSeed):
 				0:
 					var stepActions = []
 					for step in range(steps):
-						stepActions.append(Player.moveStep(Player.FORWARD))
+						stepActions.append(Robot.moveStep(Robot.FORWARD))
 					return MultiStepCard.new(
 						Sequence.new(stepActions), 
 						str("Move forward ", steps, " steps"),
@@ -108,7 +108,7 @@ static func generateCard(randSeed):
 				1:
 					var stepActions = []
 					for step in range(steps):
-						stepActions.append(Player.moveStep(Player.BACKWARDS))
+						stepActions.append(Robot.moveStep(Robot.BACKWARDS))
 					return MultiStepCard.new(
 						Sequence.new(stepActions), 
 						str("Move backwards ", steps, " steps"),
@@ -118,29 +118,29 @@ static func generateCard(randSeed):
 			match(rotation):
 				0:
 					return Card.new(
-						Player.rotateAction(Player.LEFT), 
+						Robot.rotateAction(Robot.LEFT), 
 						"Rotate left",
 						ROTATE)
 				1:
 					return Card.new(
-						Player.rotateAction(Player.RIGHT), 
+						Robot.rotateAction(Robot.RIGHT), 
 						"Rotate right",
 						ROTATE)
 				2:
 					return Card.new(
-						Player.rotateAction(Player.UTURN), 
+						Robot.rotateAction(Robot.UTURN), 
 						"Rotate uturn",
 						ROTATE)
 
 static func moveAction(direction, steps):
 	var stepActions = []
 	for step in range(steps):
-		stepActions.append(Player.moveStep(direction))
+		stepActions.append(Robot.moveStep(direction))
 	var description
 	match(direction):
-		Player.FORWARD:
+		Robot.FORWARD:
 			description = str("Move backwards ", steps, " steps")
-		Player.BACKWARDS:
+		Robot.BACKWARDS:
 			description = str("Move backwards ", steps, " steps")
 			
 	return MultiStepCard.new(
@@ -193,7 +193,7 @@ class Card:
 		.finish()
 		emit_signal("cardFinished", self)
 
-	func onDestroyed(player):
+	func onDestroyed(robot):
 		character = null
 		
 	func act(delta):
