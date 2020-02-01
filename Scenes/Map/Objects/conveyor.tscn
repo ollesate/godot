@@ -1,7 +1,63 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Scripts/ConveyorBelt.gd" type="Script" id=1]
 [ext_resource path="res://Assets/2005TilesetA.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Area2D
+
+var steps = 1
+var rotate = 0
+var direction
+
+func start():
+	$Sprite.isDrawing = true
+	$Sprite.update()
+
+func stop():
+	$Sprite.isDrawing = false
+	$Sprite.update()
+
+func _init():
+	add_to_group(\"belts\")
+	
+func config(flipX, flipY, transpose):
+	$Sprite.flip_h = flipX if not transpose else flipY
+	$Sprite.flip_v = flipY if not transpose else flipX
+	if transpose:
+		$Sprite.scale.y = -1
+		$Sprite.rotate(deg2rad(90))
+
+func getAction():
+	return MovePlayer.new(self, Vector2(0, 0))
+
+func getPlayer():
+	for body in get_overlapping_bodies():
+		if (body.is_in_group(\"players\")):
+			return body
+	return null
+	
+class MovePlayer:
+	extends Action
+	
+	var action
+	var belt
+	var direction
+	
+	func _init(belt, direction):
+		self.belt = belt
+		self.direction = direction
+		
+	func act(delta):
+		.act(delta)
+		if (self.isFirstTime):
+			var player = belt.getPlayer()
+			if (player != null):
+				action = MoveStep.new(direction)
+				action.character = player
+			else:
+				action = Wait.new(0)
+		return action.act(delta)
+"
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
@@ -13,10 +69,11 @@ var isDrawing
 
 func _draw():
 	if isDrawing:
-		draw_rect(get_rect(), Color.red, false)"
+		draw_rect(get_rect(), Color.red, false)
+"
 
 [node name="Belt" type="Area2D"]
-script = ExtResource( 1 )
+script = SubResource( 3 )
 __meta__ = {
 "_edit_group_": true
 }

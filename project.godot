@@ -62,7 +62,7 @@ _global_script_classes=[ {
 "base": "Action",
 "class": "PlayerCard",
 "language": "GDScript",
-"path": "res://Scripts/playerCard.gd"
+"path": "res://Actions/playerCard.gd"
 }, {
 "base": "Reference",
 "class": "PlayerInfo",
@@ -77,7 +77,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Prefs",
 "language": "GDScript",
-"path": "res://Scripts/prefs.gd"
+"path": "res://Scripts/Utils/prefs.gd"
 }, {
 "base": "Action",
 "class": "RemoveAction",

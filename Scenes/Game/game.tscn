@@ -704,7 +704,8 @@ func nextPhase():
 		BELT:
 			gameboard.beltsMove()
 		LASER:
-			gameboard.lasersShoot()"
+			gameboard.lasersShoot()
+"
 
 [node name="Game" type="Control"]
 anchor_right = 1.0
