@@ -83,7 +83,8 @@ class TextureAnimation:
 			time = delay
 			currentFrame = (currentFrame + 1) % frames
 			textureRect.texture.region = Rect2(currentFrame * size.x, 0, size.x, size.y)
-			textureRect.update()"
+			textureRect.update()
+"
 
 [sub_resource type="DynamicFont" id=2]
 size = 72
@@ -111,6 +112,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 custom_constants/separation = 50
 script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Space1" type="Control" parent="."]
 margin_right = 1024.0
@@ -162,7 +166,6 @@ texture = SubResource( 5 )
 stretch_mode = 6
 
 [node name="Colors1" type="HBoxContainer" parent="."]
-editor/display_folded = true
 margin_left = 112.0
 margin_top = 1024.0
 margin_right = 912.0
@@ -210,7 +213,6 @@ expand = true
 stretch_mode = 6
 
 [node name="Colors2" type="HBoxContainer" parent="."]
-editor/display_folded = true
 margin_left = 112.0
 margin_top = 1224.0
 margin_right = 912.0

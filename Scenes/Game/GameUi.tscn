@@ -121,6 +121,9 @@ margin_right = 1024.0
 margin_bottom = 576.0
 mouse_filter = 2
 script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Header" type="VBoxContainer" parent="."]
 anchor_left = 0.5

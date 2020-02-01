@@ -27,7 +27,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "CardDeck",
 "language": "GDScript",
-"path": "res://deck.gd"
+"path": "res://Scripts/Utils/CardDeck.gd"
 }, {
 "base": "Reference",
 "class": "Cards",
@@ -52,7 +52,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "Network",
 "language": "GDScript",
-"path": "res://Network.gd"
+"path": "res://Scripts/Network.gd"
 }, {
 "base": "CompositeAction",
 "class": "Parallell",
@@ -62,17 +62,17 @@ _global_script_classes=[ {
 "base": "KinematicBody2D",
 "class": "Player",
 "language": "GDScript",
-"path": "res://Player.gd"
+"path": "res://Scripts/Player.gd"
 }, {
 "base": "Action",
 "class": "PlayerCard",
 "language": "GDScript",
-"path": "res://playerCard.gd"
+"path": "res://Scripts/playerCard.gd"
 }, {
 "base": "Reference",
 "class": "PlayerInfo",
 "language": "GDScript",
-"path": "res://playerInfo.gd"
+"path": "res://Scripts/playerInfo.gd"
 }, {
 "base": "Card",
 "class": "PlayerMove",
@@ -82,7 +82,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Prefs",
 "language": "GDScript",
-"path": "res://prefs.gd"
+"path": "res://Scripts/prefs.gd"
 }, {
 "base": "Action",
 "class": "RemoveAction",
@@ -102,7 +102,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "ScreenUtils",
 "language": "GDScript",
-"path": "res://screenUtils.gd"
+"path": "res://Scripts/Utils/screenUtils.gd"
 }, {
 "base": "Action",
 "class": "Sequence",
@@ -112,7 +112,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Tiles",
 "language": "GDScript",
-"path": "res://tiles.gd"
+"path": "res://Scripts/tiles.gd"
 }, {
 "base": "Control",
 "class": "UiCard",
@@ -152,8 +152,8 @@ _global_script_class_icons={
 
 [application]
 
-run/main_scene="res://Scenes/Game/game.tscn"
+run/main_scene="res://Scenes/Game/Game.tscn"
 
 [autoload]
 
-Global="*res://global.gd"
+Global="*res://Scripts/Utils/Global.gd"

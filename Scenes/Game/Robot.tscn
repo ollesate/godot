@@ -1,13 +1,13 @@
 [gd_scene load_steps=15 format=2]
 
-[ext_resource path="res://Player.gd" type="Script" id=1]
-[ext_resource path="res://Assets/tank.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=2]
 [ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=3]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=4]
-[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=5]
-[ext_resource path="res://Assets/icon_up.png" type="Texture" id=6]
-[ext_resource path="res://Scenes/Game/DraggableHand.gd" type="Script" id=7]
-[ext_resource path="res://PlayerCardLittle.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Assets/tank.png" type="Texture" id=4]
+[ext_resource path="res://Assets/icon_up.png" type="Texture" id=5]
+[ext_resource path="res://Scripts/Player.gd" type="Script" id=6]
+[ext_resource path="res://Scripts/DraggableHand.gd" type="Script" id=7]
+[ext_resource path="res://Scenes/Game/PlayerCardLittle.tscn" type="PackedScene" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Sprite
@@ -30,7 +30,7 @@ extents = Vector2( 24.5806, 24.6522 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 20
-font_data = ExtResource( 5 )
+font_data = ExtResource( 1 )
 
 [sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0.309804, 0.564706, 0.14902, 1 )
@@ -41,7 +41,7 @@ corner_radius_bottom_left = 3
 
 [sub_resource type="DynamicFont" id=5]
 size = 22
-font_data = ExtResource( 5 )
+font_data = ExtResource( 1 )
 
 [sub_resource type="GDScript" id=6]
 script/source = "extends Control
@@ -76,11 +76,11 @@ func showReadyButton(visible):
 
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 96, 128 )
-script = ExtResource( 1 )
+script = ExtResource( 6 )
 
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 2, 2 )
-texture = ExtResource( 2 )
+texture = ExtResource( 4 )
 hframes = 10
 region_rect = Rect2( 0, 0, 32, 32 )
 script = SubResource( 1 )
@@ -110,7 +110,7 @@ rect_pivot_offset = Vector2( 198, 0 )
 max_value = 9.0
 value = 9.0
 texture_under = ExtResource( 3 )
-texture_progress = ExtResource( 4 )
+texture_progress = ExtResource( 2 )
 
 [node name="Cards" type="VBoxContainer" parent="UI"]
 visible = false
@@ -181,7 +181,7 @@ margin_right = 8.0
 margin_bottom = 15.0
 rect_min_size = Vector2( 16, 16 )
 rect_pivot_offset = Vector2( 8, 15 )
-texture = ExtResource( 6 )
+texture = ExtResource( 5 )
 expand = true
 stretch_mode = 6
 
@@ -213,6 +213,8 @@ text = "Ready"
 
 [node name="CardHand" type="Control" parent="DebugUi"]
 script = ExtResource( 7 )
+locked = false
+hpLeft = 5
 
 [node name="PlayerCard1" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 

@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://player_hand.gd" type="Script" id=1]
-[ext_resource path="res://PlayerHand/PlayerCard.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Scripts/player_hand.gd" type="Script" id=2]
+[ext_resource path="res://PlayerHand/PlayerCard.tscn" type="PackedScene" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "tool
@@ -87,15 +87,16 @@ func cardStarted(cardInfo):
 func cardFinished(cardInfo):
 	$CardHand.unselectCard(cardInfo)
 	
-	"
+	
+"
 
 [sub_resource type="DynamicFont" id=2]
 size = 55
-font_data = ExtResource( 3 )
+font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 40
-font_data = ExtResource( 3 )
+font_data = ExtResource( 1 )
 
 [node name="PlayerHand" type="Control"]
 anchor_right = 1.0
@@ -107,66 +108,67 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 16.0
 margin_bottom = -7.0
-script = ExtResource( 1 )
+script = ExtResource( 2 )
+locked = false
 hpLeft = 10
 
-[node name="PlayerCard" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 64.0
 margin_right = -72.0
 margin_bottom = 184.0
 
-[node name="PlayerCard2" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard2" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 218.0
 margin_right = -72.0
 margin_bottom = 338.0
 
-[node name="PlayerCard3" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard3" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 378.0
 margin_right = -72.0
 margin_bottom = 498.0
 
-[node name="PlayerCard4" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard4" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 531.0
 margin_right = -72.0
 margin_bottom = 651.0
 
-[node name="PlayerCard5" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard5" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 691.0
 margin_right = -72.0
 margin_bottom = 811.0
 
-[node name="PlayerCard7" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard7" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 851.0
 margin_right = -72.0
 margin_bottom = 971.0
 
-[node name="PlayerCard9" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard9" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 1011.0
 margin_right = -72.0
 margin_bottom = 1131.0
 
-[node name="PlayerCard6" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard6" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 1162.0
 margin_right = -72.0
 margin_bottom = 1282.0
 
-[node name="PlayerCard8" parent="CardHand" instance=ExtResource( 2 )]
+[node name="PlayerCard8" parent="CardHand" instance=ExtResource( 3 )]
 anchor_right = 1.0
 margin_left = 128.0
 margin_top = 1328.0

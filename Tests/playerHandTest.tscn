@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://player_hand.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Player/PlayerHand.tscn" type="PackedScene" id=1]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -26,12 +26,16 @@ func _ready():
 		$PlayerHand.cardFinished(info)
 		yield(Actions.wait(0.5).perform(), \"finished\")
 	$PlayerHand.setLocked(false)
-	$PlayerHand.setPlayerCards(infos)"
+	$PlayerHand.setPlayerCards(infos)
+"
 
 [node name="Test" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_bottom = 1320.0
 script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="PlayerHand" parent="." instance=ExtResource( 1 )]

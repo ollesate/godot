@@ -1,10 +1,9 @@
 [gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://Scenes/Game/ViewportTarget.gd" type="Script" id=1]
+[ext_resource path="res://Assets/new_dynamicfont.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Scenes/BaseMap.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=4]
-[ext_resource path="res://new_dynamicfont.tres" type="DynamicFont" id=5]
+[ext_resource path="res://Scenes/Game/GameUi.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scenes/Map/BaseMap.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -178,6 +177,17 @@ func prioritySort(a, b):
 "
 
 [sub_resource type="GDScript" id=2]
+script/source = "tool
+extends Node
+
+export(NodePath) var target
+
+func _ready():
+	if not Engine.editor_hint:
+		ScreenUtils.viewportFromControl(get_node(target))
+"
+
+[sub_resource type="GDScript" id=3]
 script/source = "extends Control
 
 var playerInfos = []
@@ -314,14 +324,14 @@ func beltPushPlayerIntoHole():
 func spawnPlayer(info):
 	if players.has(info):
 		return
-	var player = preload(\"res://Scenes/Game/Player.tscn\").instance()
-	player.connect(\"onDestroyed\", self, \"onPlayerDestroyed\")
-	player.connect(\"onHit\", self, \"onPlayerHit\")
-	add_child(player)
-	player.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
-	players[info] = player
-	player.info = info
-	emit_signal(\"onPlayerTokenSpawned\", player)
+	var robot = preload(\"res://Scenes/Game/Robot.tscn\").instance()
+	robot.connect(\"onDestroyed\", self, \"onPlayerDestroyed\")
+	robot.connect(\"onHit\", self, \"onPlayerHit\")
+	add_child(robot)
+	robot.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
+	players[info] = robot
+	robot.info = info
+	emit_signal(\"onPlayerTokenSpawned\", robot)
 
 func onPlayerDestroyed(player):
 	var index = players.values().find(player)
@@ -361,14 +371,14 @@ func pause():
 	get_tree().paused = true
 "
 
-[sub_resource type="StyleBoxFlat" id=3]
+[sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0, 0, 0, 0.596078 )
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=5]
 script/source = "extends PanelContainer
 
 onready var addPlayerButton: Button = $Margin/VBox/HBox/AddPlayerButton
-var playerScene = preload(\"res://Scenes/Client/PlayerScene.tscn\")
+var playerScene = preload(\"res://Scenes/Player/PlayerGame.tscn\")
 
 onready var gameBoard = $\"/root/Game/GameBoard\"
 
@@ -430,9 +440,10 @@ func getPlayerClient(id):
 func onPlayerReadyPressed(token):
 	for client in get_tree().get_nodes_in_group(\"clients\"):
 		if client.get_node(\"Network\").id == token.info.id:
-			client.lobby.onButtonPressed()"
+			client.lobby.onButtonPressed()
+"
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Control
 
 var outlines = {}
@@ -497,7 +508,7 @@ func _gui_input(event):
 					LiveEditor.editScript(node.get_script())
 					return"
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Node2D
 
 func _ready():
@@ -505,7 +516,7 @@ func _ready():
 	for client in get_tree().get_nodes_in_group(\"clients\"):
 		client.connectTo(\"localhost\")"
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=8]
 script/source = "extends Node2D
 
 const TOAST_DURATION = 0.5
@@ -602,7 +613,7 @@ __meta__ = {
 }
 
 [node name="ViewportTarget" type="Node" parent="."]
-script = ExtResource( 1 )
+script = SubResource( 2 )
 target = NodePath("../GameBoard/Map")
 
 [node name="Network" parent="." instance=ExtResource( 2 )]
@@ -611,13 +622,13 @@ isServer = true
 [node name="GameBoard" type="Control" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 2 )
+script = SubResource( 3 )
 
-[node name="Map" parent="GameBoard" instance=ExtResource( 3 )]
+[node name="Map" parent="GameBoard" instance=ExtResource( 4 )]
 margin_right = 975.0
 margin_bottom = 750.0
 
-[node name="Ui" parent="GameBoard" instance=ExtResource( 4 )]
+[node name="Ui" parent="GameBoard" instance=ExtResource( 3 )]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 0.663452
@@ -629,8 +640,8 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -83.0
-custom_styles/panel = SubResource( 3 )
-script = SubResource( 4 )
+custom_styles/panel = SubResource( 4 )
+script = SubResource( 5 )
 
 [node name="Margin" type="MarginContainer" parent="DebugOptions"]
 margin_right = 1024.0
@@ -646,7 +657,7 @@ margin_bottom = 67.0
 [node name="Title" type="Label" parent="DebugOptions/Margin/VBox"]
 margin_right = 1024.0
 margin_bottom = 27.0
-custom_fonts/font = ExtResource( 5 )
+custom_fonts/font = ExtResource( 1 )
 text = "Debug Options"
 align = 1
 valign = 1
@@ -669,13 +680,13 @@ text = "Add player"
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 5 )
+script = SubResource( 6 )
 
 [node name="InstaConnect" type="Node2D" parent="Debug"]
 visible = false
 scale = Vector2( 0.2, 0.2 )
 z_index = 3
-script = SubResource( 6 )
+script = SubResource( 7 )
 
 [node name="DebugController" type="Node2D" parent="Debug"]
-script = SubResource( 7 )
+script = SubResource( 8 )

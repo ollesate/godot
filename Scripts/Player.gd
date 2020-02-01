@@ -182,7 +182,7 @@ class Shoot:
 
 	func start():
 		# Shoot and wait for it to hit something...
-		var bullet = preload("res://Game/Bullet.tscn").instance()
+		var bullet = preload("res://Scenes/Game/Bullet.tscn").instance()
 		bullet.playerOwner = self.character
 		bullet.position = Vector2.ZERO
 		print(bullet.position)
