@@ -6,7 +6,8 @@ script/source = "extends Node2D
 var index
 
 func _ready():
-	add_to_group(\"spawns\")"
+	add_to_group(\"spawns\")
+"
 
 [node name="SpawnPoint" type="Node2D"]
 script = SubResource( 1 )

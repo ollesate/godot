@@ -53,6 +53,7 @@ onready var cardHand = $CardHand
 
 func _ready():
 	$ReadyButton.connect(\"pressed\", self, \"onReadyPressed\")
+	showUi(false)
 
 func onReadyPressed():
 	emit_signal(\"onReadyPressed\")
@@ -72,7 +73,8 @@ func toggleUi():
 	showUi(!showUi)
 
 func showReadyButton(visible):
-	$ReadyButton.visible = visible"
+	$ReadyButton.visible = visible
+"
 
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 96, 128 )
@@ -97,6 +99,9 @@ margin_left = -1.09278e-06
 margin_top = 25.0
 margin_right = -1.09278e-06
 margin_bottom = 25.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="HP" type="TextureProgress" parent="UI"]
 anchor_left = 0.5
@@ -217,35 +222,44 @@ locked = false
 hpLeft = 5
 
 [node name="PlayerCard1" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
+state = 0
 
 [node name="PlayerCard2" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = -25.336
 margin_bottom = -5.33595
+state = 0
 
 [node name="PlayerCard3" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = -2.29744
 margin_bottom = 17.7026
+state = 0
 
 [node name="PlayerCard4" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 19.9466
 margin_bottom = 39.9466
+state = 0
 
 [node name="PlayerCard5" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 42.1907
 margin_bottom = 62.1907
+state = 0
 
 [node name="PlayerCard6" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 65.2292
 margin_bottom = 85.2292
+state = 0
 
 [node name="PlayerCard7" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 64.4348
 margin_bottom = 84.4348
+state = 0
 
 [node name="PlayerCard8" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 87.0761
 margin_bottom = 107.076
+state = 0
 
 [node name="PlayerCard9" parent="DebugUi/CardHand" instance=ExtResource( 8 )]
 margin_top = 110.512
 margin_bottom = 130.512
+state = 0

@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Game/GameBoard.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/ViewportTarget.gd" type="Script" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _ready():
+	$GameBoard/Ui.visible = false
+	test1()
+
+func test1():
+	var info = PlayerInfo.new(1, \"Olof\", Color.white)
+	
+	var turns = [
+		[{\"playerInfo\": info, \"card\": Cards.createMove(2)}],
+		[{\"playerInfo\": info, \"card\": Cards.createMove(2)}],
+	]
+	
+	$GameBoard.addPlayer(info)
+	$GameBoard.simulateGame(turns)
+"
+
+[node name="Test" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ViewportTarget" type="Node" parent="."]
+script = ExtResource( 2 )
+target = NodePath("../GameBoard/Map")
+
+[node name="GameBoard" parent="." instance=ExtResource( 1 )]
+
+[node name="Map" parent="GameBoard" index="0"]
+margin_right = 825.0
+margin_bottom = 450.0
+rect_min_size = Vector2( 825, 450 )
+map = "TestMap"
+[connection signal="item_rect_changed" from="GameBoard/Map" to="ViewportTarget" method="_on_Map_item_rect_changed"]
+
+[editable path="GameBoard"]

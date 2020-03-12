@@ -1,26 +1,26 @@
 tool
 extends Control
 
-const DIZZY_HIGHWAY = "DizzyHighway"
-
-const maps = [
-	preload("res://Scenes/Map/Levels/DizzyHighway.tscn")
-]
+const maps = {
+	"DizzyHighway": preload("res://Scenes/Map/Levels/DizzyHighway.tscn"),
+	"TestMap": preload("res://Scenes/Map/Levels/TestMap.tscn"),
+}
 
 var currentMap = null
-export(String, "DizzyHighway", "Other") var map = "DizzyHighway" setget setMap
+export(String, "DizzyHighway", "TestMap") var map = "DizzyHighway" setget setMap
 
 func setMap(newMap):
-	print("setMap", newMap)
+	print("setMap ", newMap)
 	map = newMap
 	if get_child_count() > 0:
 		remove_child(get_child(0))
-	match map:
-		DIZZY_HIGHWAY:
-			var map = maps[0].instance()
-			currentMap = map
-			add_child(map)
-			rect_min_size = getMapSize(map)
+	var mapScene = maps[map]
+	if mapScene:
+		var mapInstance = mapScene.instance()
+		currentMap = mapInstance
+		add_child(mapInstance)
+		rect_min_size = getMapSize(mapInstance)
+		rect_size = rect_min_size
 
 func getMapSize(map):
 	var background: TileMap = null

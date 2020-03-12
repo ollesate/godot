@@ -1,11 +1,8 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Assets/new_dynamicfont.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Scenes/Network.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Assets/Readiness-Regular.ttf" type="DynamicFontData" id=3]
-[ext_resource path="res://Scenes/Map/BaseMap.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Assets/lifebar_fill.png" type="Texture" id=5]
-[ext_resource path="res://Assets/lifebar_bg.png" type="Texture" id=6]
+[ext_resource path="res://Scenes/Game/GameBoard.tscn" type="PackedScene" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
@@ -189,294 +186,10 @@ func _ready():
 		ScreenUtils.viewportFromControl(get_node(target))
 "
 
-[sub_resource type="GDScript" id=3]
-script/source = "extends Control
-
-var playerInfos = []
-var spawnPoints = {}
-var robots = {}
-var checkpoints = {}
-
-signal lasersEnd()
-signal onPhaseStart()
-signal onTurnStart()
-signal onPlayerWon()
-signal onRobotHpChanged()
-signal onRobotSpawned()
-
-func simulateGame(turns):
-	var cardTurns = []
-	for turn in turns:
-		var cardTurn = []
-		for action in turn:
-			action.card.with(robots[action.playerInfo])
-			cardTurn.append(action.card)
-		cardTurns.append(cardTurn)
-	turns = cardTurns
-	
-	for i in range(turns.size()):
-		var turn = turns[i]
-		emit_signal(\"onTurnStart\", i + 1)
-		print(\"Players act\")
-		yield(playersAct(turn), \"completed\")
-		print(\"Lasers shoot\")
-		emit_signal(\"onPhaseStart\", \"Lasers shoot\")
-		yield(lasersShoot(), \"completed\")
-		yield(Actions.wait(2).perform(), \"finished\")
-		print(\"Belts move\")
-		emit_signal(\"onPhaseStart\", \"Belts move\")
-		yield(Actions.wait(2).perform(), \"finished\")
-		yield(beltsMove(), \"completed\")
-
-	# Spawn players again
-	for playerInfo in playerInfos:
-		spawnRobot(playerInfo)
-
-func playersAct(turn):	
-	for card in turn:
-		card.perform()
-		if card.type == Cards.MOVE:
-			var finished = false
-			while(not finished and card.character != null):
-				finished = yield(card, \"stepFinished\") == 0
-				yield(getRobotsFallAction().perform(), \"finished\")
-			saveCheckpointsIfPossible()
-			yield(syncPositions().perform(), \"finished\")
-		else:
-			yield(card, \"finished\")
-
-	emit_signal(\"onPhaseStart\", \"Players fire\")
-	yield(Actions.wait(2).perform(), \"finished\")
-	var shootActions = []
-	for robot in robots.values():
-		shootActions.append(Robot.shootAction().with(robot))
-	yield(Parallell.new(shootActions).perform(), \"finished\")
-	yield(Actions.wait(1).perform(), \"finished\")
-
-func lasersShoot():
-	var lasers = get_tree().get_nodes_in_group(\"lasers\")
-	for laser in lasers:
-		laser.shoot()
-	for laser in lasers:
-		yield(laser, \"finished\")
-	yield(Actions.wait(0.25).perform(), \"finished\")
-
-func saveCheckpointsIfPossible():
-	for info in robots.keys():
-		var robot = robots[info] if robots.has(info) else null
-		if not robot: # Player might have died
-			continue
-			
-		var checkpoint = $Map.getCheckpoint(robot)
-		if not checkpoint: # Check if player is on a cp
-			continue
-			
-		print(\"on checkpoint\")
-		var currentCheckpointNo = checkpoints[info].number if checkpoints.has(info) else 0
-		if checkpoint.number - currentCheckpointNo != 1:
-			continue # not next checkpoint...
-
-		if currentCheckpointNo != 0: # Remove old if not first
-			checkpoint.remove(info)
-		checkpoints[info] = checkpoint
-		checkpoint.touch(info)
-		
-		var nextCheckpoint = $Map.getCheckpointIndexed(checkpoint.number + 1)
-		if nextCheckpoint:
-			nextCheckpoint.setNext()
-		else: # There's no next cp so this player won
-			emit_signal(\"onPlayerWon\", info)
-
-func beltsMove():
-	for i in range(1, 3):
-		var beltAction = $Map.getBeltAction(i)
-		yield(beltAction.perform(), \"finished\")
-		yield(getRobotsFallAction().perform(), \"finished\")
-	saveCheckpointsIfPossible()
-	yield(syncPositions().perform(), \"finished\")
-
-func syncPositions():
-	var actions = []
-	for robot in robots.values():
-		var pos = robot.position
-		var adjustedPos = $Map.getWorldPos(robot)
-		var action = Actions.moveTo(pos, adjustedPos).with(robot)
-		if adjustedPos != robot.position:
-			actions.append(action)
-	return Parallell.new(actions)
-
-func getRobotsFallAction():
-	var fallingActions = []
-	for fallingRobot in $Map.getPlayersInHole():
-		fallingActions.append(Robot.fallAction().with(fallingRobot))
-	return Parallell.new(fallingActions)
-
-func spawnRobot(info):
-	if robots.has(info):
-		return
-	var robot = preload(\"res://Scenes/Game/Robot.tscn\").instance()
-	robot.connect(\"onDestroyed\", self, \"onRobotDestroyed\")
-	robot.connect(\"onHit\", self, \"onRobotHit\")
-	add_child(robot)
-	robot.position = checkpoints[info].position if checkpoints.has(info) else spawnPoints[info].position
-	robots[info] = robot
-	robot.info = info
-	emit_signal(\"onRobotSpawned\", robot)
-
-func onRobotDestroyed(robot):
-	var index = robots.values().find(robot)
-	for info in robots.keys():
-		if robot == robots[info]:
-			robots.erase(info)
-
-func onRobotHit(robot):
-	for info in robots.keys():
-		if robot == robots[info]:
-			emit_signal(\"onPlayerHpChanged\", info, robot.currentHp)
-
-func addPlayer(info):
-	var spawnPoint = $Map.getSpawn(playerInfos.size())
-	playerInfos.append(info)
-	spawnPoints[info] = spawnPoint
-	spawnRobot(info)
-
-func removePlayer(info):
-	playerInfos.erase(info)
-	spawnPoints.erase(info)
-	var robot = robots[info]
-	robots.erase(info)
-	remove_child(robot)
-
-func onPlayerReady(info):
-	robots[info].setReady(true)
-	
-func onPlayerUnready(info):
-	robots[info].setReady(false)
-
-func updatePlayerInfo(info):
-	robots[info].playerName = info.name
-	robots[info].color = info.color
-
-func pause():
-	get_tree().paused = true
-"
-
-[sub_resource type="GDScript" id=10]
-script/source = "extends Control
-
-signal countdownFinished()
-
-var finished = false
-
-func _ready():
-	$Header/Progress.connect(\"finished\", self, \"countdownFinished\")
-	$Toast.hide()
-
-func startCountdown(time):
-	finished = false
-	$Header/Progress.start(time)
-
-func countdownFinished():
-	finished = true
-	emit_signal(\"countdownFinished\")
-
-func showSmallToast(text, duration):
-	$SmallToast.showToast(text, duration)
-
-func showToast(text, duration):
-	$Toast.show()
-	$Toast.modulate.a = 1
-	$Toast.text = text
-	var from = $Toast.modulate
-	var to = from
-	to.a = 0
-	$Toast/Tween.interpolate_property($Toast, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
-	$Toast/Tween.start()
-"
-
-[sub_resource type="StyleBoxFlat" id=11]
-bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )
-border_color = Color( 1, 1, 1, 1 )
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="DynamicFont" id=12]
-size = 32
-font_data = ExtResource( 3 )
-
-[sub_resource type="DynamicFont" id=4]
-size = 18
-font_data = ExtResource( 3 )
-
-[sub_resource type="GDScript" id=5]
-script/source = "extends TextureProgress
-
-signal finished()
-
-var duration
-var startDuration
-var started
-
-func start(duration):
-	startDuration = duration
-	self.duration = duration
-	started = true
-	
-func _process(delta):
-	if !started:
-		return
-	value = duration / startDuration * 100
-	duration -= delta
-	if duration < 0:
-		emit_signal(\"finished\")
-		started = false"
-
-[sub_resource type="DynamicFont" id=6]
-size = 40
-font_data = ExtResource( 3 )
-
-[sub_resource type="StyleBoxFlat" id=7]
-bg_color = Color( 0.431373, 0.431373, 0.431373, 1 )
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-expand_margin_left = 16.0
-expand_margin_right = 16.0
-expand_margin_top = 16.0
-expand_margin_bottom = 16.0
-
-[sub_resource type="DynamicFont" id=8]
-size = 14
-font_data = ExtResource( 3 )
-
-[sub_resource type="GDScript" id=9]
-script/source = "extends Label
-
-const DURATION = 0.5
-
-func _ready():
-	hide()
-
-func showToast(text, duration = DURATION):
-	show()
-	modulate.a = 1
-	self.text = str(text)
-	var from = modulate
-	var to = from
-	to.a = 0
-	print(\"from \", from)
-	print(\"to \", to)
-	print(\"duration \", duration)
-	$Tween.interpolate_property(self, \"modulate\", from, to, duration, Tween.TRANS_QUAD, Tween.EASE_IN)
-	$Tween.start()"
-
-[sub_resource type="StyleBoxFlat" id=13]
+[sub_resource type="StyleBoxFlat" id=3]
 bg_color = Color( 0, 0, 0, 0.596078 )
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=4]
 script/source = "extends PanelContainer
 
 onready var addPlayerButton: Button = $Margin/VBox/HBox/AddPlayerButton
@@ -545,7 +258,7 @@ func onPlayerReadyPressed(token):
 			client.lobby.onButtonPressed()
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Control
 
 var outlines = {}
@@ -610,7 +323,7 @@ func _gui_input(event):
 					LiveEditor.editScript(node.get_script())
 					return"
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Node2D
 
 func _ready():
@@ -618,7 +331,7 @@ func _ready():
 	for client in get_tree().get_nodes_in_group(\"clients\"):
 		client.connectTo(\"localhost\")"
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Node2D
 
 const TOAST_DURATION = 0.5
@@ -722,121 +435,15 @@ target = NodePath("../GameBoard/Map")
 [node name="Network" parent="." instance=ExtResource( 2 )]
 isServer = true
 
-[node name="GameBoard" type="Control" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-script = SubResource( 3 )
-
-[node name="Map" parent="GameBoard" instance=ExtResource( 4 )]
-margin_right = 975.0
-margin_bottom = 750.0
-
-[node name="Ui" type="Control" parent="GameBoard"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 0.663452
-margin_right = 0.663452
-mouse_filter = 2
-script = SubResource( 10 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Header" type="VBoxContainer" parent="GameBoard/Ui"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -294.0
-margin_top = 18.0
-margin_right = 294.0
-margin_bottom = 89.0
-
-[node name="Title" type="Label" parent="GameBoard/Ui/Header"]
-modulate = Color( 1, 1, 1, 0.752941 )
-margin_right = 588.0
-margin_bottom = 43.0
-custom_styles/normal = SubResource( 11 )
-custom_fonts/font = SubResource( 12 )
-text = "Card 1"
-align = 1
-
-[node name="Subtitle" type="Label" parent="GameBoard/Ui/Header"]
-margin_top = 47.0
-margin_right = 588.0
-margin_bottom = 71.0
-custom_fonts/font = SubResource( 4 )
-text = "Anna's turn: Rotate Right, 120"
-align = 1
-
-[node name="Progress" type="TextureProgress" parent="GameBoard/Ui/Header"]
-margin_top = 75.0
-margin_right = 588.0
-margin_bottom = 110.0
-rect_min_size = Vector2( 200, 35 )
-step = 0.0
-texture_under = ExtResource( 6 )
-texture_progress = ExtResource( 5 )
-nine_patch_stretch = true
-stretch_margin_left = 100
-stretch_margin_right = 100
-script = SubResource( 5 )
-
-[node name="Toast" type="Label" parent="GameBoard/Ui"]
-modulate = Color( 1, 1, 1, 0.752941 )
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -250.0
-margin_top = -26.5
-margin_right = 250.0
-margin_bottom = 26.5
-rect_min_size = Vector2( 500, 0 )
-custom_fonts/font = SubResource( 6 )
-text = "Phase: Lasers"
-align = 1
-
-[node name="Panel" type="Panel" parent="GameBoard/Ui/Toast"]
-show_behind_parent = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-rect_min_size = Vector2( 0.1, 0 )
-custom_styles/panel = SubResource( 7 )
-
-[node name="Tween" type="Tween" parent="GameBoard/Ui/Toast"]
-
-[node name="SmallToast" type="Label" parent="GameBoard/Ui"]
-modulate = Color( 1, 1, 1, 0.752941 )
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = 388.0
-margin_top = -213.0
-margin_right = 399.0
-margin_bottom = -194.0
-rect_min_size = Vector2( 20, 0 )
-custom_fonts/font = SubResource( 8 )
-text = "+1"
-align = 1
-script = SubResource( 9 )
-
-[node name="Panel" type="Panel" parent="GameBoard/Ui/SmallToast"]
-show_behind_parent = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-custom_styles/panel = SubResource( 7 )
-
-[node name="Tween" type="Tween" parent="GameBoard/Ui/SmallToast"]
+[node name="GameBoard" parent="." instance=ExtResource( 3 )]
 
 [node name="DebugOptions" type="PanelContainer" parent="."]
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -83.0
-custom_styles/panel = SubResource( 13 )
-script = SubResource( 14 )
+custom_styles/panel = SubResource( 3 )
+script = SubResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -878,13 +485,13 @@ text = "Add player"
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 15 )
+script = SubResource( 5 )
 
 [node name="InstaConnect" type="Node2D" parent="Debug"]
 visible = false
 scale = Vector2( 0.2, 0.2 )
 z_index = 3
-script = SubResource( 16 )
+script = SubResource( 6 )
 
 [node name="DebugController" type="Node2D" parent="Debug"]
-script = SubResource( 17 )
+script = SubResource( 7 )
